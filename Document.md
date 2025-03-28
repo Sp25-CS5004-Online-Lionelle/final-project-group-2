@@ -28,11 +28,11 @@ Jobs *.. JobFilters: uses
 Jobs *.. JobSorts: uses
 Jobs *.. DataFormatters: uses
 Jobs *.. NetUtils: uses
+
 class Main{
 <<driver>>
-argument parsing is being moved to this class. I'll have the driver decide which controller to use through the
-command line arguments. A new command line argument -c for console or -g gui will be added. if none is provided
-we will default to gui.
+This will be the main driver for the entire program. Command-line argument parsing
+will happen here and we will also select our controller.
 ------------------------------------------------
 + DNInfoApp()
 + getParsedArgs(String[]):HashMap~String, String~
@@ -42,15 +42,16 @@ we will default to gui.
 namespace view {
 class IView {
 <<Interface>>
-This will serve as an Interface for our view.Defining this correctly early on will allow the team to easily interact and 
-code simultaneously. We suspect that we will only need the argument `addFeatures` which will take the controller and map"
-the appropriate functions.
+This will serve as an interface for our view. Defining it correctly early on will enable the 
+team to interact and code seamlessly. We anticipate needing only the **addFeatures** argument, 
+which will take the controller and map the appropriate functions.
 + addFeatures(IControler): void
 }
 class MainView {
-Main view will serve as a base plate for all views. It will incorporate FindJobView and SaveJobsView as tabs. Additionally,
-all pane logic will mapped to the task bar on the main page which includes but is not limited to download data, and light
-and dark mode
+The main view will serve as a base platform for all other views. It will incorporate 
+**FindJobView** and **SaveJobsView** as tabs. Additionally, all pane logic will be mapped 
+to the taskbar on the main page, including but not limited to data downloads and light/dark 
+mode toggling.
 ---------------------------------------------------------------------------------------------------------------------------
 - FindJobView findJob
 - SavedJobsView savedJobs
@@ -58,22 +59,22 @@ and dark mode
 + getSavedJobsView() : FindJobView
 }
 class FindJobView {
-This show will reach out to an api and find relevant Jobs given a clients query. From here, the user will be able to
-view and save the like. Upon saving, the user must rate there job and provide a comment at every save.
+This view will connect to an API to find relevant jobs based on a client's query. From there, the user will be able to view
+and save jobs they like. Upon saving, the user must rate the job and provide a comment for each save.
 }
 class SavedJobsView {
 
-["This will show all saved Jobs that were found in the FindJobView. On this page, users will be able to view current 
-jobs they have saved, edit them, and delete them . When clients views a job, we will also conduct an API call that 
-will grab related skill to the job. Download will be an pane"]
--
+This view will display all jobs saved from the **FindJobView**. On this page, users can view, edit, and delete their saved jobs.
+When a user views a job, an API call will be made to fetch related skills for that job. The download feature will be available as 
+a pane.
 
 }
 }
 namespace Controller {
 class IController {
 <<Interface>>
-I controller will have three main arguments setView, setModel, and run. This will only be inherited by MainController.
+The controller will have three main arguments: **setView**, **setModel**, and **run**. These will only be inherited by 
+**MainController**.
 + setView(IView): void
 + setModel(IModel): void
 + getView(): IView
@@ -105,18 +106,6 @@ class Jobs {
 + getSavedJobs(str, str): list<~jobRecord~>
 + getSavedJobs(str, str, str): list<~jobRecord~>
 + jobRecord(str, str, str)
-}
-class Jobs {
-- dbFile: str
-+ searchJob(str): list<jobRecord>
-+ addJobs(jobRecord)
-+ removeJob(str)
-+ getSavedJobs() : list<~jobRecord~>
-+ getSavedJobs(str): list<~jobRecord~>
-+ getSavedJobs(str, str): list<~jobRecord~>
-+ getSavedJobs(str, str, str): list<~jobRecord~>
-+ jobRecord(str, str, str)
-+ downloadJobs(str)
 }
 class JobFilters {
 Filtering logic
