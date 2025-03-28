@@ -3,10 +3,14 @@ package skillzhunter.view;
 import java.awt.Container;
 
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import skillzhunter.controler.IController;
+
 
 public class MainView extends JFrame implements IView {
 
@@ -31,15 +35,39 @@ public class MainView extends JFrame implements IView {
         mainPane = this.getContentPane();
         tabbedPane = new JTabbedPane();
         
-        JPanel panel1 = new JPanel();
-        JPanel panel2 = new JPanel();
-
-        tabbedPane.add("Panel 1", panel1);
-        tabbedPane.add("Panel 2", panel2);
-
+        // Adding Panels
+        JPanel panel1 = new SavedJobView();
+        JPanel panel2 = new FindJobView();
+        tabbedPane.add("Saved Jobs", panel1);
+        tabbedPane.add("Find Jobs", panel2);
         mainPane.add(tabbedPane);
+        
+
+        // Adding menue bar
+        JMenuBar menuBar = addMenuBar();
+        setJMenuBar(menuBar);
+        
         // pack();
         setVisible(true);
+    }
+
+    /**
+     * Returns menue logic for the the main view
+     */
+    private JMenuBar addMenuBar() {
+        // Download Menu
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menuDownload = new JMenu("Download Data");
+        JMenuItem csvDownload = new JMenuItem("csv");
+        JMenuItem jsonDownload = new JMenuItem("json");
+        JMenuItem xmlDownload = new JMenuItem("xml");
+
+        menuDownload.add(xmlDownload);
+        menuDownload.add(jsonDownload);
+        menuDownload.add(csvDownload);
+        menuBar.add(menuDownload);
+
+        return menuBar;
     }
 
     @Override
