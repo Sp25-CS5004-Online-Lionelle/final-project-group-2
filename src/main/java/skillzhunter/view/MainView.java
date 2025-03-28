@@ -73,7 +73,7 @@ public class MainView extends JFrame implements IView {
     @Override
     public void addFeatures(IController controller) {
         throw new UnsupportedOperationException("Unimplemented method 'addFeatures'");
-    }
+    } 
 
     public static void main(String[] args) {
         // This will generate the view with no actions
