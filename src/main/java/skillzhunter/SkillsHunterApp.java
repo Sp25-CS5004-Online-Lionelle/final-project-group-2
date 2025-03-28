@@ -93,10 +93,5 @@ public class SkillsHunterApp {
         String[] parsedArgs = unparsed.split(" ");
         Map<String, String> argsMap = getParserArgs(parsedArgs);
         System.out.println("Parsed Arguments: " + argsMap);
-
-
-
-        
-        
 }
 }
