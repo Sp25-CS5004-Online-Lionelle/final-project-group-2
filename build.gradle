@@ -39,6 +39,10 @@ dependencies {
     implementation 'com.fasterxml.woodstox:woodstox-core:6.5.0'
     // jackson dataformat csv
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0'
+    // okthttp
+    implementation 'com.squareup.okhttp3:okhttp:4.9.3' // or the latest version
+
+
 }
 
 test {

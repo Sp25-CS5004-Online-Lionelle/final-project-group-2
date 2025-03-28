@@ -27,7 +27,7 @@ public class MainView extends JFrame implements IView {
 
 
     public MainView() {
-        super("Domain Name Info");
+        super("Skillz Hunter App");
         this.setSize(500, 500);
         this.setLocation(200, 200);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
