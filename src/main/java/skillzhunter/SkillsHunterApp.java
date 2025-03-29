@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import skillzhunter.controler.MainController;
+import skillzhunter.controller.MainController;
 
 public class SkillsHunterApp {
     static final String DEFAULT_DATA_FILE = "data\\temp_data.xml";
@@ -20,7 +20,15 @@ public class SkillsHunterApp {
      */
     public static String getHelp() {
         return """
-                <-Need to write up a command line help message for the program.->
+                Welcome to Skillz Hunter!
+                This is a command line application and gui application that helps you find jobs based on your skills.
+                Options:
+                -c <console/gui> : Specify the controller to use. Default is gui.
+                -g : Specify the controller to use. Default is gui.
+                -f <format> : Specify the format of the output file. Default is xml.
+                -o <outputFilePath> : Specify the output file path. Default is output.txt.
+                --data <dataFilePath> : Specify the data file path. Default is data/temp_data.xml.
+                -h, --help : Show this help message.
                 """;
         }
 
@@ -60,6 +68,10 @@ public class SkillsHunterApp {
                 case "--help":
                         System.out.println(getHelp());
                         break;
+                case "-g":
+                    parsedArgs.put("controller", "gui");
+                    i++;
+                    break;
                 default:
                     continue;
             }
