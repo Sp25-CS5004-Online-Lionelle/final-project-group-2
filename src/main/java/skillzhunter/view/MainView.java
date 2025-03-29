@@ -53,7 +53,7 @@ public class MainView extends JFrame implements IView {
     }
 
     /**
-     * Returns menue logic for the the main view
+     * Returns menue logic for the main view
      */
     private JMenuBar addMenuBar() {
         // Download Menu

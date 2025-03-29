@@ -13,8 +13,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-
-// import student.model.DomainNameModel.DNRecord;
+import skillzhunter.model.JobRecord;
 
 /**
  * A class to format the data in different ways.
@@ -34,9 +33,9 @@ public final class DataFormatter {
      * @param records the records to print
      * @param out the output stream to write to
      */
-    private static void prettyPrint(Collection<DNRecord> records, OutputStream out) {
+    private static void prettyPrint(Collection<JobRecord> records, OutputStream out) {
         PrintStream pout = new PrintStream(out); // so i can use println
-        for (DNRecord record : records) {
+        for (JobRecord record : records) {
             prettySingle(record, pout);
             pout.println();
         }
@@ -50,12 +49,12 @@ public final class DataFormatter {
      * @param record the record to print
      * @param out the output stream to write to
      */
-    private static void prettySingle(@Nonnull DNRecord record, @Nonnull PrintStream out) {
-        out.println(record.hostname());
-        out.println("             IP: " + record.ip());
-        out.println("       Location: " + record.city() + ", " + record.region() + ", "
-                + record.country() + ", " + record.postal());
-        out.println("    Coordinates: " + record.latitude() + ", " + record.longitude());
+    private static void prettySingle(@Nonnull JobRecord record, @Nonnull PrintStream out) {
+        out.println(record.jobTitle());
+        out.println("             Company: " + record.companyName());
+        out.println("       Pay: " + record.annualSalaryMin() + " to " + record.annualSalaryMax());
+        out.println("       Date Published: " + record.pubDate());
+        out.println("       Description: " + record.jobDescription());
 
     }
 
@@ -65,7 +64,7 @@ public final class DataFormatter {
      * @param records the records to write
      * @param out the output stream to write to
      */
-    private static void writeXmlData(Collection<DNRecord> records, OutputStream out) {
+    private static void writeXmlData(Collection<JobRecord> records, OutputStream out) {
         ObjectMapper mapper = new XmlMapper();
         DomainXmlWrapper wrapper = new DomainXmlWrapper(records);
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -83,7 +82,7 @@ public final class DataFormatter {
      * @param records the records to write
      * @param out the output stream to write to
      */
-    private static void writeJsonData(Collection<DNRecord> records, OutputStream out) {
+    private static void writeJsonData(Collection<JobRecord> records, OutputStream out) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         try {
@@ -99,9 +98,9 @@ public final class DataFormatter {
      * @param records the records to write
      * @param out the output stream to write to
      */
-    private static void writeCSVData(Collection<DNRecord> records, OutputStream out) {
+    private static void writeCSVData(Collection<JobRecord> records, OutputStream out) {
                 CsvMapper mapper = new CsvMapper();
-        CsvSchema schema = mapper.schemaFor(DNRecord.class).withHeader();
+        CsvSchema schema = mapper.schemaFor(JobRecord.class).withHeader();
         try {
             mapper.writer(schema).writeValues(out).writeAll(records);
         } catch (IOException e) {
@@ -116,7 +115,7 @@ public final class DataFormatter {
      * @param format the format to write the records in
      * @param out the output stream to write to
      */
-    public static void write(@Nonnull Collection<DNRecord> records, @Nonnull Formats format,
+    public static void write(@Nonnull Collection<JobRecord> records, @Nonnull Formats format,
             @Nonnull OutputStream out) {
 
         switch (format) {

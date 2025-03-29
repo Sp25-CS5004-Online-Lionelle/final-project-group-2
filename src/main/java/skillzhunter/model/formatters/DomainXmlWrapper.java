@@ -3,7 +3,7 @@ package skillzhunter.model.formatters;
 import java.util.Collection;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-import student.model.DomainNameModel.DNRecord;
+import skillzhunter.model.JobRecord;
 
 /**
  * This wrapper helps when using Jackson to serialize a list of domain records to xml. Without this,
@@ -23,14 +23,14 @@ public final class DomainXmlWrapper {
 
     /** List of the records. */
     @JacksonXmlElementWrapper(useWrapping = false)
-    private Collection<DNRecord> domain;
+    private Collection<JobRecord> job;
 
     /**
      * Constructor.
      *
      * @param records the records to wrap
      */
-    public DomainXmlWrapper(Collection<DNRecord> records) {
-        this.domain = records;
+    public DomainXmlWrapper(Collection<JobRecord> records) {
+        this.job = records;
     }
 }
