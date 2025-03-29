@@ -51,8 +51,8 @@ public class JobBoardApi {
     }
 
     public static void main(String[] args) {
-        List<JobRecord> jobs = JobBoardApi.getJobBoard("Data Science", 10, "USA", "business");
-        jobs.forEach(job -> System.out.println("Job Title: " + job.jobTitle()));
+        // List<JobRecord> jobs = JobBoardApi.getJobBoard("Data Science", 10, "USA", "business");
+        // jobs.forEach(job -> System.out.println("Job Title: " + job.jobTitle()));
     }
 
 }

@@ -17,29 +17,30 @@ public class MainView extends JFrame implements IView {
      /** Main pane for the entire program */
     private Container mainPane; 
     /** Pane for finding a job*/
-    private JPanel findJobTabbed;
+    private FindJobView findJobTabbed;
     /** Pane for finding a job*/
-    private JPanel searchJobTabbed;
+    private SavedJobView saveJobTabbed;
     /** Pane to host findJobs and searchJobs*/
     private JTabbedPane tabbedPane;
 
 
 
 
-    public MainView() {
+
+    public MainView(FindJobView findJobTabbed, SavedJobView saveJobTabbed) {
         super("Skillz Hunter App");
         this.setSize(500, 500);
         this.setLocation(200, 200);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.findJobTabbed = findJobTabbed;
+        this.saveJobTabbed = saveJobTabbed;
 
         mainPane = this.getContentPane();
         tabbedPane = new JTabbedPane();
         
-        // Adding Panels
-        JPanel panel1 = new SavedJobView();
-        JPanel panel2 = new FindJobView();
-        tabbedPane.add("Saved Jobs", panel1);
-        tabbedPane.add("Find Jobs", panel2);
+      
+        tabbedPane.add("Saved Jobs", this.findJobTabbed);
+        tabbedPane.add("Find Jobs", this.saveJobTabbed);
         mainPane.add(tabbedPane);
         
 
@@ -72,10 +73,13 @@ public class MainView extends JFrame implements IView {
 
     @Override
     public void addFeatures(IController controller) {
-        throw new UnsupportedOperationException("Unimplemented method 'addFeatures'");
+    //   this.findJobTabbed.addFeatures(controller);
+    //   this.searchJobTabbed.addFeatures(controller);
     } 
 
     public static void main(String[] args) {
+
+        
         // This will generate the view with no actions
         new MainView();
 

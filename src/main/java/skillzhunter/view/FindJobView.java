@@ -2,24 +2,30 @@ package skillzhunter.view;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 
-import skillzhunter.controler.IController;
+import skillzhunter.controler.FindJobController;
 
 
 
-public class FindJobView extends JPanel implements IView {
+public class FindJobView extends JPanel {
     private JButton searchButton;
-    
+    private JTextArea recordText;
+
     public FindJobView() {
         searchButton = new JButton("Find Jobs");
         add(searchButton);
+
+        recordText = new JTextArea("click to find jobs");
+        add(recordText);
+    }
+    public void setRecordText(String text) {
+        this.recordText.setText(text);
     }
 
 
-
-    @Override
-    public void addFeatures(IController controller) {
-        throw new UnsupportedOperationException("Unimplemented method 'addFeatures'");
+    public void addFeatures(FindJobController controller) {
+        searchButton.addActionListener(e -> controller.dummyFindJobMethod());
     }
 
     public static void main(String[] args) {
