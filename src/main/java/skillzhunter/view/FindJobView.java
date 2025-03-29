@@ -31,29 +31,29 @@ public class FindJobView extends JPanel {
         recordText = new JTextArea("click to find jobs");
         add(recordText);
 
-        JPanel tablePanel = new JPanel(new FlowLayout());
-        tablePanel.setSize(600,600);
-
-        jobsTable = new JobsTable(getColumnNames(), getData(JobRecordGenerator.generateDummyRecords(10)));
-        TableColumn column1 = jobsTable.getColumnModel().getColumn(0); // Name column
-        column1.setPreferredWidth(150);
-        column1.setMinWidth(150);
-        column1.setMaxWidth(150);
-
-        TableColumn column2 = jobsTable.getColumnModel().getColumn(1); // Name column
-        column2.setPreferredWidth(150);
-        column2.setMinWidth(150);
-        column2.setMaxWidth(150);
-
-
-        JScrollPane tablePane = new JScrollPane();
-        tablePane.setViewportView(jobsTable);
-        tablePane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        tablePane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        tablePanel.add(tablePane);
-
-
-        add(tablePane);
+//        JPanel tablePanel = new JPanel(new FlowLayout());
+//        tablePanel.setSize(600,600);
+//
+//        jobsTable = new JobsTable(getColumnNames(), getData(JobRecordGenerator.generateDummyRecords(10)));
+//        TableColumn column1 = jobsTable.getColumnModel().getColumn(0); // Name column
+//        column1.setPreferredWidth(150);
+//        column1.setMinWidth(150);
+//        column1.setMaxWidth(150);
+//
+//        TableColumn column2 = jobsTable.getColumnModel().getColumn(1); // Name column
+//        column2.setPreferredWidth(150);
+//        column2.setMinWidth(150);
+//        column2.setMaxWidth(150);
+//
+//
+//        JScrollPane tablePane = new JScrollPane();
+//        tablePane.setViewportView(jobsTable);
+//        tablePane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+//        tablePane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+//        tablePanel.add(tablePane);
+//
+//
+//        add(tablePane);
 
     }
 
