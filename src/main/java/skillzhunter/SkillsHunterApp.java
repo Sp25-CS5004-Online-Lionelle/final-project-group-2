@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import skillzhunter.controler.MainController;
+
 public class SkillsHunterApp {
     static final String DEFAULT_DATA_FILE = "data\\temp_data.xml";
 
@@ -93,5 +95,8 @@ public class SkillsHunterApp {
         String[] parsedArgs = unparsed.split(" ");
         Map<String, String> argsMap = getParserArgs(parsedArgs);
         System.out.println("Parsed Arguments: " + argsMap);
-}
+
+
+        MainController mainController = new MainController();
+    }
 }
