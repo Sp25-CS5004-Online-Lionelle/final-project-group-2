@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import skillzhunter.model.JobRecord;
 
-
+//Class that makes some dummy JobRecords for testing purposes
 public class JobRecordGenerator {
   public static void main(String[] args) {
     List<JobRecord> dummyRecords = generateDummyRecords(10);

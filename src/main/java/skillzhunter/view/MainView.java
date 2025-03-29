@@ -2,11 +2,13 @@ package skillzhunter.view;
 
 import java.awt.Container;
 
+import java.awt.Dimension;
+import java.awt.ScrollPane;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
 import skillzhunter.controler.IController;
@@ -14,41 +16,39 @@ import skillzhunter.controler.IController;
 
 public class MainView extends JFrame implements IView {
 
-     /** Main pane for the entire program */
-    private Container mainPane; 
-    /** Pane for finding a job*/
-    private FindJobView findJobTabbed;
-    /** Pane for finding a job*/
-    private SavedJobView saveJobTabbed;
-    /** Pane to host findJobs and searchJobs*/
+    /** Main pane for the entire program */
+    private Container mainPane = this.getContentPane();
+  /** Pane to host findJobs and searchJobs*/
     private JTabbedPane tabbedPane;
 
 
 
 
 
-    public MainView(FindJobView findJobTabbed, SavedJobView saveJobTabbed) {
+    public MainView(FindJobView findJobTab, SavedJobView saveJobTab) {
         super("Skillz Hunter App");
         this.setSize(500, 500);
         this.setLocation(200, 200);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.findJobTabbed = findJobTabbed;
-        this.saveJobTabbed = saveJobTabbed;
+      /** Pane for finding a job*/
+      /** Pane for finding a job*/
 
-        mainPane = this.getContentPane();
-        tabbedPane = new JTabbedPane();
+      tabbedPane = new JTabbedPane();
+
+//        JScrollPane findJobScroll = new JScrollPane(findJobTab);
+//        JScrollPane savedJobScroll = new JScrollPane(saveJobTab);
         
-      
-        tabbedPane.add("Saved Jobs", this.findJobTabbed);
-        tabbedPane.add("Find Jobs", this.saveJobTabbed);
+
+        tabbedPane.addTab("Find Jobs", findJobTab);
+        tabbedPane.addTab("Saved Jobs", saveJobTab);
         mainPane.add(tabbedPane);
         
 
-        // Adding menue bar
+        // Adding menu bar
         JMenuBar menuBar = addMenuBar();
         setJMenuBar(menuBar);
         
-        // pack();
+        //pack();
         setVisible(true);
     }
 
@@ -73,7 +73,7 @@ public class MainView extends JFrame implements IView {
 
     @Override
     public void addFeatures(IController controller) {
-    //   this.findJobTabbed.addFeatures(controller);
+    //   this.findJobTab.addFeatures(controller);
     //   this.searchJobTabbed.addFeatures(controller);
     } 
 
