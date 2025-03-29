@@ -1,18 +1,10 @@
 package skillzhunter.view;
 
-import static skillzhunter.view.JobsLoader.getColumnNames;
-import static skillzhunter.view.JobsLoader.getData;
-
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import javax.swing.ScrollPaneConstants;
-import javax.swing.table.TableColumn;
-import skillzhunter.controler.FindJobController;
+import skillzhunter.controller.FindJobController;
 
 
 

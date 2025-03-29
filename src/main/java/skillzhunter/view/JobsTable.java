@@ -1,5 +1,6 @@
 package skillzhunter.view;
 
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -20,32 +21,12 @@ public class JobsTable extends JTable {
 
   public JobsTable() {
     this(new String[] {}, new Object[][] {});
+    setPreferredScrollableViewportSize(new Dimension(500, 200));
   }
 
   public JobsTable(String[] columnNames, Object[][] data) {
     tableModel = new DefaultTableModel(data, columnNames);
     setModel(tableModel);
-  }
-
-  public void loadJobs(Collection<JobRecord> jobs) {
-    Object[][] data = null;
-    if (jobs == null || jobs.isEmpty()) {
-      data = new Object[0][0];
-    } else {
-      data = new Object[jobs.size()][];
-      int i = 0;
-      for (Object item : jobs) {
-        if (item instanceof Object[]) {
-          data[i] = (Object[]) item;
-        } else {
-          data[i] = new Object[] {item};
-        }
-        i++;
-      }
-      setData(data);
-      tableModel = new DefaultTableModel(data, columnNames);
-      setModel(tableModel);
-    }
   }
 
     public void setData (Object[][]data){
