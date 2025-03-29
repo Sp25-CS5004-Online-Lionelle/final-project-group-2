@@ -81,7 +81,7 @@ public class MainView extends JFrame implements IView {
 
         
         // This will generate the view with no actions
-        new MainView();
+        //new MainView();
 
         }
 }

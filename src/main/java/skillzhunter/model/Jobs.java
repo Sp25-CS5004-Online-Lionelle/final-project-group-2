@@ -24,8 +24,8 @@ public class Jobs {
         }
 
         public static void main(String[] args) {
-                // Jobs jobs = new Jobs();
-                // List<JobRecord> jobResults = jobs.searchJobs("python", 10, "USA", "business");
-                // jobResults.forEach(job -> System.out.println(job));
+//                 Jobs jobs = new Jobs();
+//                 List<JobRecord> jobResults = jobs.searchJobs("python", 10, "USA", "business");
+//                 jobResults.forEach(job -> System.out.println(job));
         }
 }
