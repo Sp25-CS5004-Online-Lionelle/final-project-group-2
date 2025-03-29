@@ -4,7 +4,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import skillzhunter.controler.FindJobController;
+import skillzhunter.controller.FindJobController;
 
 
 

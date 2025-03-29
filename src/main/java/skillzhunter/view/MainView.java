@@ -9,7 +9,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-import skillzhunter.controler.IController;
+import skillzhunter.controller.IController;
 
 
 public class MainView extends JFrame implements IView {
@@ -82,6 +82,6 @@ public class MainView extends JFrame implements IView {
         
         // This will generate the view with no actions
         new MainView();
-
+            
         }
 }
