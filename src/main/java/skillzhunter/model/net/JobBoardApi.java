@@ -26,8 +26,6 @@ public class JobBoardApi {
 
         Request request = new Request.Builder()
             .url(url)
-            .addHeader("User-Agent", "job_finder")
-            .addHeader("User-IP", "127.0.0.1") // Replace with actual user IP if available
             .build();
 
         try (Response response = client.newCall(request).execute()) {
@@ -45,6 +43,7 @@ public class JobBoardApi {
             String jsonResponse = responseBody.string();
             ResponseRecord jobResponse = objectMapper.readValue(jsonResponse, ResponseRecord.class);
             return jobResponse.jobs();
+
         } catch (IOException e) {
             e.printStackTrace();
             return Collections.emptyList();
