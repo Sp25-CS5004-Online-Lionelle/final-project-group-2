@@ -4,7 +4,7 @@ import java.util.List;
 
 import skillzhunter.model.net.JobBoardApi;
 
-public class Jobs {
+public class Jobs implements IModel{
 
         public Jobs() {
         }

@@ -77,11 +77,4 @@ public class MainView extends JFrame implements IView {
     //   this.searchJobTabbed.addFeatures(controller);
     } 
 
-    public static void main(String[] args) {
-
-        
-        // This will generate the view with no actions
-        new MainView();
-            
-        }
 }
