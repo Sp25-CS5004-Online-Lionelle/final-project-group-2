@@ -4,7 +4,8 @@ import java.util.List;
 
 public interface IModel {
     //TODO: clarify differences between these two
-    List<JobRecord> searchJobs(String jobSearched); //filter search for jobs?
+    List<JobRecord> searchJobs(String query, Integer numberOfResults,
+    String location, String industry); //filter search for jobs?
     //Gets entire list of saved jobs
     List<JobRecord> getSavedJobs(String savedJob); //what are the optional parameters for getSavedJobs(string, string, string) ??
 
