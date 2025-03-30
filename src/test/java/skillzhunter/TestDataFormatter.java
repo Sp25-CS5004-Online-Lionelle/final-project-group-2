@@ -6,6 +6,8 @@ import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -98,5 +100,80 @@ public class TestDataFormatter {
         DataFormatter.write(jobRecords, Formats.PRETTY, System.out);
     }
 
-    
+
+    /**
+     * Test the json format.
+     * Will come up as json format in the Debug Console.
+     */
+    @Test
+    public void testJson() {
+        DataFormatter.write(jobRecords, Formats.JSON, System.out);
+    }
+
+    /**
+     * Test the xml format.
+     * Will come up as xml format in the Debug Console.
+     */
+    @Test
+    public void testXml() {
+        DataFormatter.write(jobRecords, Formats.XML, System.out);
+    }
+
+    /**
+     * Test the csv format.
+     * Will come up as csv format in the Debug Console.
+     */
+    @Test
+    public void testCsv() {
+        DataFormatter.write(jobRecords, Formats.CSV, System.out);
+    }
+
+    /**
+     * Test writing to file csv
+     * Will come up as default format in the Debug Console.
+     */
+    @Test
+    public void testWriteToFile(){
+        OutputStream fout = System.out;
+        try {
+            Path outputCsvPath = tempDir.resolve("output.csv");
+            fout = new FileOutputStream(outputCsvPath.toFile());
+        } catch (Exception e) {
+            System.err.print(e);
+        }
+        DataFormatter.write(jobRecords, Formats.CSV, fout);
+    }
+
+    //test writing to a file json
+    /**
+     * Test writing to file json
+     */
+    @Test
+    public void testWriteToFileJson(){
+        //may do this in argument parser
+        OutputStream fout=System.out;
+        try {
+            Path outputJsonPath = tempDir.resolve("output.json");
+            fout = new FileOutputStream(outputJsonPath.toFile());
+        } catch (Exception e) {
+            System.err.print(e);
+        }
+        DataFormatter.write(jobRecords, Formats.JSON, fout);
+    }
+
+    //test writing to a file xml
+    /**
+     * Test writing to file xml
+     */
+    @Test
+    public void testWriteToFileXml(){
+        OutputStream fout=System.out;
+        try {
+            Path outputXmlPath = tempDir.resolve("output.xml");
+            fout = new FileOutputStream(outputXmlPath.toFile());
+        } catch (Exception e) {
+            System.err.print(e);
+        }
+        DataFormatter.write(jobRecords, Formats.XML, fout);
+    }
 }
