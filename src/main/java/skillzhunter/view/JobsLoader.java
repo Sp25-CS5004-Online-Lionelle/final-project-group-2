@@ -17,10 +17,18 @@ public final class JobsLoader {
   private JobsLoader() {
   }
 
+  //Returns column headers as they are set at the top of the class
   public static String[] getColumnNames() {
     return columnNames;
   }
 
+  //made this for converting to lists, likely uneccesary and can be removed later
+  public static List<JobRecord> getJobList(Collection<JobRecord> jobs) {
+    List<JobRecord> jobList = jobs.stream().toList();
+    return jobList;
+  }
+
+  //Converts a collection of jobs into a type that JTable can understand
   public static Object[][] getData(Collection<JobRecord> jobs) {
     List<JobRecord> jobList = jobs.stream().toList();
     Object[][] data = new Object[jobList.size()][10];

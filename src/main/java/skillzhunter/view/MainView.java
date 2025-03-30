@@ -24,7 +24,7 @@ public class MainView extends JFrame implements IView {
 //    /** Main pane for the entire program */
 //    private Container mainPane = this.getContentPane();
     private JPanel mainPane = new JPanel();
-    private JPanel findJobPane = new JPanel(new BorderLayout());
+    private JPanel findJobPane = new JPanel();
     //private JobsTable findJobsTable = new JobsTable();
     private JPanel savedJobPane = new JPanel();
     /** Pane to host findJobs and searchJobs*/
@@ -38,18 +38,7 @@ public class MainView extends JFrame implements IView {
         this.setLocation(200, 200);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        findJobPane.add(findJobTab,BorderLayout.NORTH);
-        JTable findJobsTable = new JTable(new DefaultTableModel(getData(JobRecordGenerator.generateDummyRecords(10)), getColumnNames()));
-        TableColumn column1 = findJobsTable.getColumnModel().getColumn(0); // Name column
-        column1.setPreferredWidth(150);
-        column1.setMinWidth(150);
-        column1.setMaxWidth(150);
-        TableColumn column2 = findJobsTable.getColumnModel().getColumn(1); // Name column
-        column2.setPreferredWidth(150);
-        column2.setMinWidth(150);
-        column2.setMaxWidth(150);
-        JScrollPane findJobsTableScroll = new JScrollPane(findJobsTable);
-        findJobPane.add(findJobsTableScroll, BorderLayout.CENTER);
+        findJobPane.add(findJobTab);
 
         savedJobPane.add(saveJobTab);
 

@@ -8,11 +8,6 @@ import skillzhunter.model.JobRecord;
 public class JobRecordGenerator {
   public static void main(String[] args) {
     List<JobRecord> dummyRecords = generateDummyRecords(10);
-
-//    // Print the records
-//    for (JobRecord record : dummyRecords) {
-//      System.out.println(record);
-//    }
   }
 
   public static List<JobRecord> generateDummyRecords(int count) {

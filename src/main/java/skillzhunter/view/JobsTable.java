@@ -10,6 +10,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import skillzhunter.model.JobRecord;
 
+//class set up to make JTable setting consistent across views
+//will be more important if we go with a custom table model
 public class JobsTable extends JTable {
 
   private DefaultTableModel tableModel;
