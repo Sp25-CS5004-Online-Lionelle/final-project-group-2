@@ -1,4 +1,4 @@
-package skillzhunter.controler;
+package skillzhunter.controller;
 
 import skillzhunter.model.Jobs;
 import skillzhunter.view.FindJobView;

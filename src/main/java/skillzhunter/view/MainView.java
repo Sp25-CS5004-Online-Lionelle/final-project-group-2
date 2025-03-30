@@ -1,54 +1,59 @@
 package skillzhunter.view;
 
-import java.awt.Container;
+import static skillzhunter.view.JobsLoader.getColumnNames;
+import static skillzhunter.view.JobsLoader.getData;
+
+import java.awt.BorderLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
-import skillzhunter.controler.IController;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import skillzhunter.controller.IController;
 
 
 public class MainView extends JFrame implements IView {
 
-     /** Main pane for the entire program */
-    private Container mainPane; 
-    /** Pane for finding a job*/
-    private FindJobView findJobTabbed;
-    /** Pane for finding a job*/
-    private SavedJobView saveJobTabbed;
+//    /** Main pane for the entire program */
+//    private Container mainPane = this.getContentPane();
+    private JPanel mainPane = new JPanel();
+    private JPanel findJobPane = new JPanel();
+    //private JobsTable findJobsTable = new JobsTable();
+    private JPanel savedJobPane = new JPanel();
     /** Pane to host findJobs and searchJobs*/
     private JTabbedPane tabbedPane;
 
 
 
-
-
-    public MainView(FindJobView findJobTabbed, SavedJobView saveJobTabbed) {
-        super("Skillz Hunter App");
-        this.setSize(500, 500);
+    public MainView(FindJobView findJobTab, SavedJobView saveJobTab) {
+        super("Jobz Hunter App");
+        //this.setSize(500, 500);
         this.setLocation(200, 200);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.findJobTabbed = findJobTabbed;
-        this.saveJobTabbed = saveJobTabbed;
 
-        mainPane = this.getContentPane();
+        findJobPane.add(findJobTab);
+
+        savedJobPane.add(saveJobTab);
+
+
         tabbedPane = new JTabbedPane();
-        
-      
-        tabbedPane.add("Saved Jobs", this.findJobTabbed);
-        tabbedPane.add("Find Jobs", this.saveJobTabbed);
+        tabbedPane.addTab("Find Jobs", findJobPane);
+        tabbedPane.addTab("Saved Jobs", savedJobPane);
         mainPane.add(tabbedPane);
-        
+        add(mainPane);
 
-        // Adding menue bar
+        // Adding menu bar
         JMenuBar menuBar = addMenuBar();
         setJMenuBar(menuBar);
-        
-        // pack();
+
+        pack();
         setVisible(true);
     }
 
@@ -73,7 +78,7 @@ public class MainView extends JFrame implements IView {
 
     @Override
     public void addFeatures(IController controller) {
-    //   this.findJobTabbed.addFeatures(controller);
+    //   this.findJobTab.addFeatures(controller);
     //   this.searchJobTabbed.addFeatures(controller);
     } 
 
@@ -81,7 +86,7 @@ public class MainView extends JFrame implements IView {
 
         
         // This will generate the view with no actions
-        new MainView();
+        //new MainView();
 
         }
 }
