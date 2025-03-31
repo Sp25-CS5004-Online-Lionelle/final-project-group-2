@@ -45,7 +45,7 @@ public class JobView extends JPanel {
         // Create a horizontal panel for buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));  // Center alignment
     
-        JButton openJob = new JButton("Open Selected Job");
+        JButton openJob = new JButton("Open Job");
         openJob.addActionListener(e -> openSelectedJob());
     
         JButton exit = new JButton("Exit");
