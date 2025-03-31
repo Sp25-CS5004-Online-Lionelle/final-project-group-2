@@ -2,22 +2,16 @@ package skillzhunter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import java.util.HashMap;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 import skillzhunter.model.JobRecord;
-import skillzhunter.model.formatters.DataFormatter;
-import skillzhunter.model.formatters.Formats;
+import skillzhunter.model.Jobs;
 
 public class TestJobs {
-    private HashMap<Integer, JobRecord> jobRecords = new HashMap<Integer, JobRecord>();
+    private Jobs jobList = new Jobs();  // Changed to use Jobs, which internally uses a List
     private JobRecord jobRecord1;
     private JobRecord jobRecord2;
     private JobRecord jobRecord3;
@@ -26,7 +20,7 @@ public class TestJobs {
     /**
      * Sets up the test data for job records.
      * This method initializes three job records with various attributes.
-     * The records are then stored in a HashMap for later use in tests.
+     * The records are then added to the jobList for later use in tests.
      */
     public void setUp() {
         jobRecord1 = new JobRecord(
@@ -92,34 +86,60 @@ public class TestJobs {
             "Excited to work on data policy for global impact."
         );
 
-        jobRecords.put(1, jobRecord1);
-        jobRecords.put(2, jobRecord2);
-        jobRecords.put(3, jobRecord3);
+        // Adding job records directly to the Jobs list instead of using addJob method
+        jobList.addJob(jobRecord1);
+        jobList.addJob(jobRecord2);
+        jobList.addJob(jobRecord3);
     }
 
-    /*
-     * Test each jobrecord with methods in the bean.
-     */
+    // Test setup to ensure the list is initialized correctly
     @Test
-    public void testJobRecord() {
-        assertEquals(jobRecord1.id(), 0);
-        assertEquals(jobRecord1.url(), "https://www.jpmorgan.com/jobs/ai-senior-python-engineer");
-        assertEquals(jobRecord1.jobSlug(), "ai-senior-python-engineer");
-        assertEquals(jobRecord1.jobTitle(), "AI Senior Python Engineer");
-        assertEquals(jobRecord1.companyName(), "JP Morgan");
-        assertEquals(jobRecord1.companyLogo(), "https://logo.clearbit.com/jpmorgan.com");
-        assertEquals(jobRecord1.jobIndustry(), List.of("Finance", "Technology"));
-        assertEquals(jobRecord1.jobType(), List.of("Full-time", "Remote"));
-        assertEquals(jobRecord1.jobGeo(), "New York, NY");
-        assertEquals(jobRecord1.jobLevel(), "Senior");
-        assertEquals(jobRecord1.jobExcerpt(), "Join a leading financial institution as an AI Engineer.");
-        assertEquals(jobRecord1.jobDescription(), "Work on state-of-the-art Python solutions in a top-tier banking environment.");
-        assertEquals(jobRecord1.pubDate(), "2025-03-30");
-        assertEquals(jobRecord1.annualSalaryMin(), 120000);
-        assertEquals(jobRecord1.annualSalaryMax(), 150000);
-        assertEquals(jobRecord1.salaryCurrency(), "USD");
-        assertEquals(jobRecord1.rating(), 4);
-        assertEquals(jobRecord1.comments(), "Big fan of Python and AI. Looking for a challenging role in finance.");
-
+    public void testSetup() {
+        assertEquals(3, jobList.getJobRecords().size());
     }
+
+    @Test
+    public void testGetJob() {
+        JobRecord fetchedJob = jobList.getJobRecord("Frontend React Engineer");
+        assertEquals(jobRecord2, fetchedJob);
+    }
+
+    @Test
+    public void testGetJobRecords() {
+        List<JobRecord> allJobs = jobList.getJobRecords();
+        assertEquals(3, allJobs.size());
+    }
+
+    @Test
+    public void testRemoveJob() {
+        // Ensure remove job works as expected
+        boolean removed = jobList.removeJob(1);  // Trying to remove job with ID 1
+        assertTrue(removed);
+        assertEquals(2, jobList.getJobRecords().size());  // After removal, there should be 2 jobs left
+    }
+    @Test
+    public void testSearchByQuery() {
+        List<JobRecord> results = jobList.searchByQuery("AI");
+        assertEquals(1, results.size());
+        assertEquals(jobRecord1, results.get(0));
+    }
+    @Test
+    public void testSearchByLocation() {
+        List<JobRecord> results = jobList.searchByLocation("New York");
+        assertEquals(1, results.size());
+        assertEquals(jobRecord1, results.get(0));
+    }
+    @Test
+    public void testSearchByIndustry() {
+        List<JobRecord> results = jobList.searchByIndustry("Technology");
+        assertEquals(2, results.size());
+        assertTrue(results.contains(jobRecord1));
+        assertTrue(results.contains(jobRecord2));
+    }
+    @Test
+    public void testSearchByIndustryNotFound() {
+        List<JobRecord> results = jobList.searchByIndustry("Nonexistent Industry");
+        assertEquals(0, results.size());
+    }
+    
 }
