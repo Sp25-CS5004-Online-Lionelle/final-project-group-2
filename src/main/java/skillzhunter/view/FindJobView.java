@@ -12,11 +12,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
-
-import javax.swing.ScrollPaneConstants;
-import javax.swing.table.TableColumn;
 import skillzhunter.controller.FindJobController;
-import skillzhunter.model.JobRecord;
+
+
 
 
 public class FindJobView extends JPanel {

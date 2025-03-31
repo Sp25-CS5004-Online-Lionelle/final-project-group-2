@@ -12,10 +12,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+
 import skillzhunter.controller.IController;
 
 
@@ -81,6 +81,7 @@ public class MainView extends JFrame implements IView {
     //   this.findJobTab.addFeatures(controller);
     //   this.searchJobTabbed.addFeatures(controller);
     } 
+
 
     public static void main(String[] args) {
 

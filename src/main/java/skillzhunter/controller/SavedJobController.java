@@ -4,12 +4,16 @@ import skillzhunter.view.SavedJobView;
 
 public class SavedJobController {
     private SavedJobView view;
+
+    public SavedJobController(SavedJobView savedJobTabbed) {
+        this.view = savedJobTabbed;
+        this.view.addFeatures(this);
+    }
+
     public SavedJobView getView() {
         return view;
     }
-    public SavedJobController(SavedJobView savedJobTabbed) {
-        this.view = savedJobTabbed;
-    }
+
     public void setFeatures() {
         this.view.addFeatures(this);
     }

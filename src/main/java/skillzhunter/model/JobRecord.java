@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonPropertyOrder({"id", "url", "jobSlug", "jobTitle", "companyName", "companyLogo",
 "jobIndustry", "jobType", "jobGeo", "jobLevel", "jobExcerpt", 
-"jobDescription", "pubDate", "annualSalaryMin", "annualSalaryMax", "salaryCurrency"})
+"jobDescription", "pubDate", "annualSalaryMin", "annualSalaryMax", "salaryCurrency", "rating", "comments"})
 public record JobRecord(
 int id,
 String url,
@@ -23,5 +23,7 @@ String jobDescription,
 String pubDate,
 int annualSalaryMin,
 int annualSalaryMax,
-String salaryCurrency
+String salaryCurrency,
+int rating,
+String comments
 ) {}
