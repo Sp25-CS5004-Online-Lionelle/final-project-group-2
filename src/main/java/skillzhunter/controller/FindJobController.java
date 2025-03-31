@@ -16,6 +16,10 @@ public class FindJobController {
         this.view.addFeatures(this); //give this controller to the view
     }
 
+    /**
+     * This method sets the view for the controller.
+     * @return
+     */
     public FindJobView getView() {
         return view;
     }
