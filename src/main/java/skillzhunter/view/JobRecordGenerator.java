@@ -29,7 +29,9 @@ public class JobRecordGenerator {
         "2025-02-15",
         120000,
         160000,
-        "USD"
+        "USD",
+        5,
+        "Passionate about Java and cloud technologies. Looking for a challenging role in a fast-paced environment."
     );
 
     records[1] = new JobRecord(
@@ -48,7 +50,9 @@ public class JobRecordGenerator {
         "2025-02-28",
         110000,
         145000,
-        "USD"
+        "USD",
+        4,
+        "Strong background in statistics and machine learning. Experience with big data technologies like Spark is a plus."
     );
 
     records[2] = new JobRecord(
@@ -67,7 +71,9 @@ public class JobRecordGenerator {
         "2025-03-05",
         95000,
         130000,
-        "USD"
+        "USD",
+        3,
+        "Creative thinker with a passion for user experience. Proficient in Figma, Sketch, and Adobe Creative Suite."
     );
 
     records[3] = new JobRecord(
@@ -86,7 +92,9 @@ public class JobRecordGenerator {
         "2025-03-10",
         105000,
         135000,
-        "CAD"
+        "CAD",
+        4,
+        "Experience with AWS or Azure is a plus. Strong scripting skills in Python or Bash are required."
     );
 
     records[4] = new JobRecord(
@@ -105,7 +113,9 @@ public class JobRecordGenerator {
         "2025-03-12",
         75000,
         95000,
-        "GBP"
+        "GBP",
+        5,
+        "Experience in FinTech is a plus. Strong analytical skills and ability to work in a fast-paced environment."
     );
 
     records[5] = new JobRecord(
@@ -124,7 +134,9 @@ public class JobRecordGenerator {
         "2025-03-15",
         45000,
         65000,
-        "EUR"
+        "EUR",
+        4,
+        "Familiarity with SwiftUI and Combine is a plus. Strong problem-solving skills and attention to detail are required."
     );
 
     records[6] = new JobRecord(
@@ -143,7 +155,9 @@ public class JobRecordGenerator {
         "2025-03-18",
         90000,
         120000,
-        "SGD"
+        "SGD",
+        3,
+        "Experience with SIEM tools and incident response is required. Strong knowledge of network security and threat intelligence is a plus."
     );
 
     records[7] = new JobRecord(
@@ -162,7 +176,9 @@ public class JobRecordGenerator {
         "2025-03-20",
         50000,
         70000,
-        "SEK"
+        "SEK",
+        4,
+        "Experience with Redux and RESTful APIs is a plus. Strong understanding of HTML, CSS, and JavaScript is required."
     );
 
     records[8] = new JobRecord(
@@ -181,7 +197,9 @@ public class JobRecordGenerator {
         "2025-03-22",
         130000,
         170000,
-        "AUD"
+        "AUD",
+        5,
+        "Experience with ETL processes and data warehousing is a plus. Strong programming skills in Python or Scala are required."
     );
 
     records[9] = new JobRecord(
@@ -200,7 +218,9 @@ public class JobRecordGenerator {
         "2025-03-25",
         12000000,
         15000000,
-        "JPY"
+        "JPY",
+        4,
+        "Strong background in software development and project management. Experience with Agile methodologies is a plus."
     );
 
     return Arrays.asList(records);
