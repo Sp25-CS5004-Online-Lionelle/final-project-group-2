@@ -98,7 +98,9 @@ public class MainView extends JFrame implements IView {
 
         
         // This will generate the view with no actions
-        //new MainView();
+        FindJobView findjobview = new FindJobView();
+        SavedJobView savedjobview = new SavedJobView();
+        new MainView(findjobview, savedjobview);
 
-        }
+    }
 }
