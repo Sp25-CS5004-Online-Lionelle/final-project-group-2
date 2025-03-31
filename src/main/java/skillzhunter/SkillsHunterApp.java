@@ -27,7 +27,8 @@ public class SkillsHunterApp {
         //create model and set based off of input file in data if there is a database otherwise
         IModel model = mainController.getModel();
         IView mainView = mainController.getView();
-        mainView.run();
+        // mainView.run();
+        //have controller start the application
     }
 
 }
