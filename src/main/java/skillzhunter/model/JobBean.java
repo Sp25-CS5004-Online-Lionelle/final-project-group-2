@@ -23,6 +23,8 @@ public class JobBean {
     private int annualSalaryMin;
     private int annualSalaryMax;
     private String salaryCurrency;
+    private int rating;
+    private String comments;
 
     public JobBean() {
         // no-arg constructor for Jackson and JavaBeans
@@ -247,6 +249,18 @@ public class JobBean {
         this.salaryCurrency = salaryCurrency;
     }
 
+    public int getRating() {
+        return rating;
+    }
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
+    public String getComments() {
+        return comments;
+    }
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
     //add comments and records to the bean and record
     @Override
     public String toString() {
@@ -267,6 +281,8 @@ public class JobBean {
                 ", annualSalaryMin=" + annualSalaryMin +
                 ", annualSalaryMax=" + annualSalaryMax +
                 ", salaryCurrency='" + salaryCurrency + '\'' +
+                ", rating=" + rating +
+                ", comments='" + comments + '\'' +
                 '}';
     }
 
@@ -305,7 +321,9 @@ public class JobBean {
                 this.getPubDate(),
                 this.getAnnualSalaryMin(),
                 this.getAnnualSalaryMax(),
-                this.getSalaryCurrency()
+                this.getSalaryCurrency(),
+                this.getRating(),
+                this.getComments()
         );
     }
 }
