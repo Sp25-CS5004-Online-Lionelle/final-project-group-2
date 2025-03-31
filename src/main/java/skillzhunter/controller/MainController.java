@@ -2,15 +2,21 @@ package skillzhunter.controller;
 
 
 import java.util.List;
-
 import skillzhunter.model.IModel;
 import skillzhunter.model.JobRecord;
 import skillzhunter.model.Jobs;
 import skillzhunter.model.net.JobBoardApi;
+import skillzhunter.view.SavedJobView;
+import skillzhunter.view.FindJobView;
+import skillzhunter.view.MainView;
+import skillzhunter.view.IView;
+
+public class MainController implements IController{
 
     private IModel model;
     private FindJobController findJobController;
     private SavedJobController savedJobController;
+    private IView view;
     private SavedJobView savedJobTabbed;
     private FindJobView searchJobTabbed;
 
@@ -43,6 +49,8 @@ import skillzhunter.model.net.JobBoardApi;
      * @param view The view to be set for the controller.
      */
     protected void setView(IView view) {
+        this.view = view;
+    }
 
     /**
      * This method sets the view for the controller.
