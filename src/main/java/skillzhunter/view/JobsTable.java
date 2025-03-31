@@ -19,11 +19,11 @@ public class JobsTable extends JTable {
   private String[] columnNames = {"id", "url", "jobSlug", "jobTitle", "companyName",
       "companyLogo", "jobIndustry", "jobType", "jobGeo", "jobLevel",
       "jobExcerpt", "jobDescription", "pubDate", "annualSalaryMin",
-      "annualSalaryMax", "salaryCurrency"};
+      "annualSalaryMax", "salaryCurrency", "rating", "comments"};
 
   public JobsTable() {
     this(new String[] {}, new Object[][] {});
-    setPreferredScrollableViewportSize(new Dimension(500, 200));
+    setPreferredScrollableViewportSize(new Dimension(1000, 500));
   }
 
   public JobsTable(String[] columnNames, Object[][] data) {
