@@ -54,7 +54,6 @@ public class MainView extends JFrame implements IView {
         setJMenuBar(menuBar);
 
         pack();
-        setVisible(true);
     }
 
     /**
@@ -76,6 +75,9 @@ public class MainView extends JFrame implements IView {
         return menuBar;
     }
 
+    /**
+     * Adds features to the view.
+     */
     @Override
     public void addFeatures(IController controller) {
     //   this.findJobTab.addFeatures(controller);
@@ -83,6 +85,15 @@ public class MainView extends JFrame implements IView {
     } 
 
 
+    /**
+     * Runs the view.
+     * This method is used to start the view and display it to the user.
+     * It should be called after the view has been set up and configured.
+     */
+    @Override
+    public void run(){
+        setVisible(true);
+    }
     public static void main(String[] args) {
 
         
