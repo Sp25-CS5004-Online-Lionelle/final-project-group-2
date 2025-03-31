@@ -1,7 +1,11 @@
 package skillzhunter.controller;
 
+import java.util.List;
+
 import skillzhunter.model.IModel;
+import skillzhunter.model.JobRecord;
 import skillzhunter.model.Jobs;
+import skillzhunter.model.net.JobBoardApi;
 import skillzhunter.view.FindJobView;
 import skillzhunter.view.IView;
 import skillzhunter.view.MainView;
@@ -27,6 +31,8 @@ public class MainController implements IController {
         this.findJobController = new FindJobController(searchJobTabbed);
 
         this.savedJobController = new SavedJobController(savedJobTabbed);
+
+        //theres an inheritance reason for this .... may move it back
         this.savedJobController.setFeatures(); //aka give the savedJobTabbed View the relevant controller obj
         
         this.view = new MainView(this.findJobController.getView(), this.savedJobController.getView());
@@ -54,16 +60,36 @@ public class MainController implements IController {
         this.model = model;
     }
 
+    /**
+     * This method gets the view using the controller.
+     * 
+     */
     @Override
     public IView getView() {
         return view;
     }
 
+    /**
+     * This method gets the model using the controller.
+     * 
+     */
     @Override
     public IModel getModel() {
         return model;
     }
 
+    //getApiCall to send to view
+    /**
+     * This method gets the API call using the controller.
+     * 
+     */
+    public List<JobRecord> getApiCall(String query, Integer numberOfResults, String location, String industry) {
+        return JobBoardApi.getJobBoard(query, numberOfResults, location, industry);
+    }
+
+    /**
+     * This will be used for testing purposes.
+     */
     public static void main(String[] args){
         MainController mainController = new MainController();
     }
