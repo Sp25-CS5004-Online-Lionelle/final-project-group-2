@@ -96,6 +96,8 @@ public class Jobs implements IModel {
         return JobBoardApi.getJobBoard(query, numberOfResults, location, industry);
     }
 
+    //add getSavedJobs and downloadJobs methods here
+    
     /**
      * Main method for testing purposes.
      * @param args Command line arguments (not used).
