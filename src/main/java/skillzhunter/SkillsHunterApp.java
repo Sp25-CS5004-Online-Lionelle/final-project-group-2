@@ -6,8 +6,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import skillzhunter.controller.MainController;
+
 import skillzhunter.view.IView;
 import skillzhunter.model.IModel;
+
 
 public class SkillsHunterApp {
     static final String DEFAULT_DATA_FILE = "data\\temp_data.xml";

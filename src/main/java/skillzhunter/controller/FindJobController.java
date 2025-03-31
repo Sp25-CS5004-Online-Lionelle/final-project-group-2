@@ -3,6 +3,7 @@ package skillzhunter.controller;
 
 import skillzhunter.view.FindJobView;
 
+
 import java.util.List;
 
 import skillzhunter.model.JobRecord;
@@ -39,6 +40,7 @@ public class FindJobController {
         List<JobRecord> results = model.searchByIndustry(industry);
         //Tor/Judson will create this - commenting out until they do
         //this.view.showSearchResults(results);
+
     }
 
 }

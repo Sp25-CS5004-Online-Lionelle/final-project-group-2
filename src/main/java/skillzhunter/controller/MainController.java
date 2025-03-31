@@ -1,18 +1,13 @@
 package skillzhunter.controller;
 
+
 import java.util.List;
 
 import skillzhunter.model.IModel;
 import skillzhunter.model.JobRecord;
 import skillzhunter.model.Jobs;
 import skillzhunter.model.net.JobBoardApi;
-import skillzhunter.view.FindJobView;
-import skillzhunter.view.IView;
-import skillzhunter.view.MainView;
-import skillzhunter.view.SavedJobView;
 
-public class MainController implements IController {
-    private IView view;
     private IModel model;
     private FindJobController findJobController;
     private SavedJobController savedJobController;
@@ -35,9 +30,11 @@ public class MainController implements IController {
         //theres an inheritance reason for this .... may move it back
         this.savedJobController.setFeatures(); //aka give the savedJobTabbed View the relevant controller obj
         
+
         this.view = new MainView(this.findJobController.getView(), this.savedJobController.getView());
 
     }
+
 
     /**
      * This method sets the view for the controller.
@@ -46,9 +43,6 @@ public class MainController implements IController {
      * @param view The view to be set for the controller.
      */
     protected void setView(IView view) {
-        this.view = view;
-        view.addFeatures(this);
-    }
 
     /**
      * This method sets the view for the controller.
@@ -93,4 +87,5 @@ public class MainController implements IController {
     public static void main(String[] args){
         MainController mainController = new MainController();
     }
+
 }

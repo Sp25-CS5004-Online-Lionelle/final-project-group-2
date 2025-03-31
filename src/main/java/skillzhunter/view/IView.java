@@ -1,6 +1,7 @@
 package skillzhunter.view;
 
-import skillzhunter .controller.IController;
+
+import skillzhunter.controller.IController;
 
 public interface IView {
 /**

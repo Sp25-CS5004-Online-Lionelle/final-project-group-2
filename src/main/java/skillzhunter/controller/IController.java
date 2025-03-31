@@ -1,5 +1,6 @@
 package skillzhunter.controller;
 
+
 import skillzhunter.model.IModel;
 import skillzhunter.view.IView;
 
@@ -8,4 +9,5 @@ public interface IController {
     IView getView();
     /** gets Model */
     IModel getModel();
+
 }

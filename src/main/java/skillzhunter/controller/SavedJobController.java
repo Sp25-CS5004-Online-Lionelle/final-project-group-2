@@ -13,7 +13,7 @@ public class SavedJobController {
     public SavedJobView getView() {
         return view;
     }
-    
+
     public void setFeatures() {
         this.view.addFeatures(this);
     }
