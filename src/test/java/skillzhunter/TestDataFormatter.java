@@ -39,7 +39,9 @@ public class TestDataFormatter {
             "2025-03-30",
             120000,
             150000,
-            "USD"
+            "USD",
+            4,
+            "Big fan of Python and AI. Looking for a challenging role in finance."
         );
 
         JobRecord record2 = new JobRecord(
@@ -58,7 +60,9 @@ public class TestDataFormatter {
             "2025-03-25",
             110000,
             140000,
-            "USD"
+            "USD",
+            3,
+            "Passionate about user experience and modern web technologies."
         );
 
         JobRecord record3 = new JobRecord(
@@ -77,7 +81,9 @@ public class TestDataFormatter {
             "2025-03-15",
             70000,
             85000,
-            "CHF"
+            "CHF",
+            5,
+            "Eager to contribute to global development through data analysis."
         );
 
         jobRecords = List.of(record1, record2, record3);
