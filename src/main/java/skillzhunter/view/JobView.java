@@ -138,9 +138,16 @@ public class JobView extends JPanel {
             jobRating.setPaintTicks(true);
             jobRating.setPaintLabels(true);
             
+            //add text area for comments for user to add their own comments
+            JTextArea comments = new JTextArea(5, 20);
+            comments.setLineWrap(true);
+            comments.setWrapStyleWord(true);
+            comments.setBorder(BorderFactory.createTitledBorder("Your Comments"));
+
+
             Object[] obj = {"Job Title: ", jobTitle, "Company: ", jobCompany, "Industry: ", jobIndustry,
                             "Type: ", jobType, "Location: ", jobGeo, "Level: ", jobLevel, "Salary: ", jobSalaryRange,
-                            "Currency: ", jobCurrency, "Published: ", jobPubDate, "Rate this Job: ", jobRating, "Save this Job?"};
+                            "Currency: ", jobCurrency, "Published: ", jobPubDate, "Rate this Job: ", jobRating, "Comments:", comments, "Save this Job?"};
             
             JOptionPane.showConfirmDialog(jobsTable, obj, "Job Details: " + activeJob.id(), JOptionPane.INFORMATION_MESSAGE);
         }
