@@ -36,7 +36,7 @@ public class MainView extends JFrame implements IView {
         super("Jobz Hunter App");
         //this.setSize(500, 500);
         this.setLocation(200, 200);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         findJobPane.add(findJobTab);
 
