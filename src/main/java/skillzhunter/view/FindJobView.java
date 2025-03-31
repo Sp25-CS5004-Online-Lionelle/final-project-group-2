@@ -13,7 +13,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import skillzhunter.controller.FindJobController;
-
+import skillzhunter.model.JobRecord;
+import javax.swing.table.TableColumn;
+import javax.swing.ScrollPaneConstants;
 
 
 
