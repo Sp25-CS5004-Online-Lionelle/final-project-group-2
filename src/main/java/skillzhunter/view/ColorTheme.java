@@ -33,23 +33,24 @@ public class ColorTheme {
 
     /** The light color theme for the application. */
     public static final ColorTheme LIGHT = new ColorTheme(
-        new Color(200, 200, 200),
-        new Color(180, 180, 255),
-        new Color(240, 240, 240),
-        Color.BLACK,
-        Color.WHITE,
-        Color.BLACK,
-        Color.BLACK
-    );
+    new Color(0, 0, 0),       // Black button normal color
+    new Color(105, 105, 105), // Darker grey hover color for better contrast
+    new Color(240, 240, 240), // Background color for light mode
+    Color.BLACK,              // Foreground color for text
+    Color.WHITE,              // Field background for input fields
+    Color.BLACK,              // Field foreground for input fields
+    Color.WHITE               // Button foreground color (text) for light mode
+);
 
-    /** The dark color theme for the application. */
-    public static final ColorTheme DARK = new ColorTheme(
-        new Color(58, 141, 255),
-        new Color(0, 95, 204),
-        new Color(43, 43, 43),
-        new Color(224, 224, 224),
-        new Color(60, 63, 65),
-        new Color(224, 224, 224),
-        Color.WHITE
-    );
+/** The dark color theme for the application. */
+public static final ColorTheme DARK = new ColorTheme(
+    new Color(58, 141, 255),  // Original blue button normal color
+    new Color(50, 120, 230),   // Darker blue hover color for better contrast
+    new Color(43, 43, 43),    // Background color for dark mode
+    new Color(224, 224, 224), // Foreground color for text
+    new Color(60, 63, 65),    // Field background for input fields
+    new Color(224, 224, 224), // Field foreground for input fields
+    Color.WHITE               // Button foreground color (text) for dark mode
+);
+
 }

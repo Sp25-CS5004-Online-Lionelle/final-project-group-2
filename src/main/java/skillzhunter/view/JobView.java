@@ -90,12 +90,21 @@ public class JobView extends JPanel {
     private void setButtonProperties(JButton button) {
         Color normalColor = theme.buttonNormal;
         Color hoverColor = theme.buttonHover;
-        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    
+        // First, set the normal background color for the button
+        button.setBackground(normalColor);
+        button.setForeground(theme.buttonForeground);
+        
+        // Apply hover effect with the correct hover color
         applyHoverEffect(button, hoverColor, normalColor);
+    
+        // Other properties
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         button.setFocusPainted(false);
         button.setOpaque(true);
         button.setBorderPainted(false);
     }
+    
 
     private void applyTheme() {
         setBackground(theme.background);
@@ -122,7 +131,7 @@ public class JobView extends JPanel {
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(hoverColor);
+                button.setBackground(theme.buttonHover);
             }
 
             @Override
