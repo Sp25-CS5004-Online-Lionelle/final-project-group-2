@@ -10,11 +10,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
+
 
 import skillzhunter.controller.IController;
 
@@ -38,11 +35,11 @@ public class MainView extends JFrame implements IView {
         this.setLocation(200, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        //Assigns the sub-views
         findJobPane.add(findJobTab);
-
         savedJobPane.add(saveJobTab);
 
-
+        //Creates the sub-view tabs
         tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Find Jobs", findJobPane);
         tabbedPane.addTab("Saved Jobs", savedJobPane);
@@ -60,6 +57,7 @@ public class MainView extends JFrame implements IView {
             }
         });
 
+        //Adds tabs to main view
         mainPane.add(tabbedPane);
         add(mainPane);
 
@@ -71,7 +69,7 @@ public class MainView extends JFrame implements IView {
     }
 
     /**
-     * Returns menue logic for the main view
+     * Returns menu logic for the main view
      */
     private JMenuBar addMenuBar() {
         // Download Menu
