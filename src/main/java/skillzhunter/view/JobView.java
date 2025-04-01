@@ -164,7 +164,7 @@ public class JobView extends JPanel {
             JTextArea jobCurrency = new JTextArea(activeJob.salaryCurrency());
             JTextArea jobPubDate = new JTextArea(activeJob.pubDate());
     
-            JSlider jobRating = new JSlider(0, 10, 5);
+            JSlider jobRating = new JSlider(0, 5, 2);
             jobRating.setMajorTickSpacing(5);
             jobRating.setMinorTickSpacing(1);
             jobRating.setPaintTicks(true);
