@@ -2,6 +2,7 @@ package skillzhunter.view;
 
 import static skillzhunter.view.JobsLoader.getColumnNames;
 import static skillzhunter.view.JobsLoader.getData;
+
 import java.util.List;
 import javax.swing.table.TableColumn;
 import skillzhunter.controller.FindJobController;
@@ -16,11 +17,13 @@ public class JobView extends JPanel {
     protected JobsTable jobsTable;
     private ColorTheme theme;
     protected List<JobRecord> jobsList = JobRecordGenerator.generateDummyRecords(10);
-    private JToggleButton darkModeToggle;
+    protected JButton darkModeToggle;
+    protected JButton openJob;
+    protected JButton exit;
 
     public JobView() {
         setSize(1000, 1000);
-        theme = new ColorTheme(false); // Start with light mode
+        theme = ColorTheme.LIGHT; // Start with light mode
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 
@@ -46,10 +49,10 @@ public class JobView extends JPanel {
 
         // Button Panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JButton openJob = new JButton("Open Job");
+        openJob = new JButton("Open Job");
         openJob.addActionListener(e -> openSelectedJob());
 
-        JButton exit = new JButton("Exit");
+        exit = new JButton("Exit");
         exit.addActionListener(exitEvent -> {
             int result = JOptionPane.showConfirmDialog(mainPanel, "Are you sure you want to exit?", "Exit", JOptionPane.YES_NO_OPTION);
             if (result == JOptionPane.YES_OPTION) {
@@ -57,14 +60,13 @@ public class JobView extends JPanel {
             }
         });
 
-        // Dark Mode Toggle Button
-        darkModeToggle = new JToggleButton("🌙");
-        darkModeToggle.setSelected(false);
+        // Dark Mode Toggle Button (Changed to JButton)
+        darkModeToggle = new JButton("🌙");
         darkModeToggle.addActionListener(e -> {
-            boolean isDarkMode = darkModeToggle.isSelected();
-            theme = new ColorTheme(isDarkMode); 
-            applyTheme(); 
-            darkModeToggle.setText(isDarkMode ? "☀️" : "🌙");
+            boolean isDarkMode = darkModeToggle.getText().equals("🌙");
+            theme = isDarkMode ? ColorTheme.DARK : ColorTheme.LIGHT;
+            applyTheme();
+            darkModeToggle.setText(isDarkMode ? "☀️" : "🌙"); // Toggle the text/icon
         });
 
         // Add buttons to button panel
@@ -73,32 +75,61 @@ public class JobView extends JPanel {
         buttonPanel.add(exit);
         mainPanel.add(buttonPanel);
 
-        // Set cursor for all buttons
-        JButton[] buttons = {searchButton, openJob, exit};
-        for (JButton button : buttons) {
-            button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        }
-        darkModeToggle.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        // Set initial button properties
+        setButtonProperties(searchButton);
+        setButtonProperties(openJob);
+        setButtonProperties(exit);
+        setButtonProperties(darkModeToggle); // Make sure darkModeToggle has the same hover effect
+
         jobsTable.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         add(mainPanel);
         applyTheme(); // Apply initial theme
     }
 
+    private void setButtonProperties(JButton button) {
+        Color normalColor = theme.buttonNormal;
+        Color hoverColor = theme.buttonHover;
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        applyHoverEffect(button, hoverColor, normalColor);
+        button.setFocusPainted(false);
+        button.setOpaque(true);
+        button.setBorderPainted(false);
+    }
+
     private void applyTheme() {
-        setBackground(theme.getBackgroundColor());
-        recordText.setBackground(theme.getBackgroundColor());
-        recordText.setForeground(theme.getForegroundColor());
-        searchButton.setBackground(theme.getButtonBackgroundColor());
-        searchButton.setForeground(theme.getButtonForegroundColor());
-        darkModeToggle.setBackground(theme.getButtonBackgroundColor());
-        darkModeToggle.setForeground(theme.getButtonForegroundColor());
-        jobsTable.setBackground(theme.getTableBackgroundColor());
-        jobsTable.setForeground(theme.getTableForegroundColor());
-        jobsTable.setBorder(BorderFactory.createLineBorder(theme.getBorderColor()));
-        jobsTable.getTableHeader().setBackground(theme.getTableHeaderBackgroundColor());
-        jobsTable.getTableHeader().setForeground(theme.getTableHeaderForegroundColor());
+        setBackground(theme.background);
+        recordText.setBackground(theme.background);
+        recordText.setForeground(theme.foreground);
+        // Set button colors
+        searchButton.setBackground(theme.buttonNormal);
+        searchButton.setForeground(theme.buttonForeground);
+        openJob.setBackground(theme.buttonNormal);
+        openJob.setForeground(theme.buttonForeground);
+        exit.setBackground(theme.buttonNormal);
+        exit.setForeground(theme.buttonForeground);
+        darkModeToggle.setBackground(theme.buttonNormal);
+        darkModeToggle.setForeground(theme.buttonForeground);
+        jobsTable.setBackground(theme.fieldBackground);
+        jobsTable.setForeground(theme.fieldForeground);
+        jobsTable.setBorder(BorderFactory.createLineBorder(theme.buttonNormal));
+        jobsTable.getTableHeader().setBackground(theme.fieldBackground);
+        jobsTable.getTableHeader().setForeground(theme.foreground);
         repaint();
+    }
+
+    private void applyHoverEffect(JButton button, Color hoverColor, Color normalColor) {
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(hoverColor);
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(theme.buttonNormal); // Dynamically retrieve the current normal color
+            }
+        });
     }
 
     private void openSelectedJob() {
@@ -136,8 +167,6 @@ public class JobView extends JPanel {
             JOptionPane.showConfirmDialog(jobsTable, obj, "Job Details: " + activeJob.id(), JOptionPane.INFORMATION_MESSAGE);
         }
     }
-
-
 
     public void setRecordText(String text) {
         recordText.setText(text);
