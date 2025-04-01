@@ -10,7 +10,7 @@ public final class JobsLoader {
 
 
   private static String[] columnNames = {"Job ID", "Job Title", "Company",
-      "Industry", "Type", "Geo", "Level", "Salary Range", "Currency", "Published Date" };
+      "Industry", "Type", "Geo", "Level", "Salary Range", "Currency", "Published Date", "Rating", "Comments" };
   private final Collection<JobRecord> jobs = new ArrayList<>();
 
   //* private constructor to prevent instantiation */
@@ -31,7 +31,7 @@ public final class JobsLoader {
   //Converts a collection of jobs into a type that JTable can understand
   public static Object[][] getData(Collection<JobRecord> jobs) {
     List<JobRecord> jobList = jobs.stream().toList();
-    Object[][] data = new Object[jobList.size()][10];
+    Object[][] data = new Object[jobList.size()][12];
 
     for (int i = 0; i < jobList.size(); i++) {
       JobRecord record = jobList.get(i);
@@ -56,6 +56,8 @@ public final class JobsLoader {
       data[i][7] = salaryRange;
       data[i][8] = record.salaryCurrency();
       data[i][9] = record.pubDate();
+      data[i][10] = record.rating();
+      data[i][11] = record.comments();
     }
 
     return data;

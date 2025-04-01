@@ -36,7 +36,7 @@ public class MainView extends JFrame implements IView {
         super("Jobz Hunter App");
         //this.setSize(500, 500);
         this.setLocation(200, 200);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         findJobPane.add(findJobTab);
 
@@ -46,6 +46,20 @@ public class MainView extends JFrame implements IView {
         tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Find Jobs", findJobPane);
         tabbedPane.addTab("Saved Jobs", savedJobPane);
+
+        // Set hand cursor for tabs
+        tabbedPane.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+            tabbedPane.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+            tabbedPane.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+            }
+        });
+
         mainPane.add(tabbedPane);
         add(mainPane);
 

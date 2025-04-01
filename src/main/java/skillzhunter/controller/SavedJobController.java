@@ -2,7 +2,7 @@ package skillzhunter.controller;
 
 import skillzhunter.view.SavedJobView;
 
-public class SavedJobController {
+public class SavedJobController implements IJobController{
     private SavedJobView view;
 
     public SavedJobController(SavedJobView savedJobTabbed) {
@@ -18,7 +18,8 @@ public class SavedJobController {
         this.view.addFeatures(this);
     }
 
-    public void dummySavedJobMethod(){
+    @Override
+    public void setViewData(){
         this.view.setRecordText("Dummy Saved Job Method Called");
 
     }

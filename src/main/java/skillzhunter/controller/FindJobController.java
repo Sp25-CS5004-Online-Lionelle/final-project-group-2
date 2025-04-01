@@ -8,7 +8,7 @@ import java.util.List;
 
 import skillzhunter.model.JobRecord;
 import skillzhunter.model.Jobs;
-public class FindJobController {
+public class FindJobController implements IJobController{
     private FindJobView view;
     private Jobs model;
     public FindJobController(FindJobView findJobTabbed) {
@@ -27,7 +27,8 @@ public class FindJobController {
     /**
      * Sets text for the view when find job is called.
      */
-    public void dummyFindJobMethod(){
+    @Override
+    public void setViewData(){
         this.view.setRecordText("Dummy Find Job Method Called");
     }
 
