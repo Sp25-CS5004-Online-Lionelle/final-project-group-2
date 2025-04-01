@@ -146,36 +146,44 @@ public class JobView extends JPanel {
         if (viewIdx >= 0) {
             int n = jobsTable.convertRowIndexToModel(viewIdx);
             JobRecord activeJob = jobsList.get(n);
-
+    
             JTextArea jobTitle = new JTextArea(activeJob.jobTitle());
             JTextArea jobCompany = new JTextArea(activeJob.companyName());
-            JTextArea jobIndustry = new JTextArea(activeJob.jobIndustry().toString());
-            JTextArea jobType = new JTextArea(activeJob.jobType().toString());
+            
+            // Join the industry array elements into a string without brackets
+            String jobIndustryText = String.join(", ", activeJob.jobIndustry());
+            JTextArea jobIndustry = new JTextArea(jobIndustryText);
+    
+            // Join the type array elements into a string without brackets
+            String jobTypeText = String.join(", ", activeJob.jobType());
+            JTextArea jobType = new JTextArea(jobTypeText);
+    
             JTextArea jobGeo = new JTextArea(activeJob.jobGeo());
             JTextArea jobLevel = new JTextArea(activeJob.jobLevel());
             JTextArea jobSalaryRange = new JTextArea(String.valueOf(activeJob.annualSalaryMin()));
             JTextArea jobCurrency = new JTextArea(activeJob.salaryCurrency());
             JTextArea jobPubDate = new JTextArea(activeJob.pubDate());
-
+    
             JSlider jobRating = new JSlider(0, 10, 5);
             jobRating.setMajorTickSpacing(5);
             jobRating.setMinorTickSpacing(1);
             jobRating.setPaintTicks(true);
             jobRating.setPaintLabels(true);
-
+    
             JTextArea comments = new JTextArea(5, 20);
             comments.setLineWrap(true);
             comments.setWrapStyleWord(true);
             comments.setBorder(BorderFactory.createTitledBorder("Your Comments"));
-
+    
             Object[] obj = {"Job Title: ", jobTitle, "Company: ", jobCompany, "Industry: ", jobIndustry,
                             "Type: ", jobType, "Location: ", jobGeo, "Level: ", jobLevel, "Salary: ", jobSalaryRange,
                             "Currency: ", jobCurrency, "Published: ", jobPubDate, "Rate this Job: ", jobRating, 
                             "Comments:", comments, "Save this Job?"};
-
+    
             JOptionPane.showConfirmDialog(jobsTable, obj, "Job Details: " + activeJob.id(), JOptionPane.INFORMATION_MESSAGE);
         }
     }
+    
 
     public void setRecordText(String text) {
         recordText.setText(text);
