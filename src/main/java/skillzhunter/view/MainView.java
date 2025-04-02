@@ -35,6 +35,8 @@ public class MainView extends JFrame implements IView {
         this.setLocation(200, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        SavedJobsLists.addObserver(saveJobTab);
+
         //Assigns the sub-views
         findJobPane.add(findJobTab);
         savedJobPane.add(saveJobTab);

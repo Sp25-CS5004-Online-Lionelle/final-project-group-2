@@ -3,9 +3,8 @@ package skillzhunter.view;
 import static skillzhunter.view.JobsLoader.getColumnNames;
 import static skillzhunter.view.JobsLoader.getData;
 
+import java.util.ArrayList;
 import java.util.List;
-import javax.swing.table.TableColumn;
-import skillzhunter.controller.FindJobController;
 import skillzhunter.controller.IJobController;
 import skillzhunter.model.JobRecord;
 import javax.swing.*;
@@ -16,10 +15,14 @@ public class JobView extends JPanel {
     protected JTextArea recordText;
     protected JobsTable jobsTable;
     private ColorTheme theme;
-    protected List<JobRecord> jobsList = JobRecordGenerator.generateDummyRecords(10);
+    protected List<JobRecord> jobsList = new ArrayList<>();
     protected JButton darkModeToggle;
     protected JButton openJob;
     protected JButton exit;
+
+    //This is an ugly way to let inheriting classes know if they are SavedJobView or FindJobView
+    //We should probably figure something else out
+    protected boolean savedJobs = false;
 
     public JobView() {
         setSize(1000, 1000);
@@ -142,10 +145,18 @@ public class JobView extends JPanel {
     }
 
     private void openSelectedJob() {
+        boolean jobPresent = false;
+        String dialogMsg = "Save this Job?";
         int viewIdx = jobsTable.getSelectedRow();
         if (viewIdx >= 0) {
             int n = jobsTable.convertRowIndexToModel(viewIdx);
             JobRecord activeJob = jobsList.get(n);
+
+            //See if we already have this one
+            if (SavedJobsLists.getSavedJobs().contains(activeJob)) {
+                jobPresent = true;
+                dialogMsg = "Remove this Job?";
+            }
     
             JTextArea jobTitle = new JTextArea(activeJob.jobTitle());
             JTextArea jobCompany = new JTextArea(activeJob.companyName());
@@ -174,16 +185,35 @@ public class JobView extends JPanel {
             comments.setLineWrap(true);
             comments.setWrapStyleWord(true);
             comments.setBorder(BorderFactory.createTitledBorder("Your Comments"));
+
+            //TODO: make the text & function update if the record is already in the saved list (ADD v REMOVE)
     
             Object[] obj = {"Job Title: ", jobTitle, "Company: ", jobCompany, "Industry: ", jobIndustry,
                             "Type: ", jobType, "Location: ", jobGeo, "Level: ", jobLevel, "Salary: ", jobSalaryRange,
                             "Currency: ", jobCurrency, "Published: ", jobPubDate, "Rate this Job: ", jobRating, 
-                            "Comments:", comments, "Save this Job?"};
+                            "Comments:", comments, dialogMsg};
     
-            JOptionPane.showConfirmDialog(jobsTable, obj, "Job Details: " + activeJob.id(), JOptionPane.INFORMATION_MESSAGE);
+            int result = JOptionPane.showConfirmDialog(jobsTable, obj, "Job Details: ", JOptionPane.INFORMATION_MESSAGE);
+
+            if (result == JOptionPane.YES_OPTION) {
+                if (jobPresent) {
+                    SavedJobsLists.removeSavedJob(activeJob);
+                } else {
+                    SavedJobsLists.addSavedJob(activeJob);
+                }
+            }
         }
     }
-    
+
+
+    public void setJobsList(List<JobRecord> jobsList) {
+       this.jobsList = jobsList;
+       this.jobsTable.setData(getData(jobsList));
+    }
+
+    public List<JobRecord> getJobsList() {
+        return this.jobsList;
+    }
 
     public void setRecordText(String text) {
         recordText.setText(text);
@@ -191,6 +221,17 @@ public class JobView extends JPanel {
 
     public void addFeatures(IJobController controller) {
         searchButton.addActionListener(e -> controller.setViewData());
+    }
+
+
+    public void addJobRecord(JobRecord record) {
+        this.jobsList.add(record);
+        this.jobsTable.setData(getData(jobsList));
+    }
+
+    public void removeJobRecord(JobRecord record) {
+        this.jobsList.remove(record);
+        this.jobsTable.setData(getData(jobsList));
     }
 
     public static void main(String[] args) {

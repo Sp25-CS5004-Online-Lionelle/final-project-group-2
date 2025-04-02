@@ -20,10 +20,19 @@ import skillzhunter.model.JobRecord;
 
 
 public class SavedJobView extends JobView{
+
     public SavedJobView(){
+
         super();
+        setJobsList(SavedJobsLists.getSavedJobs());
         this.searchButton.setText("Saved Jobs");
+        this.savedJobs = true;
+
+        SavedJobsLists.addObserver(this);
     }
+
+
+
 
     public static void main(String[] args) {
         System.out.println("hello");
