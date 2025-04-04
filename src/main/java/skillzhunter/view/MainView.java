@@ -26,7 +26,7 @@ public class MainView extends JFrame implements IView {
     final private JobView savedJobTab;
     /** Pane to host findJobs and searchJobs*/
     private JTabbedPane tabbedPane;
-    private IController controller;
+    final private IController controller;
 
 
 
@@ -37,13 +37,12 @@ public class MainView extends JFrame implements IView {
         this.setLocation(200, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // // Create the tabbed pane
-        // tabbedPane = new JTabbedPane();
-
+        // building tabs
         findJobTab = new FindJobView(controller);
         savedJobTab = new SavedJobView(controller);
+        
+        // building tabbed pane
         tabbedPane  = buildTabbedPane(findJobTab, savedJobTab);
-
 
         //Adds tabs to main view
         mainPane.add(tabbedPane);
@@ -56,6 +55,12 @@ public class MainView extends JFrame implements IView {
         pack();
     }
 
+    /**
+     * Builds the tabbed pane for the main view.
+     * @param findJobTab The tab for finding jobs.
+     * @param savedJobTab The tab for saved jobs.
+     * @return The tabbed pane containing the two tabs.
+     */
     private JTabbedPane buildTabbedPane(JobView findJobTab, JobView savedJobTab) {
         // Create the tabbed pane
         tabbedPane = new JTabbedPane();
@@ -83,6 +88,7 @@ public class MainView extends JFrame implements IView {
         });
         return tabbedPane;
     }
+
     /**
      * Returns menu logic for the main view
      */

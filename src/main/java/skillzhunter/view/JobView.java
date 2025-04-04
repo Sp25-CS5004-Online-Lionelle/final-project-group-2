@@ -50,9 +50,9 @@ public class JobView extends JPanel {
 
         // Search Row with TextField and Button
         mainPanel.add(getSearchRow());
-
         recordText = new JTextArea("Click to find jobs");
         mainPanel.add(recordText);
+
 
         // Table Panel with Scrollable Jobs Table
         JPanel tablePanel = new JPanel();
