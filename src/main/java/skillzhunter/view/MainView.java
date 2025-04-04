@@ -21,30 +21,53 @@ public class MainView extends JFrame implements IView {
 //    /** Main pane for the entire program */
 //    private Container mainPane = this.getContentPane();
     private JPanel mainPane = new JPanel();
-    private JPanel findJobPane = new JPanel();
+    final private JobView findJobTab;
     //private JobsTable findJobsTable = new JobsTable();
-    private JPanel savedJobPane = new JPanel();
+    final private JobView savedJobTab;
     /** Pane to host findJobs and searchJobs*/
     private JTabbedPane tabbedPane;
+    private IController controller;
 
 
 
-    public MainView(FindJobView findJobTab, SavedJobView saveJobTab) {
+    public MainView(IController controller) {
         super("Jobz Hunter App");
+        this.controller = controller;
         //this.setSize(500, 500);
         this.setLocation(200, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        SavedJobsLists.addObserver(saveJobTab);
+        // // Create the tabbed pane
+        // tabbedPane = new JTabbedPane();
 
-        //Assigns the sub-views
-        findJobPane.add(findJobTab);
-        savedJobPane.add(saveJobTab);
+        findJobTab = new FindJobView(controller);
+        savedJobTab = new SavedJobView(controller);
+        tabbedPane  = buildTabbedPane(findJobTab, savedJobTab);
 
-        //Creates the sub-view tabs
+
+        //Adds tabs to main view
+        mainPane.add(tabbedPane);
+        add(mainPane);
+
+        // Adding menu bar
+        JMenuBar menuBar = addMenuBar();
+        setJMenuBar(menuBar);
+
+        pack();
+    }
+
+    private JTabbedPane buildTabbedPane(JobView findJobTab, JobView savedJobTab) {
+        // Create the tabbed pane
         tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Find Jobs", findJobPane);
-        tabbedPane.addTab("Saved Jobs", savedJobPane);
+
+        findJobTab = new FindJobView(controller);
+        savedJobTab = new SavedJobView(controller);
+
+        SavedJobsLists.addObserver(savedJobTab);
+
+        tabbedPane.add("Find Jobs",findJobTab);
+        tabbedPane.add("Saved Jobs",savedJobTab);
+
 
         // Set hand cursor for tabs
         tabbedPane.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -58,18 +81,8 @@ public class MainView extends JFrame implements IView {
             tabbedPane.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
             }
         });
-
-        //Adds tabs to main view
-        mainPane.add(tabbedPane);
-        add(mainPane);
-
-        // Adding menu bar
-        JMenuBar menuBar = addMenuBar();
-        setJMenuBar(menuBar);
-
-        pack();
+        return tabbedPane;
     }
-
     /**
      * Returns menu logic for the main view
      */

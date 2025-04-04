@@ -93,7 +93,8 @@ public class Jobs implements IModel {
      */
     @Override
     public List<JobRecord> searchJobs(String query, Integer numberOfResults, String location, String industry) {
-        return JobBoardApi.getJobBoard(query, numberOfResults, location, industry);
+        List<JobRecord> results = JobBoardApi.getJobBoard(query, numberOfResults, location, industry);
+        return results;
     }
 
     //add getSavedJobs and downloadJobs methods here

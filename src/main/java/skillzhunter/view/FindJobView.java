@@ -5,10 +5,12 @@ import static skillzhunter.view.JobsLoader.getData;
 
 import java.util.List;
 import skillzhunter.model.JobRecord;
+import skillzhunter.controller.IController;
 
 public class FindJobView extends JobView {
+    private static IController controller;
 
-    public FindJobView(){
+    public FindJobView(IController controller){
         super();
         setJobsList(JobRecordGenerator.generateDummyRecords(10));
     }

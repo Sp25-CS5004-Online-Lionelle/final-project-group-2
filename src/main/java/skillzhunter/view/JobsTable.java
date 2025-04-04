@@ -3,12 +3,12 @@ package skillzhunter.view;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+
 import javax.swing.JTable;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
+
 import skillzhunter.model.JobRecord;
+;
 
 //class set up to make JTable setting consistent across views
 //will be more important if we go with a custom table model
@@ -16,6 +16,7 @@ public class JobsTable extends JTable {
 
   private DefaultTableModel tableModel;
   private final Collection<JobRecord> jobs = new ArrayList<>();
+  
   private String[] columnNames = {"id", "url", "jobSlug", "jobTitle", "companyName",
       "companyLogo", "jobIndustry", "jobType", "jobGeo", "jobLevel",
       "jobExcerpt", "jobDescription", "pubDate", "annualSalaryMin",
@@ -32,6 +33,7 @@ public class JobsTable extends JTable {
   }
 
     public void setData (Object[][]data){
+
       tableModel.setDataVector(data, getColumnNames());
       tableModel.fireTableDataChanged();
     }
@@ -53,7 +55,7 @@ public class JobsTable extends JTable {
       tableModel.setValueAt(value, row, column);
     }
 
-    public Object getValueAt ( int row, int column){
+    public Object getValueAt( int row, int column){
       return tableModel.getValueAt(row, column);
     }
 

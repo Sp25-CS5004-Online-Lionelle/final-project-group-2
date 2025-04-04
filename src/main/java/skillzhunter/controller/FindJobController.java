@@ -1,14 +1,15 @@
 package skillzhunter.controller;
 
 
-import skillzhunter.view.FindJobView;
-
-
 import java.util.List;
 
 import skillzhunter.model.JobRecord;
 import skillzhunter.model.Jobs;
-public class FindJobController implements IJobController{
+import skillzhunter.model.net.JobBoardApi;
+import skillzhunter.view.FindJobView;
+
+public class FindJobController implements IJobController {
+
     private FindJobView view;
     private Jobs model;
     public FindJobController(FindJobView findJobTabbed) {
@@ -64,7 +65,22 @@ public class FindJobController implements IJobController{
         List<JobRecord> results = model.searchByIndustry(industry);
         //Tor/Judson will create this - commenting out until they do
         //this.view.showSearchResults(results);
+    }
 
+    public List<JobRecord> api2DataFrame(String query, Integer numberOfResults, String location, String industry){
+
+        List<JobRecord> results = model.searchJobs(query, numberOfResults, location, industry);
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    /**
+     * This method gets the API call using the controller.
+     * 
+     */
+    public static List<JobRecord> getApiCall(String query, Integer numberOfResults, String location, String industry) {
+        return JobBoardApi.getJobBoard(query, numberOfResults, location, industry);
+    }
+    public static void main(String[] args) {
+        FindJobController.getApiCall("java", 10, "toronto", "software");
     }
 
 }

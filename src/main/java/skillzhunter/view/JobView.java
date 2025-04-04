@@ -1,17 +1,35 @@
 package skillzhunter.view;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.TextField;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
+
+import skillzhunter.controller.IJobController;
+import skillzhunter.model.JobRecord;
 import static skillzhunter.view.JobsLoader.getColumnNames;
 import static skillzhunter.view.JobsLoader.getData;
 
-import java.util.ArrayList;
-import java.util.List;
-import skillzhunter.controller.IJobController;
-import skillzhunter.model.JobRecord;
-import javax.swing.*;
-import java.awt.*;
+import skillzhunter.controller.FindJobController;
+
 
 public class JobView extends JPanel {
     protected JButton searchButton;
+    protected JTextArea searchField;
     protected JTextArea recordText;
     protected JobsTable jobsTable;
     private ColorTheme theme;
@@ -30,8 +48,8 @@ public class JobView extends JPanel {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 
-        searchButton = new JButton("Find Jobs");
-        mainPanel.add(searchButton);
+        // Search Row with TextField and Button
+        mainPanel.add(getSearchRow());
 
         recordText = new JTextArea("Click to find jobs");
         mainPanel.add(recordText);
@@ -107,7 +125,30 @@ public class JobView extends JPanel {
         button.setOpaque(true);
         button.setBorderPainted(false);
     }
-    
+    /**
+     * Build the search row with a TextField and a Button
+     * @return JPanel containing the search row
+    */
+    private JPanel getSearchRow(){
+        JPanel searchRow = new JPanel();
+        searchRow.setLayout(new BoxLayout(searchRow, BoxLayout.LINE_AXIS));
+        TextField searchField = new TextField("", 20);    
+        searchButton = new JButton("Find Jobs");
+        searchRow.add(searchField);
+        searchRow.add(searchButton);
+        searchButton.addActionListener(e -> {
+            List<JobRecord> jobs = FindJobController.getApiCall(searchField.getText(), 10, "any","any");
+            jobsTable = new JobsTable(getColumnNames(), getData(jobsList));
+
+            // jobsTable.setActionMap();
+            System.out.println(jobs);
+        }
+            );
+        // TextField.addActionListener(e -> controller.setViewData());
+
+        
+        return searchRow;
+    }
 
     private void applyTheme() {
         setBackground(theme.background);
@@ -219,9 +260,6 @@ public class JobView extends JPanel {
         recordText.setText(text);
     }
 
-    public void addFeatures(IJobController controller) {
-        searchButton.addActionListener(e -> controller.setViewData());
-    }
 
 
     public void addJobRecord(JobRecord record) {
@@ -236,5 +274,8 @@ public class JobView extends JPanel {
 
     public static void main(String[] args) {
         System.out.println("hello");
+    }
+    public void addFeatures(IJobController controller) {
+        searchButton.addActionListener(e -> controller.setViewData());
     }
 }
