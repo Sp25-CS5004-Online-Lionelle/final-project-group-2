@@ -1,7 +1,9 @@
 package skillzhunter.controller;
 
 
+import java.awt.TextField;
 import java.util.List;
+
 
 import skillzhunter.model.JobRecord;
 import skillzhunter.model.Jobs;
@@ -16,7 +18,6 @@ public class FindJobController implements IJobController {
         this.view = findJobTabbed;
         this.view.addFeatures(this); //give this controller to the view
     }
-
     /**
      * This method sets the view for the controller.
      * @return

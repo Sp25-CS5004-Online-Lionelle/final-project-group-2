@@ -18,6 +18,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.plaf.basic.BasicRadioButtonMenuItemUI;
 
 import skillzhunter.controller.IJobController;
 import skillzhunter.model.JobRecord;
@@ -25,9 +26,10 @@ import static skillzhunter.view.JobsLoader.getColumnNames;
 import static skillzhunter.view.JobsLoader.getData;
 
 import skillzhunter.controller.FindJobController;
+import skillzhunter.controller.IController;
 
 
-public class JobView extends JPanel {
+public abstract class JobView extends JPanel implements IJobView {
     protected JButton searchButton;
     protected JTextArea searchField;
     protected JTextArea recordText;
@@ -37,6 +39,9 @@ public class JobView extends JPanel {
     protected JButton darkModeToggle;
     protected JButton openJob;
     protected JButton exit;
+    protected JPanel topButtonLayout = new JPanel();
+    protected IController controller;
+    protected JPanel mainPanel;
 
     //This is an ugly way to let inheriting classes know if they are SavedJobView or FindJobView
     //We should probably figure something else out
@@ -44,17 +49,43 @@ public class JobView extends JPanel {
 
     public JobView() {
         setSize(1000, 1000);
-        theme = ColorTheme.LIGHT; // Start with light mode
-        JPanel mainPanel = new JPanel();
+
+        mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
+    
+        // Adding in Layout Panels
+        // mainPanel.add(getSearchRow());
+        mainPanel.add(makeTopButtonPanel());
+        mainPanel.add(makeTablePanel());
+        mainPanel.add(makeBottomButtonPanel());
+        add(mainPanel);
 
-        // Search Row with TextField and Button
-        mainPanel.add(getSearchRow());
-        recordText = new JTextArea("Click to find jobs");
-        mainPanel.add(recordText);
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        openJob = new JButton("Open Job");
+        openJob.addActionListener(e -> openSelectedJob());
 
+        mainPanel.add(buttonPanel);
 
-        // Table Panel with Scrollable Jobs Table
+    }
+
+    public JPanel makeTopButtonPanel() {
+        JPanel searchRow = new JPanel();
+        searchRow.setLayout(new BoxLayout(searchRow, BoxLayout.LINE_AXIS));
+        TextField searchField = new TextField("!!This is Place Holder Overide this method!!", 20);    
+        searchRow.add(searchField);
+        return searchRow;
+
+    }
+
+    private JPanel makeBottomButtonPanel() {
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        openJob = new JButton("Open Job");
+        openJob.addActionListener(e -> openSelectedJob());
+        buttonPanel.add(openJob);
+        return buttonPanel;
+    }
+
+    private JPanel makeTablePanel() {
         JPanel tablePanel = new JPanel();
         tablePanel.setLayout(new BorderLayout()); // Use BorderLayout for better handling of the table
         tablePanel.setPreferredSize(new Dimension(800, 400)); // Set a reasonable preferred size for the table
@@ -66,47 +97,9 @@ public class JobView extends JPanel {
         tablePane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
         tablePanel.add(tablePane, BorderLayout.CENTER); // Add tablePane to the center of the panel
-        mainPanel.add(tablePanel);
-
-        // Button Panel
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        openJob = new JButton("Open Job");
-        openJob.addActionListener(e -> openSelectedJob());
-
-        exit = new JButton("Exit");
-        exit.addActionListener(exitEvent -> {
-            int result = JOptionPane.showConfirmDialog(mainPanel, "Are you sure you want to exit?", "Exit", JOptionPane.YES_NO_OPTION);
-            if (result == JOptionPane.YES_OPTION) {
-                System.exit(0);
-            }
-        });
-
-        // Dark Mode Toggle Button (Changed to JButton)
-        darkModeToggle = new JButton("🌙");
-        darkModeToggle.addActionListener(e -> {
-            boolean isDarkMode = darkModeToggle.getText().equals("🌙");
-            theme = isDarkMode ? ColorTheme.DARK : ColorTheme.LIGHT;
-            applyTheme();
-            darkModeToggle.setText(isDarkMode ? "☀️" : "🌙"); // Toggle the text/icon
-        });
-
-        // Add buttons to button panel
-        buttonPanel.add(openJob);
-        buttonPanel.add(darkModeToggle);
-        buttonPanel.add(exit);
-        mainPanel.add(buttonPanel);
-
-        // Set initial button properties
-        setButtonProperties(searchButton);
-        setButtonProperties(openJob);
-        setButtonProperties(exit);
-        setButtonProperties(darkModeToggle); // Make sure darkModeToggle has the same hover effect
-
-        jobsTable.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        add(mainPanel);
-        applyTheme(); // Apply initial theme
+        return tablePanel;
     }
+
 
     private void setButtonProperties(JButton button) {
         Color normalColor = theme.buttonNormal;
@@ -129,40 +122,41 @@ public class JobView extends JPanel {
      * Build the search row with a TextField and a Button
      * @return JPanel containing the search row
     */
-    private JPanel getSearchRow(){
-        JPanel searchRow = new JPanel();
-        searchRow.setLayout(new BoxLayout(searchRow, BoxLayout.LINE_AXIS));
-        TextField searchField = new TextField("", 20);    
-        searchButton = new JButton("Find Jobs");
-        searchRow.add(searchField);
-        searchRow.add(searchButton);
-        searchButton.addActionListener(e -> {
-            List<JobRecord> jobs = FindJobController.getApiCall(searchField.getText(), 10, "any","any");
-            jobsTable = new JobsTable(getColumnNames(), getData(jobsList));
+    // private JPanel getSearchRow(){
+    //     JPanel searchRow = new JPanel();
+    //     searchRow.setLayout(new BoxLayout(searchRow, BoxLayout.LINE_AXIS));
+    //     TextField searchField = new TextField("", 20);    
+    //     searchButton = new JButton("Findjghfvjhvjhvjhvjhvjh Jobs");
+    //     searchRow.add(searchField);
+    //     searchRow.add(searchButton);
+    //     searchButton.addActionListener(e -> {
+    //         List<JobRecord> jobs = FindJobController.getApiCall(searchField.getText(), 10, "any","any");
+    //         jobsTable = new JobsTable(getColumnNames(), getData(jobsList));
 
-            // jobsTable.setActionMap();
-            System.out.println(jobs);
-        }
-            );
-        // TextField.addActionListener(e -> controller.setViewData());
+    //         // jobsTable.setActionMap();
+    //         System.out.println(jobs);
+    //     }
+    //         );
+    //     // TextField.addActionListener(e -> controller.setViewData());
 
         
-        return searchRow;
-    }
+    //     return searchRow;
+    // }
 
-    private void applyTheme() {
+    public void applyTheme(ColorTheme theme) {
         setBackground(theme.background);
-        recordText.setBackground(theme.background);
-        recordText.setForeground(theme.foreground);
+        System.out.println("Applying theme: " + theme);
+        // recordText.setBackground(theme.background);
+        // recordText.setForeground(theme.foreground);
         // Set button colors
-        searchButton.setBackground(theme.buttonNormal);
-        searchButton.setForeground(theme.buttonForeground);
+        // searchButton.setBackground(theme.buttonNormal);
+        // searchButton.setForeground(theme.buttonForeground);
         openJob.setBackground(theme.buttonNormal);
         openJob.setForeground(theme.buttonForeground);
-        exit.setBackground(theme.buttonNormal);
-        exit.setForeground(theme.buttonForeground);
-        darkModeToggle.setBackground(theme.buttonNormal);
-        darkModeToggle.setForeground(theme.buttonForeground);
+        // exit.setBackground(theme.buttonNormal);
+        // exit.setForeground(theme.buttonForeground);
+        // darkModeToggle.setBackground(theme.buttonNormal);
+        // darkModeToggle.setForeground(theme.buttonForeground);
         jobsTable.setBackground(theme.fieldBackground);
         jobsTable.setForeground(theme.fieldForeground);
         jobsTable.setBorder(BorderFactory.createLineBorder(theme.buttonNormal));
