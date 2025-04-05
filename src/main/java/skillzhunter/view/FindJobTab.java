@@ -25,8 +25,7 @@ public class FindJobTab extends JobView {
         super();
         super.initView();
         this.controller = controller;
-        //setJobsList(JobRecordGenerator.generateDummyRecords(10));
-        
+        setJobsList(controller.getApiCall("any", 10 , "any", "any"));
     }
 
 
@@ -40,7 +39,7 @@ public class FindJobTab extends JobView {
         TextField searchField = new TextField("", 20);    
         searchButton = new JButton("Find Jobs");
         String[] comboOptions = {"any", "option1", "option2"};//need to make this specific to field
-        Integer[] results = {1,2,3,5,10,20};
+        Integer[] results = {5,10,20,50};
         JComboBox<String> industryCombo = new JComboBox<>(comboOptions);
         industryCombo.setEditable(true);
         JComboBox<String> locationCombo = new JComboBox<>(comboOptions);
@@ -66,7 +65,7 @@ public class FindJobTab extends JobView {
         //set listeners
         searchButton.addActionListener(e -> {
             List<JobRecord> jobs = controller.getApiCall(searchField.getText(), (Integer) resultsCombo.getSelectedItem() , locationCombo.getSelectedItem().toString(),
-                locationCombo.getSelectedItem().toString());
+                industryCombo.getSelectedItem().toString());
             setJobsList(jobs);
         }
             );
