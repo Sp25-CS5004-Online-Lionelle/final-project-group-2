@@ -17,17 +17,19 @@ public class JobsTable extends JTable {
   private DefaultTableModel tableModel;
   private final Collection<JobRecord> jobs = new ArrayList<>();
 
-  private String[] columnNames = {"Job ID", "Job Title", "Company",
-      "Industry", "Type", "Geo", "Level", "Salary Range", "Currency", "Published Date", "Rating", "Comments" };
+  private String[] columnNames = { "Job Title", "Company",
+      "Level", "Salary Range", "Currency" };
 
   public JobsTable() {
     this(new String[] {}, new Object[][] {});
     setPreferredScrollableViewportSize(new Dimension(1000, 500));
+
   }
 
   public JobsTable(String[] columnNames, Object[][] data) {
     tableModel = new DefaultTableModel(data, columnNames);
     setModel(tableModel);
+
   }
 
     public void setData (Object[][]data){

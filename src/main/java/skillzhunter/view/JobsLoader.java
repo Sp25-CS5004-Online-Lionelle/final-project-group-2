@@ -9,8 +9,8 @@ import skillzhunter.model.JobRecord;
 public final class JobsLoader {
 
 
-  private static String[] columnNames = {"Job ID", "Job Title", "Company",
-      "Industry", "Type", "Geo", "Level", "Salary Range", "Currency", "Published Date", "Rating", "Comments" };
+  private static String[] columnNames = { "Job Title", "Company",
+      "Level", "Salary Range", "Currency" };
   private final Collection<JobRecord> jobs = new ArrayList<>();
 
   //* private constructor to prevent instantiation */
@@ -46,18 +46,18 @@ public final class JobsLoader {
       String salaryRange = record.annualSalaryMin() + " - " + record.annualSalaryMax();
 
       // Add data for each column
-      data[i][0] = record.id();
-      data[i][1] = record.jobTitle();
-      data[i][2] = record.companyName();
-      data[i][3] = industry;
-      data[i][4] = jobType;
-      data[i][5] = record.jobGeo();
-      data[i][6] = record.jobLevel();
-      data[i][7] = salaryRange;
-      data[i][8] = record.salaryCurrency();
-      data[i][9] = record.pubDate();
-      data[i][10] = record.rating();
-      data[i][11] = record.comments();
+      //data[i][0] = record.id();
+      data[i][0] = record.jobTitle();
+      data[i][1] = record.companyName();
+      //data[i][3] = industry;
+      //data[i][4] = jobType;
+      //data[i][5] = record.jobGeo();
+      data[i][2] = record.jobLevel();
+      data[i][3] = salaryRange;
+      data[i][4] = record.salaryCurrency();
+      //data[i][9] = record.pubDate();
+      //data[i][10] = record.rating();
+      //data[i][11] = record.comments();
     }
 
     return data;

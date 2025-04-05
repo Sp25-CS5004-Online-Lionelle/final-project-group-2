@@ -13,8 +13,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
 
+import javax.swing.UIManager;
 import skillzhunter.controller.IController;
 
 
@@ -44,14 +46,12 @@ public class MainView extends JFrame implements IView {
     public MainView(IController controller) {
         super("Jobz Hunter App");
         this.controller = controller;
-        //this.setSize(500, 500);
         this.setLocation(200, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // building tabs
         findJobTab = new FindJobTab(controller);
         savedJobTab = new SavedJobTab(controller);
-        
 
         // building tabbed pane
         tabbedPane  = buildTabbedPane(findJobTab, savedJobTab);
@@ -127,9 +127,7 @@ public class MainView extends JFrame implements IView {
         settings.add(exit);
         menuBar.add(settings);
 
-        
         mapMenuEvents();
-
         return menuBar;
 
     }
@@ -199,6 +197,8 @@ public class MainView extends JFrame implements IView {
         setVisible(true);
     }
     public static void main(String[] args) {
-
+//        for(UIManager.LookAndFeelInfo lnFinfo: UIManager.getInstalledLookAndFeels()) {
+//            System.out.println(lnFinfo.getClassName());
+//        }
     }
 }
