@@ -1,17 +1,18 @@
 package skillzhunter.view;
 
+import skillzhunter.controller.IController;
 
-import static skillzhunter.view.JobsLoader.getData;
+public class SavedJobTab extends JobView {
+    private IController controller;
 
-import java.util.List;
-import skillzhunter.model.JobRecord;
+    public SavedJobTab(IController controller) {
 
-public class FindJobView extends JobView {
-
-    public FindJobView(){
         super();
         setJobsList(JobRecordGenerator.generateDummyRecords(10));
+        super.initView();
     }
+
+
 
 
     public static void main(String[] args) {

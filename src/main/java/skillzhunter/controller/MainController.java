@@ -2,43 +2,28 @@ package skillzhunter.controller;
 
 
 import java.util.List;
+
 import skillzhunter.model.IModel;
 import skillzhunter.model.JobRecord;
 import skillzhunter.model.Jobs;
 import skillzhunter.model.net.JobBoardApi;
-import skillzhunter.view.SavedJobView;
-import skillzhunter.view.FindJobView;
-import skillzhunter.view.MainView;
+import skillzhunter.view.FindJobTab;
 import skillzhunter.view.IView;
+import skillzhunter.view.MainView;
+import skillzhunter.view.SavedJobTab;
+
 
 public class MainController implements IController{
 
     private IModel model;
-    private FindJobController findJobController;
-    private SavedJobController savedJobController;
     private IView view;
-    private SavedJobView savedJobTabbed;
-    private FindJobView searchJobTabbed;
+
 
     public MainController(){
         /** Model */
-        this.model = new Jobs();
-        
-        /** Views */
-        this.searchJobTabbed = new FindJobView();
-        this.savedJobTabbed = new SavedJobView();
-
-        /** Controllers */
-        this.findJobController = new FindJobController(searchJobTabbed);
-
-        this.savedJobController = new SavedJobController(savedJobTabbed);
-
-        //theres an inheritance reason for this .... may move it back
-        this.savedJobController.setFeatures(); //aka give the savedJobTabbed View the relevant controller obj
-        
-
-        this.view = new MainView(this.findJobController.getView(), this.savedJobController.getView());
-
+        model = new Jobs();
+        /* View */
+        view = new MainView(this);
     }
 
 
@@ -80,14 +65,22 @@ public class MainController implements IController{
         return model;
     }
 
-    //getApiCall to send to view
+    
     /**
-     * This method gets the API call using the controller.
-     * 
+     * this methos queries job board api for jobs api and returns the results.
+     * @param query
+     * @param numberOfResults
+     * @param location
+     * @param industry
+     * @return
      */
-    public List<JobRecord> getApiCall(String query, Integer numberOfResults, String location, String industry) {
+    @Override
+    public  List<JobRecord> getApiCall(String query, Integer numberOfResults, String location, String industry) {
         return JobBoardApi.getJobBoard(query, numberOfResults, location, industry);
     }
+
+    //getApiCall to send to view
+
 
     /**
      * This will be used for testing purposes.

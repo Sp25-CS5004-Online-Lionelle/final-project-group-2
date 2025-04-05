@@ -1,42 +1,90 @@
 package skillzhunter.view;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.TextField;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.plaf.basic.BasicRadioButtonMenuItemUI;
+import javax.swing.table.DefaultTableModel;
+
+import skillzhunter.controller.IJobController;
+import skillzhunter.model.JobRecord;
 import static skillzhunter.view.JobsLoader.getColumnNames;
 import static skillzhunter.view.JobsLoader.getData;
 
-import java.util.ArrayList;
-import java.util.List;
-import skillzhunter.controller.IJobController;
-import skillzhunter.model.JobRecord;
-import javax.swing.*;
-import java.awt.*;
+import skillzhunter.controller._FindJobController;
+import skillzhunter.controller.IController;
 
-public class JobView extends JPanel {
+
+public abstract class JobView extends JPanel implements IJobView {
     protected JButton searchButton;
+    protected JTextArea searchField;
     protected JTextArea recordText;
-    protected JobsTable jobsTable;
+    protected JobsTable jobsTable = new JobsTable(getColumnNames(), new Object[0][0]);
     private ColorTheme theme;
     protected List<JobRecord> jobsList = new ArrayList<>();
     protected JButton darkModeToggle;
     protected JButton openJob;
     protected JButton exit;
+    protected JPanel topButtonLayout = new JPanel();
+    protected IController controller;
+    protected JPanel mainPanel;
 
-    //This is an ugly way to let inheriting classes know if they are SavedJobView or FindJobView
-    //We should probably figure something else out
+
+
     protected boolean savedJobs = false;
 
     public JobView() {
+    }
+
+    public void initView(){
         setSize(1000, 1000);
-        theme = ColorTheme.LIGHT; // Start with light mode
-        JPanel mainPanel = new JPanel();
+        jobsTable = new JobsTable(getColumnNames(), getData(jobsList));
+        mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 
-        searchButton = new JButton("Find Jobs");
-        mainPanel.add(searchButton);
+        // Adding in Layouts
+        mainPanel.add(makeTopButtonPanel());
+        mainPanel.add(makeTablePanel());
+        mainPanel.add(makeBottomButtonPanel());
+        add(mainPanel);
 
-        recordText = new JTextArea("Click to find jobs");
-        mainPanel.add(recordText);
+    }
 
-        // Table Panel with Scrollable Jobs Table
+    public JPanel makeTopButtonPanel() {
+        JPanel searchRow = new JPanel();
+        searchRow.setLayout(new BoxLayout(searchRow, BoxLayout.LINE_AXIS));
+        TextField searchField = new TextField("!!This is Place Holder Overide this method!!", 20);    
+        searchRow.add(searchField);
+        return searchRow;
+
+    }
+
+    public JPanel makeBottomButtonPanel() {
+        JPanel searchRow = new JPanel();
+        searchRow.setLayout(new BoxLayout(searchRow, BoxLayout.LINE_AXIS));
+        TextField searchField = new TextField("!!This is Place Holder Overide this method!!", 20);    
+        searchRow.add(searchField);
+        return searchRow;
+    }
+    
+
+    public JPanel makeTablePanel() {
         JPanel tablePanel = new JPanel();
         tablePanel.setLayout(new BorderLayout()); // Use BorderLayout for better handling of the table
         tablePanel.setPreferredSize(new Dimension(800, 400)); // Set a reasonable preferred size for the table
@@ -48,49 +96,11 @@ public class JobView extends JPanel {
         tablePane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
         tablePanel.add(tablePane, BorderLayout.CENTER); // Add tablePane to the center of the panel
-        mainPanel.add(tablePanel);
-
-        // Button Panel
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        openJob = new JButton("Open Job");
-        openJob.addActionListener(e -> openSelectedJob());
-
-        exit = new JButton("Exit");
-        exit.addActionListener(exitEvent -> {
-            int result = JOptionPane.showConfirmDialog(mainPanel, "Are you sure you want to exit?", "Exit", JOptionPane.YES_NO_OPTION);
-            if (result == JOptionPane.YES_OPTION) {
-                System.exit(0);
-            }
-        });
-
-        // Dark Mode Toggle Button (Changed to JButton)
-        darkModeToggle = new JButton("🌙");
-        darkModeToggle.addActionListener(e -> {
-            boolean isDarkMode = darkModeToggle.getText().equals("🌙");
-            theme = isDarkMode ? ColorTheme.DARK : ColorTheme.LIGHT;
-            applyTheme();
-            darkModeToggle.setText(isDarkMode ? "☀️" : "🌙"); // Toggle the text/icon
-        });
-
-        // Add buttons to button panel
-        buttonPanel.add(openJob);
-        buttonPanel.add(darkModeToggle);
-        buttonPanel.add(exit);
-        mainPanel.add(buttonPanel);
-
-        // Set initial button properties
-        setButtonProperties(searchButton);
-        setButtonProperties(openJob);
-        setButtonProperties(exit);
-        setButtonProperties(darkModeToggle); // Make sure darkModeToggle has the same hover effect
-
-        jobsTable.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        add(mainPanel);
-        applyTheme(); // Apply initial theme
+        return tablePanel;
     }
 
-    private void setButtonProperties(JButton button) {
+
+    public void setButtonProperties(JButton button) {
         Color normalColor = theme.buttonNormal;
         Color hoverColor = theme.buttonHover;
     
@@ -107,21 +117,18 @@ public class JobView extends JPanel {
         button.setOpaque(true);
         button.setBorderPainted(false);
     }
-    
 
-    private void applyTheme() {
+
+    public void applyTheme(ColorTheme theme) {
         setBackground(theme.background);
-        recordText.setBackground(theme.background);
-        recordText.setForeground(theme.foreground);
+        System.out.println("Applying theme: " + theme);
+        // recordText.setBackground(theme.background);
+        // recordText.setForeground(theme.foreground);
         // Set button colors
-        searchButton.setBackground(theme.buttonNormal);
-        searchButton.setForeground(theme.buttonForeground);
+        // searchButton.setBackground(theme.buttonNormal);
+        // searchButton.setForeground(theme.buttonForeground);
         openJob.setBackground(theme.buttonNormal);
         openJob.setForeground(theme.buttonForeground);
-        exit.setBackground(theme.buttonNormal);
-        exit.setForeground(theme.buttonForeground);
-        darkModeToggle.setBackground(theme.buttonNormal);
-        darkModeToggle.setForeground(theme.buttonForeground);
         jobsTable.setBackground(theme.fieldBackground);
         jobsTable.setForeground(theme.fieldForeground);
         jobsTable.setBorder(BorderFactory.createLineBorder(theme.buttonNormal));
@@ -144,71 +151,17 @@ public class JobView extends JPanel {
         });
     }
 
-    private void openSelectedJob() {
-        boolean jobPresent = false;
-        String dialogMsg = "Save this Job?";
-        int viewIdx = jobsTable.getSelectedRow();
-        if (viewIdx >= 0) {
-            int n = jobsTable.convertRowIndexToModel(viewIdx);
-            JobRecord activeJob = jobsList.get(n);
-
-            //See if we already have this one
-            if (SavedJobsLists.getSavedJobs().contains(activeJob)) {
-                jobPresent = true;
-                dialogMsg = "Remove this Job?";
-            }
-    
-            JTextArea jobTitle = new JTextArea(activeJob.jobTitle());
-            JTextArea jobCompany = new JTextArea(activeJob.companyName());
-            
-            // Join the industry array elements into a string without brackets
-            String jobIndustryText = String.join(", ", activeJob.jobIndustry());
-            JTextArea jobIndustry = new JTextArea(jobIndustryText);
-    
-            // Join the type array elements into a string without brackets
-            String jobTypeText = String.join(", ", activeJob.jobType());
-            JTextArea jobType = new JTextArea(jobTypeText);
-    
-            JTextArea jobGeo = new JTextArea(activeJob.jobGeo());
-            JTextArea jobLevel = new JTextArea(activeJob.jobLevel());
-            JTextArea jobSalaryRange = new JTextArea(String.valueOf(activeJob.annualSalaryMin()));
-            JTextArea jobCurrency = new JTextArea(activeJob.salaryCurrency());
-            JTextArea jobPubDate = new JTextArea(activeJob.pubDate());
-    
-            JSlider jobRating = new JSlider(0, 5, 2);
-            jobRating.setMajorTickSpacing(5);
-            jobRating.setMinorTickSpacing(1);
-            jobRating.setPaintTicks(true);
-            jobRating.setPaintLabels(true);
-    
-            JTextArea comments = new JTextArea(5, 20);
-            comments.setLineWrap(true);
-            comments.setWrapStyleWord(true);
-            comments.setBorder(BorderFactory.createTitledBorder("Your Comments"));
-
-            //TODO: make the text & function update if the record is already in the saved list (ADD v REMOVE)
-    
-            Object[] obj = {"Job Title: ", jobTitle, "Company: ", jobCompany, "Industry: ", jobIndustry,
-                            "Type: ", jobType, "Location: ", jobGeo, "Level: ", jobLevel, "Salary: ", jobSalaryRange,
-                            "Currency: ", jobCurrency, "Published: ", jobPubDate, "Rate this Job: ", jobRating, 
-                            "Comments:", comments, dialogMsg};
-    
-            int result = JOptionPane.showConfirmDialog(jobsTable, obj, "Job Details: ", JOptionPane.INFORMATION_MESSAGE);
-
-            if (result == JOptionPane.YES_OPTION) {
-                if (jobPresent) {
-                    SavedJobsLists.removeSavedJob(activeJob);
-                } else {
-                    SavedJobsLists.addSavedJob(activeJob);
-                }
-            }
-        }
-    }
-
-
     public void setJobsList(List<JobRecord> jobsList) {
        this.jobsList = jobsList;
        this.jobsTable.setData(getData(jobsList));
+       Object[][] data = getData(jobsList);
+       DefaultTableModel tableData = new DefaultTableModel(data, getColumnNames());
+       this.jobsTable.setModel(tableData);
+       this.jobsTable.repaint();
+           // Enable selection
+        this.jobsTable.setRowSelectionAllowed(true);
+        this.jobsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+       
     }
 
     public List<JobRecord> getJobsList() {
@@ -219,9 +172,6 @@ public class JobView extends JPanel {
         recordText.setText(text);
     }
 
-    public void addFeatures(IJobController controller) {
-        searchButton.addActionListener(e -> controller.setViewData());
-    }
 
 
     public void addJobRecord(JobRecord record) {
@@ -236,5 +186,8 @@ public class JobView extends JPanel {
 
     public static void main(String[] args) {
         System.out.println("hello");
+    }
+    public void addFeatures(IJobController controller) {
+        searchButton.addActionListener(e -> controller.setViewData());
     }
 }
