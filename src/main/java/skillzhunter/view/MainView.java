@@ -179,10 +179,6 @@ public class MainView extends JFrame implements IView {
     }
 
 
-
-
-
-
     /**
      * Adds features to the view.
      */

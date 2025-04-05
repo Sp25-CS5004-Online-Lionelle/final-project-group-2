@@ -145,7 +145,7 @@ public abstract class JobView extends JPanel implements IJobView {
         });
     }
 
-    public void setJobsList(List<JobRecord> jobsList) {
+    public void setJobsList(List<JobRecord> jobsList) { //this is may be where we are having issues
        this.jobsList = jobsList;
        this.jobsTable.setData(getData(jobsList));
        Object[][] data = getData(jobsList);

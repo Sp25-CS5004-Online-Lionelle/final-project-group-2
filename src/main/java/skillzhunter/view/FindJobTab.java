@@ -47,7 +47,7 @@ public class FindJobTab extends JobView {
         searchButton.addActionListener(e -> {
             List<JobRecord> jobs = controller.getApiCall(searchField.getText(), 10, "any","any");
             setJobsList(jobs);
-            // setJobsList(JobRecordGenerator.generateDummyRecords(10));
+            //setJobsList(JobRecordGenerator.generateDummyRecords(10));
 
             // this.jobsTable = new JobsTable(getColumnNames(), getData(jobsList));
 
