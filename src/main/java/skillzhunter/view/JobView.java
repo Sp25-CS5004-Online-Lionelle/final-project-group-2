@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.plaf.basic.BasicRadioButtonMenuItemUI;
 import javax.swing.table.DefaultTableModel;
@@ -157,6 +158,10 @@ public abstract class JobView extends JPanel implements IJobView {
        DefaultTableModel tableData = new DefaultTableModel(data, getColumnNames());
        this.jobsTable.setModel(tableData);
        this.jobsTable.repaint();
+           // Enable selection
+        this.jobsTable.setRowSelectionAllowed(true);
+        this.jobsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+       
     }
 
     public List<JobRecord> getJobsList() {
