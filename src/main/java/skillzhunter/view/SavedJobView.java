@@ -8,11 +8,8 @@ public class SavedJobView extends JobView {
     public SavedJobView(IController controller) {
 
         super();
-        setJobsList(SavedJobsLists.getSavedJobs());
-        // this.searchButton.setText("Saved Jobs");
-        this.savedJobs = true;
-
-        SavedJobsLists.addObserver(this);
+        setJobsList(JobRecordGenerator.generateDummyRecords(10));
+        super.initView();
     }
 
 

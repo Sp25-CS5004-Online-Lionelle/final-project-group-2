@@ -16,7 +16,7 @@ public class JobsTable extends JTable {
 
   private DefaultTableModel tableModel;
   private final Collection<JobRecord> jobs = new ArrayList<>();
-  
+
   private String[] columnNames = {"id", "url", "jobSlug", "jobTitle", "companyName",
       "companyLogo", "jobIndustry", "jobType", "jobGeo", "jobLevel",
       "jobExcerpt", "jobDescription", "pubDate", "annualSalaryMin",
@@ -43,7 +43,7 @@ public class JobsTable extends JTable {
       tableModel.fireTableStructureChanged();
     }
 
-    public void addRow (Object[]rowData){
+    public void addRow (Object[] rowData){
       tableModel.addRow(rowData);
     }
 

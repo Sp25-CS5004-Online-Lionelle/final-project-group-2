@@ -79,6 +79,7 @@ public class MainView extends JFrame implements IView {
     
         // Use the existing tabs instead of creating new ones
         SavedJobsLists.addObserver(savedJobTab);
+        SavedJobsLists.addObserver(findJobTab);
     
         tabbedPane.add("Find Jobs", findJobTab);
         tabbedPane.add("Saved Jobs", savedJobTab);
@@ -158,13 +159,11 @@ public class MainView extends JFrame implements IView {
     private void applyTheme(ColorTheme theme) {
         getContentPane().setBackground(theme.background);
         
-        // Apply to menu bar
         if (getJMenuBar() != null) {
             getJMenuBar().setBackground(theme.background);
             getJMenuBar().setForeground(theme.foreground);
         }
         
-        // Apply to tabs - make sure we're using the correct instances
         if (findJobTab != null) {
             findJobTab.applyTheme(theme);
         }
@@ -173,7 +172,6 @@ public class MainView extends JFrame implements IView {
             savedJobTab.applyTheme(theme);
         }
         
-        // Apply to tabbed pane itself
         tabbedPane.setBackground(theme.background);
         tabbedPane.setForeground(theme.foreground);
         
