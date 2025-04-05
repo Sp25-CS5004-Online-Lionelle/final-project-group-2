@@ -84,10 +84,12 @@ public abstract class JobView extends JPanel implements IJobView {
         tablePanel.setPreferredSize(new Dimension(800, 400)); // Set a reasonable preferred size for the table
 
         jobsTable = new JobsTable(getColumnNames(), getData(jobsList));
+        jobsTable.setAutoCreateRowSorter(true); //not working yet
 
         JScrollPane tablePane = new JScrollPane(jobsTable);
         tablePane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         tablePane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+
 
         tablePanel.add(tablePane, BorderLayout.CENTER); // Add tablePane to the center of the panel
         return tablePanel;
