@@ -21,17 +21,19 @@ import javax.swing.ScrollPaneConstants;
 
 import kotlin.Suppress;
 import skillzhunter.model.JobRecord;
-import skillzhunter.controller.FindJobController;
+import skillzhunter.controller._FindJobController;
 import skillzhunter.controller.IController;
 import static skillzhunter.view.JobsLoader.getColumnNames;
 
 public class FindJobView extends JobView {
-    private static IController controller;
+    private IController controller;
 
     public FindJobView(IController controller){
         super();
-        setJobsList(JobRecordGenerator.generateDummyRecords(10));
         super.initView();
+        this.controller = controller;
+        setJobsList(JobRecordGenerator.generateDummyRecords(10));
+        
     }
 
 
@@ -44,7 +46,7 @@ public class FindJobView extends JobView {
         searchRow.add(searchField);
         searchRow.add(searchButton);
         searchButton.addActionListener(e -> {
-            List<JobRecord> jobs = FindJobController.getApiCall(searchField.getText(), 10, "any","any");
+            List<JobRecord> jobs = controller.getApiCall(searchField.getText(), 10, "any","any");
             setJobsList(jobs);
             // setJobsList(JobRecordGenerator.generateDummyRecords(10));
 
@@ -143,22 +145,6 @@ public class FindJobView extends JobView {
             }
         }
     }
-
-    // @Override
-    // public JPanel makeTablePanel() {
-    //     JPanel tablePanel = new JPanel();
-    //     tablePanel.setLayout(new BorderLayout()); // Use BorderLayout for better handling of the table
-    //     tablePanel.setPreferredSize(new Dimension(800, 400)); // Set a reasonable preferred size for the table
-
-    //     jobsTable = new JobsTable(getColumnNames(), getData(jobsList));
-
-    //     JScrollPane tablePane = new JScrollPane(jobsTable);
-    //     tablePane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-    //     tablePane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-
-    //     tablePanel.add(tablePane, BorderLayout.CENTER); // Add tablePane to the center of the panel
-    //     return tablePanel;
-    // }
 
 
     public static void main(String[] args) {

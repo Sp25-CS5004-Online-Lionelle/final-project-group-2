@@ -1,8 +1,12 @@
 package skillzhunter.controller;
 
 
+import java.util.List;
+
 import skillzhunter.model.IModel;
+import skillzhunter.model.JobRecord;
 import skillzhunter.model.Jobs;
+import skillzhunter.model.net.JobBoardApi;
 import skillzhunter.view.FindJobView;
 import skillzhunter.view.IView;
 import skillzhunter.view.MainView;
@@ -59,6 +63,20 @@ public class MainController implements IController{
     @Override
     public IModel getModel() {
         return model;
+    }
+
+    
+    /**
+     * this methos queries job board api for jobs api and returns the results.
+     * @param query
+     * @param numberOfResults
+     * @param location
+     * @param industry
+     * @return
+     */
+    @Override
+    public  List<JobRecord> getApiCall(String query, Integer numberOfResults, String location, String industry) {
+        return JobBoardApi.getJobBoard(query, numberOfResults, location, industry);
     }
 
     //getApiCall to send to view

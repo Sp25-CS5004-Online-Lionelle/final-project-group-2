@@ -10,11 +10,11 @@ import skillzhunter.model.Jobs;
 import skillzhunter.model.net.JobBoardApi;
 import skillzhunter.view.FindJobView;
 
-public class FindJobController implements IJobController {
+public class _FindJobController implements IJobController {
 
     private FindJobView view;
     private Jobs model;
-    public FindJobController(FindJobView findJobTabbed) {
+    public _FindJobController(FindJobView findJobTabbed) {
         this.view = findJobTabbed;
         this.view.addFeatures(this); //give this controller to the view
     }
@@ -81,7 +81,7 @@ public class FindJobController implements IJobController {
         return JobBoardApi.getJobBoard(query, numberOfResults, location, industry);
     }
     public static void main(String[] args) {
-        FindJobController.getApiCall("java", 10, "toronto", "software");
+        _FindJobController.getApiCall("java", 10, "toronto", "software");
     }
 
 }

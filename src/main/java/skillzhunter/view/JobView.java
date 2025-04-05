@@ -19,13 +19,14 @@ import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.plaf.basic.BasicRadioButtonMenuItemUI;
+import javax.swing.table.DefaultTableModel;
 
 import skillzhunter.controller.IJobController;
 import skillzhunter.model.JobRecord;
 import static skillzhunter.view.JobsLoader.getColumnNames;
 import static skillzhunter.view.JobsLoader.getData;
 
-import skillzhunter.controller.FindJobController;
+import skillzhunter.controller._FindJobController;
 import skillzhunter.controller.IController;
 
 
@@ -44,16 +45,15 @@ public abstract class JobView extends JPanel implements IJobView {
     protected JPanel mainPanel;
 
 
-    //This is an ugly way to let inheriting classes know if they are SavedJobView or FindJobView
-    //We should probably figure something else out
+
     protected boolean savedJobs = false;
 
     public JobView() {
- 
     }
 
     public void initView(){
         setSize(1000, 1000);
+        jobsTable = new JobsTable(getColumnNames(), getData(jobsList));
         mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 
@@ -153,14 +153,20 @@ public abstract class JobView extends JPanel implements IJobView {
     public void setJobsList(List<JobRecord> jobsList) {
        this.jobsList = jobsList;
        this.jobsTable.setData(getData(jobsList));
-    //    this.jobsTable.fireTableStructureChanged();
+       Object[][] data = getData(jobsList);
+       DefaultTableModel tableData = new DefaultTableModel(data, getColumnNames());
+       this.jobsTable.setModel(tableData);
        this.jobsTable.repaint();
-
     }
 
     public List<JobRecord> getJobsList() {
         return this.jobsList;
     }
+
+    public void setRecordText(String text) {
+        recordText.setText(text);
+    }
+
 
 
     public void addJobRecord(JobRecord record) {
@@ -176,7 +182,6 @@ public abstract class JobView extends JPanel implements IJobView {
     public static void main(String[] args) {
         System.out.println("hello");
     }
-
     public void addFeatures(IJobController controller) {
         searchButton.addActionListener(e -> controller.setViewData());
     }
