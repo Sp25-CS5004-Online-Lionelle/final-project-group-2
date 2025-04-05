@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.TextField;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,23 +11,18 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.plaf.basic.BasicRadioButtonMenuItemUI;
 import javax.swing.table.DefaultTableModel;
 
+import skillzhunter.controller.IController;
 import skillzhunter.controller.IJobController;
 import skillzhunter.model.JobRecord;
 import static skillzhunter.view.JobsLoader.getColumnNames;
 import static skillzhunter.view.JobsLoader.getData;
-
-import skillzhunter.controller._FindJobController;
-import skillzhunter.controller.IController;
 
 
 public abstract class JobView extends JPanel implements IJobView {
@@ -158,7 +152,7 @@ public abstract class JobView extends JPanel implements IJobView {
        DefaultTableModel tableData = new DefaultTableModel(data, getColumnNames());
        this.jobsTable.setModel(tableData);
        this.jobsTable.repaint();
-           // Enable selection
+       // Enable selection
         this.jobsTable.setRowSelectionAllowed(true);
         this.jobsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
        

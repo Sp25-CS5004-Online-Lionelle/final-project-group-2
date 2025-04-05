@@ -21,7 +21,6 @@ import javax.swing.ScrollPaneConstants;
 
 import kotlin.Suppress;
 import skillzhunter.model.JobRecord;
-import skillzhunter.controller._FindJobController;
 import skillzhunter.controller.IController;
 import static skillzhunter.view.JobsLoader.getColumnNames;
 
