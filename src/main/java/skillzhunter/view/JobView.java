@@ -15,7 +15,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.table.DefaultTableModel;
 
 import skillzhunter.controller.IController;
@@ -38,9 +37,6 @@ public abstract class JobView extends JPanel implements IJobView {
     protected JPanel topButtonLayout = new JPanel();
     protected IController controller;
     protected JPanel mainPanel;
-
-
-
     protected boolean savedJobs = false;
 
     public JobView() {
@@ -61,20 +57,22 @@ public abstract class JobView extends JPanel implements IJobView {
     }
 
     public JPanel makeTopButtonPanel() {
-        JPanel searchRow = new JPanel();
-        searchRow.setLayout(new BoxLayout(searchRow, BoxLayout.LINE_AXIS));
+        JPanel topRow = new JPanel();
+        topRow.setLayout(new BoxLayout(topRow, BoxLayout.LINE_AXIS));
+        topRow.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         TextField searchField = new TextField("!!This is Place Holder Overide this method!!", 20);    
-        searchRow.add(searchField);
-        return searchRow;
+        topRow.add(searchField);
+        return topRow;
 
     }
 
     public JPanel makeBottomButtonPanel() {
-        JPanel searchRow = new JPanel();
-        searchRow.setLayout(new BoxLayout(searchRow, BoxLayout.LINE_AXIS));
+        JPanel bottomRow = new JPanel();
+        bottomRow.setLayout(new BoxLayout(bottomRow, BoxLayout.LINE_AXIS));
+        bottomRow.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         TextField searchField = new TextField("!!This is Place Holder Overide this method!!", 20);    
-        searchRow.add(searchField);
-        return searchRow;
+        bottomRow.add(searchField);
+        return bottomRow;
     }
     
 
@@ -82,14 +80,12 @@ public abstract class JobView extends JPanel implements IJobView {
         JPanel tablePanel = new JPanel();
         tablePanel.setLayout(new BorderLayout()); // Use BorderLayout for better handling of the table
         tablePanel.setPreferredSize(new Dimension(800, 400)); // Set a reasonable preferred size for the table
+        tablePanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
         jobsTable = new JobsTable(getColumnNames(), getData(jobsList));
         jobsTable.setAutoCreateRowSorter(true); //not working yet
 
         JScrollPane tablePane = new JScrollPane(jobsTable);
-        tablePane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        tablePane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-
 
         tablePanel.add(tablePane, BorderLayout.CENTER); // Add tablePane to the center of the panel
         return tablePanel;

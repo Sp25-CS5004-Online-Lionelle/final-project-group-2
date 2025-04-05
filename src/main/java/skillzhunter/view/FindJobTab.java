@@ -1,28 +1,22 @@
 package skillzhunter.view;
 
-
-import static skillzhunter.view.JobsLoader.getData;
-
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.TextField;
 import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
+import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
-import javax.swing.ScrollPaneConstants;
 
-import kotlin.Suppress;
 import skillzhunter.model.JobRecord;
 import skillzhunter.controller.IController;
-import static skillzhunter.view.JobsLoader.getColumnNames;
 
 public class FindJobTab extends JobView {
     private IController controller;
@@ -31,38 +25,73 @@ public class FindJobTab extends JobView {
         super();
         super.initView();
         this.controller = controller;
-        setJobsList(JobRecordGenerator.generateDummyRecords(10));
+        //setJobsList(JobRecordGenerator.generateDummyRecords(10));
         
     }
 
 
     @Override
     public JPanel makeTopButtonPanel() {
+
+        //make the panel & set layout
         JPanel searchRow = new JPanel();
-        searchRow.setLayout(new BoxLayout(searchRow, BoxLayout.LINE_AXIS));
+
+        //create fields, buttons, and combos
         TextField searchField = new TextField("", 20);    
         searchButton = new JButton("Find Jobs");
+        String[] comboOptions = {"any", "option1", "option2"};//need to make this specific to field
+        Integer[] results = {1,2,3,5,10,20};
+        JComboBox<String> industryCombo = new JComboBox<>(comboOptions);
+        industryCombo.setEditable(true);
+        JComboBox<String> locationCombo = new JComboBox<>(comboOptions);
+        locationCombo.setEditable(true);
+        JComboBox<Integer> resultsCombo = new JComboBox<>(results);
+        resultsCombo.setPrototypeDisplayValue(100);
+        resultsCombo.setEditable(true);
+
+        //add fields, buttons, labels, combos, and spaces
+        searchRow.add(new JLabel("Industry: "));
+        searchRow.add(industryCombo);
+        searchRow.add(Box.createRigidArea(new Dimension(5, 0))); // these are invisible objects that create spacing
+        searchRow.add(new JLabel("Location: "));
+        searchRow.add(locationCombo);
+        searchRow.add(Box.createRigidArea(new Dimension(5, 0)));
+        searchRow.add(new JLabel("# of Results : "));
+        searchRow.add(resultsCombo);
+        searchRow.add(Box.createRigidArea(new Dimension(5, 0)));
+        searchRow.add(new JLabel("Job Title : "));
         searchRow.add(searchField);
         searchRow.add(searchButton);
+
+        //set listeners
         searchButton.addActionListener(e -> {
-            List<JobRecord> jobs = controller.getApiCall(searchField.getText(), 10, "any","any");
+            List<JobRecord> jobs = controller.getApiCall(searchField.getText(), (Integer) resultsCombo.getSelectedItem() , locationCombo.getSelectedItem().toString(),
+                locationCombo.getSelectedItem().toString());
             setJobsList(jobs);
-            //setJobsList(JobRecordGenerator.generateDummyRecords(10));
-
-            // this.jobsTable = new JobsTable(getColumnNames(), getData(jobsList));
-
         }
             );
+
+        //return the panel
         return searchRow;
 
     }
 
     @Override
     public JPanel makeBottomButtonPanel() {
+
+        //make the panel & set layout
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        openJob = new JButton("Open Job!!");
-        openJob.addActionListener(e -> openSelectedJob());
+
+        //make buttons
+        openJob = new JButton("Open Job");
+
+        //add fields, buttons, labels, combos, and spaces
         buttonPanel.add(openJob);
+
+        //set listeners
+        openJob.addActionListener(e -> openSelectedJob());
+
+        //return the panel
         return buttonPanel;
     }
 
@@ -126,7 +155,6 @@ public class FindJobTab extends JobView {
             comments.setWrapStyleWord(true);
             comments.setBorder(BorderFactory.createTitledBorder("Your Comments"));
 
-            //TODO: make the text & function update if the record is already in the saved list (ADD v REMOVE)
     
             Object[] obj = {"Job Title: ", jobTitle, "Company: ", jobCompany, "Industry: ", jobIndustry,
                             "Type: ", jobType, "Location: ", jobGeo, "Level: ", jobLevel, "Salary: ", jobSalaryRange,
