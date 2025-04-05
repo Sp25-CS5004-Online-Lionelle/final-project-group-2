@@ -166,8 +166,6 @@ public abstract class JobView extends JPanel implements IJobView {
         recordText.setText(text);
     }
 
-
-
     public void addJobRecord(JobRecord record) {
         this.jobsList.add(record);
         this.jobsTable.setData(getData(jobsList));

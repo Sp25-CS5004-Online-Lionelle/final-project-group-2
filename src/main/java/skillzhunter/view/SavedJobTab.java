@@ -8,7 +8,7 @@ public class SavedJobTab extends JobView {
     public SavedJobTab(IController controller) {
 
         super();
-        setJobsList(JobRecordGenerator.generateDummyRecords(10));
+        //setJobsList(JobRecordGenerator.generateDummyRecords(10));
         super.initView();
     }
 
