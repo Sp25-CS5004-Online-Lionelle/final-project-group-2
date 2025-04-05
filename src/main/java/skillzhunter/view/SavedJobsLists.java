@@ -41,7 +41,7 @@ public class SavedJobsLists {
 
   private static void notifyObservers() {
     for (JobView observer : observers) {
-      if (observer instanceof SavedJobView) {
+      if (observer instanceof SavedJobTab) {
         observer.setJobsList(getSavedJobs());
       }
     }

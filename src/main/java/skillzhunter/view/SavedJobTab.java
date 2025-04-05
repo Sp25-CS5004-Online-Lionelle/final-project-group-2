@@ -2,10 +2,10 @@ package skillzhunter.view;
 
 import skillzhunter.controller.IController;
 
-public class SavedJobView extends JobView {
+public class SavedJobTab extends JobView {
     private IController controller;
 
-    public SavedJobView(IController controller) {
+    public SavedJobTab(IController controller) {
 
         super();
         setJobsList(JobRecordGenerator.generateDummyRecords(10));

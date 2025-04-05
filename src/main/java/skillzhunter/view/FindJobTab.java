@@ -25,10 +25,10 @@ import skillzhunter.controller._FindJobController;
 import skillzhunter.controller.IController;
 import static skillzhunter.view.JobsLoader.getColumnNames;
 
-public class FindJobView extends JobView {
+public class FindJobTab extends JobView {
     private IController controller;
 
-    public FindJobView(IController controller){
+    public FindJobTab(IController controller){
         super();
         super.initView();
         this.controller = controller;

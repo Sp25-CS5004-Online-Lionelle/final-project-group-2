@@ -49,8 +49,8 @@ public class MainView extends JFrame implements IView {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // building tabs
-        findJobTab = new FindJobView(controller);
-        savedJobTab = new SavedJobView(controller);
+        findJobTab = new FindJobTab(controller);
+        savedJobTab = new SavedJobTab(controller);
         
 
         // building tabbed pane

@@ -7,10 +7,10 @@ import skillzhunter.model.IModel;
 import skillzhunter.model.JobRecord;
 import skillzhunter.model.Jobs;
 import skillzhunter.model.net.JobBoardApi;
-import skillzhunter.view.FindJobView;
+import skillzhunter.view.FindJobTab;
 import skillzhunter.view.IView;
 import skillzhunter.view.MainView;
-import skillzhunter.view.SavedJobView;
+import skillzhunter.view.SavedJobTab;
 
 
 public class MainController implements IController{
