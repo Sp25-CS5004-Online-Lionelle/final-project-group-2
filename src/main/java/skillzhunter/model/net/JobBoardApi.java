@@ -30,6 +30,23 @@ public class JobBoardApi {
     private static final Map<String, String> locationsMap = loadCsvData("data\\locations.csv", "location", "slug");
     /** empty contructor*/
     public JobBoardApi() {}
+    
+    
+    /**
+     * retries pretty name for industry.
+     * @return List<String> pretty name for industry
+     */
+    public static List<String> getIndustries() {
+        return industriesMap.keySet().stream().toList();
+    }
+
+    /**
+     * retries pretty name for location.
+     * @return List<String> pretty name for location
+     */
+    public static List<String> getLocations() {
+        return locationsMap.keySet().stream().toList();
+    }
 
     /** loads csv data into a map
      * @param filePath path to the csv file
@@ -161,8 +178,8 @@ public class JobBoardApi {
     }
 
     public static void main(String[] args) {
-        List<JobRecord> jobs = JobBoardApi.getJobBoard("Data", 10, "usa", "any");
-        jobs.forEach(job -> System.out.println("Job Title: " + job.companyName()));
+        
+        
     }
 
 }

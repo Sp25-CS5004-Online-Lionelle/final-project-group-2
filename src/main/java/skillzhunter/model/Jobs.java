@@ -3,15 +3,36 @@ package skillzhunter.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import skillzhunter.model.net.JobBoardApi;
 
 public class Jobs implements IModel {
-
+    /** map for storing industries and their slugs*/
+    private static final Map<String, String> industriesMap = JobBoardApi.loadCsvData("data\\industries.csv", "industry", "slug");
+    /** map for storing locations and their slugs*/
+    private static final Map<String, String> locationsMap =JobBoardApi.loadCsvData("data\\locations.csv", "location", "slug");    
+    /**  */
     private final List<JobRecord> jobList;
 
     public Jobs() {
         this.jobList = new ArrayList<>();
+    }
+
+       /**
+     * retries pretty name for industry.
+     * @return List<String> pretty name for industry
+     */
+    public List<String> getIndustries() {
+        return industriesMap.keySet().stream().toList();
+    }
+
+    /**
+     * retries pretty name for location.
+     * @return List<String> pretty name for location
+     */
+    public List<String> getLocations() {
+        return locationsMap.keySet().stream().toList();
     }
 
     // CRUD functionality
@@ -104,6 +125,7 @@ public class Jobs implements IModel {
      * @param args Command line arguments (not used).
      */
     public static void main(String[] args) {
+
         Jobs jobs = new Jobs();
         // Test adding, updating, removing jobs
         JobRecord job = new JobRecord(1, "url", "slug", "Python Developer", "Company A", "logo", Arrays.asList("Tech"), Arrays.asList("Full-time"), "NYC", "Senior", "Job excerpt", "Job description", "2025-03-30", 60000, 80000, "USD", 4, "Great job");
@@ -136,5 +158,8 @@ public class Jobs implements IModel {
         // Remove job
         System.out.println("Removing job with ID 1");
         jobs.removeJob(1);
+
+        jobs.getIndustries().forEach(System.out::println);
+        jobs.getLocations().forEach(System.out::println);
     }
 }
