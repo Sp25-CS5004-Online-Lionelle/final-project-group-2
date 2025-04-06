@@ -57,37 +57,58 @@ public abstract class JobView extends JPanel implements IJobView {
     }
 
     public JPanel makeTopButtonPanel() {
+
+        //make the panel & set layout
         JPanel topRow = new JPanel();
         topRow.setLayout(new BoxLayout(topRow, BoxLayout.LINE_AXIS));
         topRow.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-        TextField searchField = new TextField("!!This is Place Holder Overide this method!!", 20);    
+
+        //create fields, buttons, and combos
+        TextField searchField = new TextField("!!This is Place Holder Overide this method!!", 20);
+
+        //add fields, buttons, labels, combos, and spaces
         topRow.add(searchField);
+
+        //return the panel
         return topRow;
 
     }
 
     public JPanel makeBottomButtonPanel() {
+
+        //make the panel & set layout
         JPanel bottomRow = new JPanel();
         bottomRow.setLayout(new BoxLayout(bottomRow, BoxLayout.LINE_AXIS));
         bottomRow.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-        TextField searchField = new TextField("!!This is Place Holder Overide this method!!", 20);    
+
+        //create fields, buttons, and combos
+        TextField searchField = new TextField("!!This is Place Holder Overide this method!!", 20);
+
+        //add fields, buttons, labels, combos, and spaces
         bottomRow.add(searchField);
+
+        //return the panel
         return bottomRow;
     }
     
 
     public JPanel makeTablePanel() {
+
+        //make the panel & set layout
         JPanel tablePanel = new JPanel();
         tablePanel.setLayout(new BorderLayout()); // Use BorderLayout for better handling of the table
         tablePanel.setPreferredSize(new Dimension(900, 400)); // Set a reasonable preferred size for the table
         tablePanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
+        //create tables
         jobsTable = new JobsTable(getColumnNames(), getData(jobsList));
         jobsTable.setAutoCreateRowSorter(true); //not working yet
-
         JScrollPane tablePane = new JScrollPane(jobsTable);
 
+        //add tables
         tablePanel.add(tablePane, BorderLayout.CENTER); // Add tablePane to the center of the panel
+
+        //return the panel
         return tablePanel;
     }
 
@@ -143,7 +164,7 @@ public abstract class JobView extends JPanel implements IJobView {
         });
     }
 
-    public void setJobsList(List<JobRecord> jobsList) { //this is may be where we are having issues
+    public void setJobsList(List<JobRecord> jobsList) {
        this.jobsList = jobsList;
        this.jobsTable.setData(getData(jobsList));
        Object[][] data = getData(jobsList);
