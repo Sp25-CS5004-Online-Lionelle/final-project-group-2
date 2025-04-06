@@ -117,7 +117,7 @@ public class JobBoardApi {
         location = locationsMap.get(location.toLowerCase().trim());
         industry = industriesMap.get(industry.toLowerCase().trim());
         Boolean location_passed = location != null && !location.isEmpty() && !location.equalsIgnoreCase("anywhere");
-        Boolean industry_passed = industry != null && !industry.isEmpty() && !industry.equalsIgnoreCase("any");
+        Boolean industry_passed = industry != null && !industry.isEmpty() && !industry.equalsIgnoreCase("all")&& !industry.equalsIgnoreCase("any");
 
         //defualting and slugggin query
         if (query == null || query.isEmpty() || query.equalsIgnoreCase("any") || query.equalsIgnoreCase("all") || query.equalsIgnoreCase("all jobs") || query.equalsIgnoreCase("all job")) {
@@ -178,6 +178,16 @@ public class JobBoardApi {
     }
 
     public static void main(String[] args) {
+
+        JobBoardApi api = new JobBoardApi();
+        List<JobRecord> results = api.getJobBoard("python", 5, "all", "all");
+        System.out.println("Job Records: " + results.size());
+        for (JobRecord job : results) {
+            System.out.println("Job Title: " + job.jobTitle());
+            System.out.println("Company: " + job.companyName());
+            System.out.println("Location: " + job.jobGeo());
+            System.out.println("-----------------------------");
+        }
         
         
     }

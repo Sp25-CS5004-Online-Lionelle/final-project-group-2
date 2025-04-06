@@ -71,6 +71,7 @@ public class FindJobTab extends JobView {
         searchRow.add(searchField);
         searchRow.add(searchButton);
 
+
         //set listeners
         searchButton.addActionListener(e -> {
             List<JobRecord> jobs = controller.getApiCall(searchField.getText(), (Integer) resultsCombo.getSelectedItem() , locationCombo.getSelectedItem().toString(),

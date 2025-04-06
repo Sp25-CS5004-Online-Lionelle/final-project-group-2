@@ -24,7 +24,7 @@ public class Jobs implements IModel {
      * @return List<String> pretty name for industry
      */
     public List<String> getIndustries() {
-        return industriesMap.keySet().stream().toList();
+        return industriesMap.keySet().stream().sorted().toList();
     }
 
     /**
@@ -32,7 +32,7 @@ public class Jobs implements IModel {
      * @return List<String> pretty name for location
      */
     public List<String> getLocations() {
-        return locationsMap.keySet().stream().toList();
+        return locationsMap.keySet().stream().sorted().toList();
     }
 
     // CRUD functionality
