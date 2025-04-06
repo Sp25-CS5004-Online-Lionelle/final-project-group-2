@@ -79,7 +79,7 @@ public abstract class JobView extends JPanel implements IJobView {
     public JPanel makeTablePanel() {
         JPanel tablePanel = new JPanel();
         tablePanel.setLayout(new BorderLayout()); // Use BorderLayout for better handling of the table
-        tablePanel.setPreferredSize(new Dimension(800, 400)); // Set a reasonable preferred size for the table
+        tablePanel.setPreferredSize(new Dimension(900, 400)); // Set a reasonable preferred size for the table
         tablePanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
         jobsTable = new JobsTable(getColumnNames(), getData(jobsList));

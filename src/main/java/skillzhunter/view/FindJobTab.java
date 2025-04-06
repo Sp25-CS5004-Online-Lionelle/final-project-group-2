@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -34,6 +35,7 @@ public class FindJobTab extends JobView {
 
         //make the panel & set layout
         JPanel searchRow = new JPanel();
+        searchRow.setLayout(new BoxLayout(searchRow, BoxLayout.LINE_AXIS));
 
         //create fields, buttons, and combos
         TextField searchField = new TextField("", 20);    
