@@ -172,7 +172,6 @@ public class JobBoardApi {
             return jobResponse.jobs();
 
         } catch (IOException e) {
-            e.printStackTrace();
             return Collections.emptyList();
         }
     }
@@ -180,7 +179,7 @@ public class JobBoardApi {
     public static void main(String[] args) {
 
         JobBoardApi api = new JobBoardApi();
-        List<JobRecord> results = api.getJobBoard("python", 5, "all", "all");
+        List<JobRecord> results = api.getJobBoard("python", 5, "austria", "devops & sysadmin");
         System.out.println("Job Records: " + results.size());
         for (JobRecord job : results) {
             System.out.println("Job Title: " + job.jobTitle());
