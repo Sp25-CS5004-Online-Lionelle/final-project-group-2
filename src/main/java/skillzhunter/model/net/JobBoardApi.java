@@ -31,22 +31,6 @@ public class JobBoardApi {
     /** empty contructor*/
     public JobBoardApi() {}
     
-    
-    /**
-     * retries pretty name for industry.
-     * @return List<String> pretty name for industry
-     */
-    public static List<String> getIndustries() {
-        return industriesMap.keySet().stream().toList();
-    }
-
-    /**
-     * retries pretty name for location.
-     * @return List<String> pretty name for location
-     */
-    public static List<String> getLocations() {
-        return locationsMap.keySet().stream().toList();
-    }
 
     /** loads csv data into a map
      * @param filePath path to the csv file
