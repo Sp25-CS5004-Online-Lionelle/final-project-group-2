@@ -16,16 +16,23 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
 
-import skillzhunter.model.JobRecord;
 import skillzhunter.controller.IController;
+import skillzhunter.model.JobRecord;
 
 public class FindJobTab extends JobView {
     private IController controller;
+    private String[] locations;
+    private String[] industries;
 
     public FindJobTab(IController controller){
         super();
-        super.initView();
+        
         this.controller = controller;
+        this.locations = controller.getLocations().toArray(new String[0]);
+        this.industries = controller.getIndustries().toArray(new String[0]);
+
+        super.initView();
+
         setJobsList(controller.getApiCall("any", 10 , "any", "any"));
     }
 
@@ -42,9 +49,9 @@ public class FindJobTab extends JobView {
         searchButton = new JButton("Find Jobs");
         String[] comboOptions = {"any", "option1", "option2"};//need to make this specific to field
         Integer[] results = {5,10,20,50};
-        JComboBox<String> industryCombo = new JComboBox<>(comboOptions);
+        JComboBox<String> industryCombo = new JComboBox<>(industries);
         industryCombo.setEditable(true);
-        JComboBox<String> locationCombo = new JComboBox<>(comboOptions);
+        JComboBox<String> locationCombo = new JComboBox<>(locations);
         locationCombo.setEditable(true);
         JComboBox<Integer> resultsCombo = new JComboBox<>(results);
         resultsCombo.setPrototypeDisplayValue(100);
@@ -63,6 +70,7 @@ public class FindJobTab extends JobView {
         searchRow.add(new JLabel("Job Title : "));
         searchRow.add(searchField);
         searchRow.add(searchButton);
+
 
         //set listeners
         searchButton.addActionListener(e -> {
