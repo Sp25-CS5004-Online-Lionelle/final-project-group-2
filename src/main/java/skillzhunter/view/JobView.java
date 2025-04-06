@@ -62,7 +62,7 @@ public abstract class JobView extends JPanel implements IJobView {
 
         //make the panel & set layout
         JPanel topRow = new JPanel();
-        topRow.setLayout(new BoxLayout(topRow, BoxLayout.LINE_AXIS));
+        topRow.setLayout(new BoxLayout(topRow, BoxLayout.LINE_AXIS)); //this doesn't seem to get passed to children well?
         topRow.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
         //create fields, buttons, and combos
