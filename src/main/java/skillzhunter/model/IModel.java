@@ -13,6 +13,6 @@ public interface IModel {
     List<String> getLocations();
     List<String> getIndustries();
     
-    List<JobRecord> getSavedJobs(String savedJob); //what are the optional parameters for getSavedJobs(string, string, string)
+    // List<JobRecord> getSavedJobs(String savedJob); //what are the optional parameters for getSavedJobs(string, string, string)
     //void downloadJobs(String jobDownloaded);
 }

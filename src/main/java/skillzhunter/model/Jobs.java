@@ -12,7 +12,7 @@ public class Jobs implements IModel {
     private static final Map<String, String> industriesMap = JobBoardApi.loadCsvData("data\\industries.csv", "industry", "slug");
     /** map for storing locations and their slugs*/
     private static final Map<String, String> locationsMap =JobBoardApi.loadCsvData("data\\locations.csv", "location", "slug");    
-    /**  */
+    /** Job List */
     private final List<JobRecord> jobList;
 
     public Jobs() {
