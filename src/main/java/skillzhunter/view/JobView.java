@@ -43,12 +43,14 @@ public abstract class JobView extends JPanel implements IJobView {
     }
 
     public void initView(){
+
+        //make the frame & panels and set layout
         setSize(1000, 1000);
         jobsTable = new JobsTable(getColumnNames(), getData(jobsList));
         mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 
-        // Adding in Layouts
+        // Adding in panels
         mainPanel.add(makeTopButtonPanel());
         mainPanel.add(makeTablePanel());
         mainPanel.add(makeBottomButtonPanel());
