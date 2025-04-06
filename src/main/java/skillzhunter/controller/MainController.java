@@ -93,7 +93,7 @@ public class MainController implements IController{
      */
     @Override
     public  List<JobRecord> getApiCall(String query, Integer numberOfResults, String location, String industry) {
-        return JobBoardApi.getJobBoard(query, numberOfResults, location, industry);
+        return model.searchJobs(query, numberOfResults, location, industry);
     }
 
     //getApiCall to send to view

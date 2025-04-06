@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.checkerframework.common.returnsreceiver.qual.This;
+
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
@@ -61,24 +63,6 @@ public class JobBoardApi {
         return myMap;
     }
 
-    /** gets the job board with default values
-     * @param query search query
-     * @return list of job records
-     */
-    public static List<JobRecord> getJobBoard(String query){
-        List<JobRecord> jobs  = getJobBoard(query, 5);
-        return jobs;
-    }
-    /** gets the job board with default values
-     * @param query search query
-     * @param numberOfResults number of results to return
-     * @return list of job records
-     */
-    public static List<JobRecord> getJobBoard(String query, Integer numberOfResults){
-        List<JobRecord> jobs = getJobBoard(query, 5, "anywhere", "any");
-        return jobs;
-    }
-
     /**
      * Retrieves job records based on the provided query parameters.
      * If any parameter is invalid or not provided, default values are applied:
@@ -96,7 +80,7 @@ public class JobBoardApi {
      * @param industry Industry to filter jobs (e.g., IT, healthcare).
      * @return List of job records matching the criteria.
      */
-    public static List<JobRecord> getJobBoard(String query, Integer numberOfResults, String location, String industry){
+    public List<JobRecord> getJobBoard(String query, Integer numberOfResults, String location, String industry){
         // getting slug for request, if it breaks we default
         location = locationsMap.get(location.toLowerCase().trim());
         industry = industriesMap.get(industry.toLowerCase().trim());
@@ -126,7 +110,7 @@ public class JobBoardApi {
         }
         System.err.println("URL: " + url);
     
-        List<JobRecord> jobs = searchApi(url);
+        List<JobRecord> jobs = this.searchApi(url);
         return jobs;
     }
     
@@ -134,7 +118,7 @@ public class JobBoardApi {
      * @param url url to make the request to
      * @return list of job records
      */
-    private static List<JobRecord> searchApi(String url) {
+    protected List<JobRecord> searchApi(String url) {
         Request request = new Request.Builder()
             .url(url)
             .build();

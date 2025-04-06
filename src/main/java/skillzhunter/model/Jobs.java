@@ -15,6 +15,9 @@ public class Jobs implements IModel {
     /** Job List */
     private final List<JobRecord> jobList;
 
+    /** Jobs Api */
+    private final JobBoardApi api = new JobBoardApi();
+
     public Jobs() {
         this.jobList = new ArrayList<>();
     }
@@ -114,7 +117,7 @@ public class Jobs implements IModel {
      */
     @Override
     public List<JobRecord> searchJobs(String query, Integer numberOfResults, String location, String industry) {
-        List<JobRecord> results = JobBoardApi.getJobBoard(query, numberOfResults, location, industry);
+        List<JobRecord> results = api.getJobBoard(query, numberOfResults, location, industry);
         return results;
     }
 
