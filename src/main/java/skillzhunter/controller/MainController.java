@@ -65,6 +65,23 @@ public class MainController implements IController{
         return model;
     }
 
+    /**
+     * This method gets the locations using the controller.
+     * @return List<String> of locations
+     */
+    @Override
+    public List<String> getLocations() {
+        return model.getLocations();
+    }
+
+    /**
+     * This method gets the industries using the controller.
+     * @return List<String> of industries
+     */
+    @Override
+    public List<String> getIndustries() {
+        return model.getIndustries();
+    }
     
     /**
      * this methos queries job board api for jobs api and returns the results.

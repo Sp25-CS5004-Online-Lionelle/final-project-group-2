@@ -16,16 +16,21 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
 
-import skillzhunter.model.JobRecord;
 import skillzhunter.controller.IController;
+import skillzhunter.model.JobRecord;
 
 public class FindJobTab extends JobView {
     private IController controller;
+    private List<String> locations;
+    private List<String> industries;
 
     public FindJobTab(IController controller){
         super();
         super.initView();
         this.controller = controller;
+        this.locations = controller.getLocations();
+        this.industries = controller.getIndustries();
+
         setJobsList(controller.getApiCall("any", 10 , "any", "any"));
     }
 

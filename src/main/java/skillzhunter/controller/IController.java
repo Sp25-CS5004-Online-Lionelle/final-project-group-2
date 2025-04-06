@@ -13,8 +13,11 @@ public interface IController {
     
     /** gets Model */
     IModel getModel();
-
     /** queries jobicy api */
     List<JobRecord> getApiCall(String query, Integer numberOfResults, String location, String industry);
+    /** gets locations */
+    List<String> getLocations();
+    /** gets industries */
+    List<String> getIndustries();
 
 }
