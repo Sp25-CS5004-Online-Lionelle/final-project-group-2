@@ -89,6 +89,13 @@ public class Jobs implements IModel {
     }
 
     //update comments and rating
+    /**
+     * Update a job's comments and rating.
+     * @param id Job ID
+     * @param comments Comments to update
+     * @param rating Rating to update
+     */
+    @Override
     public void updateJob(int id, String comments, int rating) {
         for (JobRecord job : jobList) {
             if (job.id() == id) {
@@ -125,6 +132,11 @@ public class Jobs implements IModel {
             }
         }
     }
+    /**
+     * Searches for jobs based on the given location.
+     * @param location The location to search for jobs in.
+     * @return A list of JobRecord objects representing the search results.
+     */
     public List<JobRecord> searchByLocation(String location) {
         List<JobRecord> result = new ArrayList<>();
         for (JobRecord job : jobList) {
