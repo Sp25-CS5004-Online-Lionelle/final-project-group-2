@@ -34,9 +34,11 @@ public class JobDetailsDialogue {
         JTextArea jobGeo = new JTextArea(job.jobGeo());
         JTextArea jobLevel = new JTextArea(job.jobLevel());
         JTextArea jobSalaryRange = new JTextArea(
-            String.format("%s - %s",
-            String.format("%,d", job.annualSalaryMin()),
-            String.format("%,d", job.annualSalaryMax())
+            job.annualSalaryMin() == 0 && job.annualSalaryMax() == 0 
+            ? "N/A" 
+            : String.format("%s - %s",
+            job.annualSalaryMin() == 0 ? "N/A" : String.format("%,d", job.annualSalaryMin()),
+            job.annualSalaryMax() == 0 ? "N/A" : String.format("%,d", job.annualSalaryMax())
             )
         );
         JTextArea jobCurrency = new JTextArea(job.salaryCurrency());
