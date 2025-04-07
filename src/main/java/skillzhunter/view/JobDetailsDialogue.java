@@ -15,7 +15,18 @@ public class JobDetailsDialogue {
         JTextArea jobTitle = new JTextArea(job.jobTitle());
         JTextArea jobCompany = new JTextArea(job.companyName());
         JTextArea jobIndustry = new JTextArea(String.join(", ", job.jobIndustry()));
-        JTextArea jobType = new JTextArea(String.join(", ", job.jobType()));
+        JTextArea jobType = new JTextArea(
+            String.join(", ", job.jobType().stream()
+            .map(type -> {
+                String[] parts = type.split("-");
+                for (int i = 0; i < parts.length; i++) {
+                parts[i] = parts[i].substring(0, 1).toUpperCase() + parts[i].substring(1);
+                }
+                return String.join("-", parts);
+            })
+            .toList()
+            )
+        );
         JTextArea jobGeo = new JTextArea(job.jobGeo());
         JTextArea jobLevel = new JTextArea(job.jobLevel());
         JTextArea jobSalaryRange = new JTextArea(String.valueOf(job.annualSalaryMin()));
