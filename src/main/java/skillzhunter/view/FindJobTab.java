@@ -3,6 +3,8 @@ package skillzhunter.view;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.TextField;
+import java.awt.Component;
+
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -123,64 +125,14 @@ public class FindJobTab extends JobView {
     }
 
     private void openSelectedJob() {
-        boolean jobPresent = false;
-        String dialogMsg = "Save this Job?";
         int viewIdx = jobsTable.getSelectedRow();
         if (viewIdx >= 0) {
-            int n = jobsTable.convertRowIndexToModel(viewIdx);
-            JobRecord activeJob = jobsList.get(n);
-
-            //See if we already have this one
-            if (SavedJobsLists.getSavedJobs().contains(activeJob)) {
-                jobPresent = true;
-                dialogMsg = "Remove this Job?";
-            }
-    
-            JTextArea jobTitle = new JTextArea(activeJob.jobTitle());
-            JTextArea jobCompany = new JTextArea(activeJob.companyName());
-            
-            // Join the industry array elements into a string without brackets
-            String jobIndustryText = String.join(", ", activeJob.jobIndustry());
-            JTextArea jobIndustry = new JTextArea(jobIndustryText);
-    
-            // Join the type array elements into a string without brackets
-            String jobTypeText = String.join(", ", activeJob.jobType());
-            JTextArea jobType = new JTextArea(jobTypeText);
-    
-            JTextArea jobGeo = new JTextArea(activeJob.jobGeo());
-            JTextArea jobLevel = new JTextArea(activeJob.jobLevel());
-            JTextArea jobSalaryRange = new JTextArea(String.valueOf(activeJob.annualSalaryMin()));
-            JTextArea jobCurrency = new JTextArea(activeJob.salaryCurrency());
-            JTextArea jobPubDate = new JTextArea(activeJob.pubDate());
-    
-            JSlider jobRating = new JSlider(0, 5, 2);
-            jobRating.setMajorTickSpacing(5);
-            jobRating.setMinorTickSpacing(1);
-            jobRating.setPaintTicks(true);
-            jobRating.setPaintLabels(true);
-    
-            JTextArea comments = new JTextArea(5, 20);
-            comments.setLineWrap(true);
-            comments.setWrapStyleWord(true);
-            comments.setBorder(BorderFactory.createTitledBorder("Your Comments"));
-
-    
-            Object[] obj = {"Job Title: ", jobTitle, "Company: ", jobCompany, "Industry: ", jobIndustry,
-                            "Type: ", jobType, "Location: ", jobGeo, "Level: ", jobLevel, "Salary: ", jobSalaryRange,
-                            "Currency: ", jobCurrency, "Published: ", jobPubDate, "Rate this Job: ", jobRating, 
-                            "Comments:", comments, dialogMsg};
-    
-            int result = JOptionPane.showConfirmDialog(jobsTable, obj, "Job Details: ", JOptionPane.INFORMATION_MESSAGE);
-
-            if (result == JOptionPane.YES_OPTION) {
-                if (jobPresent) {
-                    SavedJobsLists.removeSavedJob(activeJob);
-                } else {
-                    SavedJobsLists.addSavedJob(activeJob);
-                }
-            }
+            int modelIdx = jobsTable.convertRowIndexToModel(viewIdx);
+            JobRecord selectedJob = jobsList.get(modelIdx);
+            JobDetailsDialogue.showJobDetails(jobsTable, selectedJob, SavedJobsLists.getSavedJobs());
         }
     }
+    
 
 
     public static void main(String[] args) {

@@ -43,8 +43,15 @@ public final class JobsLoader {
       String jobType = String.join(", ", record.jobType());
 
       // Format the salary range
-      String salaryRange = record.annualSalaryMin() + " - " + record.annualSalaryMax();
+      String salaryRange = (record.annualSalaryMin() == 0 || record.annualSalaryMax() == 0 || 
+            record.annualSalaryMin() == 0 && record.annualSalaryMax() == 0) 
+            ? "N/A" 
+            : String.format("%,d - %,d", record.annualSalaryMin(), record.annualSalaryMax());
 
+      // Format currency
+      String salaryCurrency = (record.salaryCurrency() == null || record.salaryCurrency().isEmpty()) 
+                ? "N/A" 
+                : record.salaryCurrency();    
       // Add data for each column
       //data[i][0] = record.id();
       data[i][0] = record.jobTitle();
@@ -54,7 +61,7 @@ public final class JobsLoader {
       //data[i][5] = record.jobGeo();
       data[i][2] = record.jobLevel();
       data[i][3] = salaryRange;
-      data[i][4] = record.salaryCurrency();
+      data[i][4] = salaryCurrency;
       //data[i][9] = record.pubDate();
       //data[i][10] = record.rating();
       //data[i][11] = record.comments();
