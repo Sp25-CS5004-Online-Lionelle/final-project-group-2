@@ -43,7 +43,10 @@ public final class JobsLoader {
       String jobType = String.join(", ", record.jobType());
 
       // Format the salary range
-      String salaryRange = record.annualSalaryMin() + " - " + record.annualSalaryMax();
+      String salaryRange = (record.annualSalaryMin() == 0 || record.annualSalaryMax() == 0 || 
+                record.annualSalaryMin() == 0 && record.annualSalaryMax() == 0) 
+                ? "Not Available" 
+                : record.annualSalaryMin() + " - " + record.annualSalaryMax();
 
       // Add data for each column
       //data[i][0] = record.id();
