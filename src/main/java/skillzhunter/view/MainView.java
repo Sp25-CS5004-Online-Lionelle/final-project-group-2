@@ -137,8 +137,31 @@ public class MainView extends JFrame implements IView {
     
         // view mode
         JMenu viewMenu = new JMenu("View Mode");
-        lightMode = new JMenuItem("☀️");
-        darkMode = new JMenuItem("🌙");
+        try {
+            java.net.URL lightModeImgURL = getClass().getClassLoader().getResource("images/LightModeIcon.png");
+            if (lightModeImgURL != null) {
+            javax.swing.ImageIcon lightModeIcon = new javax.swing.ImageIcon(lightModeImgURL);
+            java.awt.Image scaledLightModeImage = lightModeIcon.getImage().getScaledInstance(12, 12, java.awt.Image.SCALE_SMOOTH);
+            lightMode = new JMenuItem(new javax.swing.ImageIcon(scaledLightModeImage));
+            } else {
+            System.err.println("Couldn't find file: images/LightModeIcon.png");
+            lightMode = new JMenuItem("Light Mode");
+            }
+
+            java.net.URL darkModeImgURL = getClass().getClassLoader().getResource("images/DarkModeIcon.png");
+            if (darkModeImgURL != null) {
+            javax.swing.ImageIcon darkModeIcon = new javax.swing.ImageIcon(darkModeImgURL);
+            java.awt.Image scaledDarkModeImage = darkModeIcon.getImage().getScaledInstance(12, 12, java.awt.Image.SCALE_SMOOTH);
+            darkMode = new JMenuItem(new javax.swing.ImageIcon(scaledDarkModeImage));
+            } else {
+            System.err.println("Couldn't find file: images/DarkModeIcon.png");
+            darkMode = new JMenuItem("Dark Mode");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            lightMode = new JMenuItem("Light Mode");
+            darkMode = new JMenuItem("Dark Mode");
+        }
         viewMenu.add(lightMode);
         viewMenu.add(darkMode);
     
