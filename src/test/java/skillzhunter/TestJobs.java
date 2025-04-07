@@ -141,5 +141,15 @@ public class TestJobs {
         List<JobRecord> results = jobList.searchByIndustry("Nonexistent Industry");
         assertEquals(0, results.size());
     }
+
+    //add test for update jobs
+    @Test
+    public void testUpdateJob() {
+        // Update job with ID 0
+        jobList.updateJob(0, "Updated comments", 5);
+        JobRecord updatedJob = jobList.getJobRecord("AI Senior Python Engineer");
+        assertEquals("Updated comments", updatedJob.comments());
+        assertEquals(5, updatedJob.rating());
+    }
     
 }
