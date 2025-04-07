@@ -44,9 +44,9 @@ public final class JobsLoader {
 
       // Format the salary range
       String salaryRange = (record.annualSalaryMin() == 0 || record.annualSalaryMax() == 0 || 
-                record.annualSalaryMin() == 0 && record.annualSalaryMax() == 0) 
-                ? "N/A" 
-                : record.annualSalaryMin() + " - " + record.annualSalaryMax();
+            record.annualSalaryMin() == 0 && record.annualSalaryMax() == 0) 
+            ? "N/A" 
+            : String.format("%,d - %,d", record.annualSalaryMin(), record.annualSalaryMax());
 
       // Format currency
       String salaryCurrency = (record.salaryCurrency() == null || record.salaryCurrency().isEmpty()) 
