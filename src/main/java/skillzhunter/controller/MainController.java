@@ -84,7 +84,7 @@ public class MainController implements IController{
     }
     
     /**
-     * this methos queries job board api for jobs api and returns the results.
+     * This method queries job board api for jobs api and returns the results.
      * @param query
      * @param numberOfResults
      * @param location
@@ -96,7 +96,34 @@ public class MainController implements IController{
         return model.searchJobs(query, numberOfResults, location, industry);
     }
 
-    //getApiCall to send to view
+    /**
+     * Passes the add job method to the view from the model.
+     * @param jobRecord
+     */
+    public void getAddJob(JobRecord jobRecord) {
+        model.addJob(jobRecord);
+    }
+    
+    /**
+     * Passes the remove job method to the view from the model.
+     * 
+     * 
+     * @param id
+     */
+    public void getRemoveJob(int id) {
+        model.removeJob(id);
+    }
+
+    //getUpdateJob to send to view
+    /**
+     * Passes the update job method to the view from the model.
+     * @param id
+     * @param comments
+     * @param rating
+     */
+    public void getUpdateJob(int id, String comments, int rating) {
+        model.updateJob(id, comments, rating);
+    }
 
 
     /**

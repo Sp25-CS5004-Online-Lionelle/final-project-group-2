@@ -6,6 +6,7 @@ public interface IModel {
     JobRecord getJobRecord(String jobTitle);
     List<JobRecord> getJobRecords();
     boolean removeJob(int id);
+    void updateJob(int id, String comments, int rating);
     List<JobRecord> searchByQuery(String query);
     List<JobRecord> searchByLocation(String location);
     List<JobRecord> searchByIndustry(String industry);
