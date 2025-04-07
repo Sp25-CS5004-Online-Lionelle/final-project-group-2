@@ -41,7 +41,9 @@ public class JobDetailsDialogue {
             job.annualSalaryMax() == 0 ? "N/A" : String.format("%,d", job.annualSalaryMax())
             )
         );
-        JTextArea jobCurrency = new JTextArea(job.salaryCurrency());
+        JTextArea jobCurrency = new JTextArea(
+            (job.salaryCurrency() == null || job.salaryCurrency().isEmpty()) ? "N/A" : job.salaryCurrency()
+        );
         JTextArea jobPubDate = new JTextArea(job.pubDate());
 
         JSlider jobRating = new JSlider(0, 5, 2);
