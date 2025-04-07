@@ -33,7 +33,12 @@ public class JobDetailsDialogue {
         );
         JTextArea jobGeo = new JTextArea(job.jobGeo());
         JTextArea jobLevel = new JTextArea(job.jobLevel());
-        JTextArea jobSalaryRange = new JTextArea(String.valueOf(job.annualSalaryMin()));
+        JTextArea jobSalaryRange = new JTextArea(
+            String.format("%s - %s",
+            String.format("%,d", job.annualSalaryMin()),
+            String.format("%,d", job.annualSalaryMax())
+            )
+        );
         JTextArea jobCurrency = new JTextArea(job.salaryCurrency());
         JTextArea jobPubDate = new JTextArea(job.pubDate());
 
