@@ -14,7 +14,11 @@ public class JobDetailsDialogue {
 
         JTextArea jobTitle = new JTextArea(job.jobTitle());
         JTextArea jobCompany = new JTextArea(job.companyName());
-        JTextArea jobIndustry = new JTextArea(String.join(", ", job.jobIndustry()));
+        JTextArea jobIndustry = new JTextArea(
+            String.join(",", job.jobIndustry().stream()
+            .map(industry -> industry.replace("&amp;", ",").replace("&", ",").trim())
+            .toList())
+        );
         JTextArea jobType = new JTextArea(
             String.join(", ", job.jobType().stream()
             .map(type -> {
