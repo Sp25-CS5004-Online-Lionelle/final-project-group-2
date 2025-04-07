@@ -4,7 +4,7 @@ import static skillzhunter.view.JobsLoader.getColumnNames;
 import static skillzhunter.view.JobsLoader.getData;
 
 import java.awt.BorderLayout;
-
+import java.awt.Insets;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -105,8 +105,27 @@ public class MainView extends JFrame implements IView {
     private JMenuBar createMenuBar() {
         // settings
         JMenuBar menuBar = new JMenuBar();
-        JMenu settings = new JMenu("settings");
+        JMenu settings = new JMenu();
+        try {
+            java.net.URL imgURL = getClass().getClassLoader().getResource("images/SettingsIcon.png");
+            if (imgURL != null) {
+                javax.swing.ImageIcon icon = new javax.swing.ImageIcon(imgURL);
+                java.awt.Image scaledImage = icon.getImage().getScaledInstance(24, 24, java.awt.Image.SCALE_SMOOTH);
+                settings.setIcon(new javax.swing.ImageIcon(scaledImage));
+                
+                // 👇 This is the key change
+                settings.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 0, 10, 0)); // Top, Left, Bottom, Right
+                
+                settings.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR)); // Set hand cursor
+            } else {
+                System.err.println("Couldn't find file: images/SettingsIcon.png");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    
         exit = new JMenuItem("Exit");
+    
         // download
         JMenu menuDownload = new JMenu("Download Data");
         csvDownload = new JMenuItem("csv");
@@ -115,22 +134,46 @@ public class MainView extends JFrame implements IView {
         menuDownload.add(xmlDownload);
         menuDownload.add(jsonDownload);
         menuDownload.add(csvDownload);
+    
         // view mode
         JMenu viewMenu = new JMenu("View Mode");
-        lightMode = new JMenuItem("☀️");
-        darkMode = new JMenuItem("🌙");
+        try {
+            java.net.URL lightModeImgURL = getClass().getClassLoader().getResource("images/LightModeIcon.png");
+            if (lightModeImgURL != null) {
+            javax.swing.ImageIcon lightModeIcon = new javax.swing.ImageIcon(lightModeImgURL);
+            java.awt.Image scaledLightModeImage = lightModeIcon.getImage().getScaledInstance(12, 12, java.awt.Image.SCALE_SMOOTH);
+            lightMode = new JMenuItem(new javax.swing.ImageIcon(scaledLightModeImage));
+            } else {
+            System.err.println("Couldn't find file: images/LightModeIcon.png");
+            lightMode = new JMenuItem("Light Mode");
+            }
+
+            java.net.URL darkModeImgURL = getClass().getClassLoader().getResource("images/DarkModeIcon.png");
+            if (darkModeImgURL != null) {
+            javax.swing.ImageIcon darkModeIcon = new javax.swing.ImageIcon(darkModeImgURL);
+            java.awt.Image scaledDarkModeImage = darkModeIcon.getImage().getScaledInstance(12, 12, java.awt.Image.SCALE_SMOOTH);
+            darkMode = new JMenuItem(new javax.swing.ImageIcon(scaledDarkModeImage));
+            } else {
+            System.err.println("Couldn't find file: images/DarkModeIcon.png");
+            darkMode = new JMenuItem("Dark Mode");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            lightMode = new JMenuItem("Light Mode");
+            darkMode = new JMenuItem("Dark Mode");
+        }
         viewMenu.add(lightMode);
         viewMenu.add(darkMode);
+    
         // add menu items to settings
         settings.add(menuDownload);
         settings.add(viewMenu);
         settings.add(exit);
         menuBar.add(settings);
-
+    
         mapMenuEvents();
         return menuBar;
-
-    }
+    }    
 
     private void mapMenuEvents(){
         // Exit Functionality
