@@ -88,6 +88,43 @@ public class Jobs implements IModel {
         return result;
     }
 
+    //update comments and rating
+    public void updateJob(int id, String comments, int rating) {
+        for (JobRecord job : jobList) {
+            if (job.id() == id) {
+                //make job into bean
+                JobBean jobBean = new JobBean();
+                jobBean.setId(job.id());
+                jobBean.setJobTitle(job.jobTitle());
+                jobBean.setCompanyName(job.companyName());
+                jobBean.setJobIndustry(job.jobIndustry());
+                jobBean.setJobType(job.jobType());
+                jobBean.setJobGeo(job.jobGeo());
+                jobBean.setJobLevel(job.jobLevel());
+                jobBean.setAnnualSalaryMin(job.annualSalaryMin());
+                jobBean.setAnnualSalaryMax(job.annualSalaryMax());
+                jobBean.setSalaryCurrency(job.salaryCurrency());
+                jobBean.setPubDate(job.pubDate());
+                //setcomments and rating in bean
+                jobBean.setComments(comments);
+                jobBean.setRating(rating);
+                //then make into jobrecord
+                JobRecord updatedJob = jobBean.toRecord();
+                //remove old job
+                jobList.remove(job);
+                //add updated job
+                jobList.add(updatedJob);
+                //update job in list
+                for (int i = 0; i < jobList.size(); i++) {
+                    if (jobList.get(i).id() == id) {
+                        jobList.set(i, updatedJob);
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+    }
     public List<JobRecord> searchByLocation(String location) {
         List<JobRecord> result = new ArrayList<>();
         for (JobRecord job : jobList) {
