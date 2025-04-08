@@ -19,5 +19,18 @@ public interface IController {
     List<String> getLocations();
     /** gets industries */
     List<String> getIndustries();
+    void setViewData();
+    /** gets add job */
+    void getAddJob(JobRecord job);
+    /** gets remove job */
+    void getRemoveJob(int id);
+    /** gets saved jobs that need to be made into a csv */
+    void getSavedJobsToCsv(String filePath);
+    /** gets saved jobs */
+    List<JobRecord> getSavedJobs();
+    /** updates comments */
+    void updateComments(int id, String comments);
+    /** updates rating */
+    void updateRating(int id, int rating);
 
 }
