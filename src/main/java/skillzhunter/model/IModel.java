@@ -13,6 +13,7 @@ public interface IModel {
     List<JobRecord> searchJobs(String query, Integer numberOfResults, String location, String industry);
     List<String> getLocations();
     List<String> getIndustries();
+    void saveJobsToCsv(String fileName);
     
     // List<JobRecord> getSavedJobs(String savedJob); //what are the optional parameters for getSavedJobs(string, string, string)
     //void downloadJobs(String jobDownloaded);
