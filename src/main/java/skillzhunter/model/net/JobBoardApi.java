@@ -2,6 +2,7 @@ package skillzhunter.model.net;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -27,9 +28,12 @@ public class JobBoardApi {
     /** object mapper for parsing json response*/
     private static final ObjectMapper objectMapper = new ObjectMapper();
     /** map for storing industries and their slugs*/
-    private static final Map<String, String> industriesMap = loadCsvData("data\\industries.csv", "industry", "slug");
+    private static final Map<String, String> industriesMap = JobBoardApi.loadCsvData(
+    Paths.get("data", "industries.csv").toString(), "industry", "slug");
     /** map for storing locations and their slugs*/
-    private static final Map<String, String> locationsMap = loadCsvData("data\\locations.csv", "location", "slug");
+    private static final Map<String, String> locationsMap = JobBoardApi.loadCsvData(
+    Paths.get("data", "locations.csv").toString(), "location", "slug");
+
     /** empty contructor*/
     public JobBoardApi() {}
     

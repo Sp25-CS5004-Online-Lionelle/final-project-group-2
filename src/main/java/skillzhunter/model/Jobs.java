@@ -1,5 +1,6 @@
 package skillzhunter.model;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,9 +10,12 @@ import skillzhunter.model.net.JobBoardApi;
 
 public class Jobs implements IModel {
     /** map for storing industries and their slugs*/
-    private static final Map<String, String> industriesMap = JobBoardApi.loadCsvData("data\\industries.csv", "industry", "slug");
+    private static final Map<String, String> industriesMap = JobBoardApi.loadCsvData(
+    Paths.get("data", "industries.csv").toString(), "industry", "slug");
     /** map for storing locations and their slugs*/
-    private static final Map<String, String> locationsMap =JobBoardApi.loadCsvData("data\\locations.csv", "location", "slug");    
+    private static final Map<String, String> locationsMap = JobBoardApi.loadCsvData(
+    Paths.get("data", "locations.csv").toString(), "location", "slug");
+
     /** Job List */
     private final List<JobRecord> jobList;
 
