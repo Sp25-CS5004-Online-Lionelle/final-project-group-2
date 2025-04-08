@@ -15,5 +15,4 @@ void run();
  */
 void addFeatures(IController controller);
 
-
 }
