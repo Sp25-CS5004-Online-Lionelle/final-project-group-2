@@ -152,4 +152,30 @@ public class TestJobs {
         assertEquals(5, updatedJob.rating());
     }
     
+    @Test
+    public void addJob() {
+        JobRecord newJob = new JobRecord(
+            3,
+            "https://www.example.com/jobs/software-engineer",
+            "software-engineer",
+            "Software Engineer",
+            "Example Company",
+            "https://logo.clearbit.com/example.com",
+            List.of("Technology"),
+            List.of("Full-time"),
+            "Remote",
+            "Mid",
+            "Develop and maintain software applications.",
+            "Collaborate with cross-functional teams to define, design, and ship new features.",
+            "2025-04-01",
+            90000,
+            120000,
+            "USD",
+            4,
+            "Looking for a challenging role in software development."
+        );
+
+        jobList.addJob(newJob);
+        assertEquals(4, jobList.getJobRecords().size());
+    }
 }
