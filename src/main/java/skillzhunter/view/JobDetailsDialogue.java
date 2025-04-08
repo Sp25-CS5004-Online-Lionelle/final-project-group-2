@@ -96,7 +96,6 @@ public class JobDetailsDialogue {
                     maybe we are trying to update a job too early? has this job even been added to the model yet?
 
                 - possible idea: have the controller/model return a JobRecord after it updates a job so the view has an accurate JobRecord
-                
                 */
             }
         });
