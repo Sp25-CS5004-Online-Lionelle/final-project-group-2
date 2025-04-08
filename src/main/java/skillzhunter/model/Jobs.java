@@ -1,12 +1,20 @@
 package skillzhunter.model;
 
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import skillzhunter.model.formatters.DataFormatter;
+import skillzhunter.model.formatters.Formats;
 import skillzhunter.model.net.JobBoardApi;
+
+
 
 public class Jobs implements IModel {
     /** map for storing industries and their slugs*/
@@ -48,7 +56,21 @@ public class Jobs implements IModel {
      * @param job JobRecord instance to add
      */
     public void addJob(JobRecord job) {
-        jobList.add(job);
+        JobBean jobBean = new JobBean();
+        jobBean.setId(job.id());
+        jobBean.setJobTitle(job.jobTitle() != null && !job.jobTitle().isBlank() ? job.jobTitle() : "");
+        jobBean.setCompanyName(job.companyName() != null && !job.companyName().isBlank() ? job.companyName() : "");
+        jobBean.setJobIndustry(job.jobIndustry() != null && job.jobIndustry().stream().noneMatch(String::isBlank) ? job.jobIndustry() : new ArrayList<>());
+        jobBean.setJobType(job.jobType() != null && job.jobType().stream().noneMatch(String::isBlank) ? job.jobType() : new ArrayList<>());
+        jobBean.setJobGeo(job.jobGeo() != null && !job.jobGeo().isBlank() ? job.jobGeo() : "");
+        jobBean.setJobLevel(job.jobLevel() != null && !job.jobLevel().isBlank() ? job.jobLevel() : "");
+        jobBean.setAnnualSalaryMin(job.annualSalaryMin());
+        jobBean.setAnnualSalaryMax(job.annualSalaryMax());
+        jobBean.setSalaryCurrency(job.salaryCurrency() != null && !job.salaryCurrency().isBlank() ? job.salaryCurrency() : "");
+        jobBean.setPubDate(job.pubDate() != null && !job.pubDate().isBlank() ? job.pubDate() : "");
+        jobBean.setComments(job.comments() != null && !job.comments().isBlank() ? job.comments() : "No comments provided");
+        jobBean.setRating(job.rating());
+        jobList.add(jobBean.toRecord());
     }
 
     /**
@@ -70,6 +92,11 @@ public class Jobs implements IModel {
      * @return List of JobRecords
      */
     public List<JobRecord> getJobRecords() {
+        if (jobList.isEmpty()) {
+            System.out.println("Job List is empty. Ensure jobs are added before retrieving.");
+        } else {
+            //System.out.println("Job List: " + jobList);
+        }
         return new ArrayList<>(jobList);
     }
 
@@ -175,7 +202,26 @@ public class Jobs implements IModel {
     }
 
     //add getSavedJobs and downloadJobs methods here
-    
+    /**
+     * Saves the job records to a CSV file.
+     * @param jobRecords List of JobRecord objects to save
+     * @param fileName Name of the CSV file
+     */
+    @Override
+    /**
+     * Saves the job records (saved jobs) in the jobList to a CSV file.
+     * @param fileName Name of the CSV file to save to
+     */
+    public void saveJobsToCsv(String fileName) {
+        try (OutputStream out = new FileOutputStream(fileName)) {
+            // Use the jobList to get the saved jobs
+            DataFormatter.write(jobList, Formats.CSV, out);
+        } catch (IOException e) {
+            throw new RuntimeException("Error writing to CSV file", e);
+        }
+    }
+
+   
     /**
      * Main method for testing purposes.
      * @param args Command line arguments (not used).
@@ -185,7 +231,7 @@ public class Jobs implements IModel {
         Jobs jobs = new Jobs();
         // Test adding, updating, removing jobs
         JobRecord job = new JobRecord(1, "url", "slug", "Python Developer", "Company A", "logo", Arrays.asList("Tech"), Arrays.asList("Full-time"), "NYC", "Senior", "Job excerpt", "Job description", "2025-03-30", 60000, 80000, "USD", 4, "Great job");
-        System.out.println("Adding job: " + job);
+        System.out.println("Adding job" + job);
         jobs.addJob(job);
 
         // Search job by title
