@@ -5,6 +5,8 @@ import static skillzhunter.view.JobsLoader.getData;
 
 import java.awt.BorderLayout;
 import java.awt.Insets;
+import java.util.List;
+
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -18,6 +20,7 @@ import javax.swing.SwingUtilities;
 
 import javax.swing.UIManager;
 import skillzhunter.controller.IController;
+import skillzhunter.model.JobRecord;
 
 
 public class MainView extends JFrame implements IView {
@@ -51,7 +54,7 @@ public class MainView extends JFrame implements IView {
 
         // building tabs
         findJobTab = new FindJobTab(controller);
-        savedJobTab = new SavedJobTab(controller);
+        savedJobTab = new SavedJobsTab(controller, controller.getSavedJobs());
 
         // building tabbed pane
         tabbedPane  = buildTabbedPane(findJobTab, savedJobTab);
@@ -80,6 +83,9 @@ public class MainView extends JFrame implements IView {
         // Use the existing tabs instead of creating new ones
         SavedJobsLists.addObserver(savedJobTab);
         SavedJobsLists.addObserver(findJobTab);
+
+        //TA: make sure SavedJobsList actually has a controller
+        SavedJobsLists.setController(controller);
     
         tabbedPane.add("Find Jobs", findJobTab);
         tabbedPane.add("Saved Jobs", savedJobTab);
@@ -229,7 +235,6 @@ public class MainView extends JFrame implements IView {
     //   this.searchJobTabbed.addFeatures(controller);
     } 
 
-
     /**
      * Runs the view.
      * This method is used to start the view and display it to the user.
@@ -244,4 +249,5 @@ public class MainView extends JFrame implements IView {
 //            System.out.println(lnFinfo.getClassName());
 //        }
     }
+
 }
