@@ -71,7 +71,20 @@ public class MainController implements IController{
      */
     @Override
     public List<String> getLocations() {
-        return model.getLocations();
+        return model.getLocations().stream()
+                    .map(location -> {
+                        String[] words = location.split(" ");
+                        StringBuilder capitalizedLocation = new StringBuilder();
+                        for (String word : words) {
+                            if (!word.isEmpty()) {
+                                capitalizedLocation.append(Character.toUpperCase(word.charAt(0)))
+                                                   .append(word.substring(1).toLowerCase())
+                                                   .append(" ");
+                            }
+                        }
+                        return capitalizedLocation.toString().trim();
+                    })
+                    .toList();
     }
 
     /**
@@ -80,7 +93,24 @@ public class MainController implements IController{
      */
     @Override
     public List<String> getIndustries() {
-        return model.getIndustries();
+        return model.getIndustries().stream()
+                    .map(industry -> {
+                        String[] words = industry.split(" ");
+                        StringBuilder capitalizedIndustry = new StringBuilder();
+                        for (String word : words) {
+                            if (!word.isEmpty()) {
+                                if (word.equalsIgnoreCase("hr")) {
+                                    capitalizedIndustry.append("HR").append(" ");
+                                } else {
+                                    capitalizedIndustry.append(Character.toUpperCase(word.charAt(0)))
+                                                       .append(word.substring(1).toLowerCase())
+                                                       .append(" ");
+                                }
+                            }
+                        }
+                        return capitalizedIndustry.toString().trim();
+                    })
+                    .toList();
     }
     
     /**
