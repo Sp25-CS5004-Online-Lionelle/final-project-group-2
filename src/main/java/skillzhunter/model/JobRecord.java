@@ -26,4 +26,11 @@ int annualSalaryMax,
 String salaryCurrency,
 int rating,
 String comments
-) {}
+) {
+    //TESTING ONLY
+    @Override
+    public String toString(){
+        return String.format("JOB #%d - comment = %s", id, comments);
+    }
+
+}
