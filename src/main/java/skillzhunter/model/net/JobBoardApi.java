@@ -67,6 +67,51 @@ public class JobBoardApi {
         return myMap;
     }
 
+    // Optional overloads — these go here:
+    /**
+     * Retrieves job records based on the provided query parameters.
+     * If any parameter is invalid or not provided, default values are applied:
+     * - `query`: Defaults to "all" if null, empty, or generic terms like "any" or "all" are passed.
+     * - `numberOfResults`: Defaults to 5 if null or less than 1.
+     * - `location`: Must match an entry in `location.csv`. Defaults to "anywhere" if not found.
+     * - `industry`: Must match an entry in `industry.csv`. Defaults to "any" if not found.
+     * @param query
+     * @return
+     */
+    public List<JobRecord> getJobBoard(String query) {
+        return getJobBoard(query, null, null, null);
+    }
+
+    /**
+     * Retrieves job records based on the provided query parameters.
+     * If any parameter is invalid or not provided, default values are applied:
+     * - `query`: Defaults to "all" if null, empty, or generic terms like "any" or "all" are passed.
+     * - `numberOfResults`: Defaults to 5 if null or less than 1.
+     * - `location`: Must match an entry in `location.csv`. Defaults to "anywhere" if not found.
+     * - `industry`: Must match an entry in `industry.csv`. Defaults to "any" if not found.
+     * @param query
+     * @param numberOfResults
+     * @return
+     */
+    public List<JobRecord> getJobBoard(String query, Integer numberOfResults) {
+        return getJobBoard(query, numberOfResults, null, null);
+    }
+
+    /**
+     * Retrieves job records based on the provided query parameters.
+     * If any parameter is invalid or not provided, default values are applied:
+     * - `query`: Defaults to "all" if null, empty, or generic terms like "any" or "all" are passed.
+     * - `numberOfResults`: Defaults to 5 if null or less than 1.
+     * - `location`: Must match an entry in `location.csv`. Defaults to "anywhere" if not found.
+     * - `industry`: Must match an entry in `industry.csv`. Defaults to "any" if not found.
+     * @param query
+     * @param numberOfResults
+     * @param location
+     * @return
+     */
+    public List<JobRecord> getJobBoard(String query, Integer numberOfResults, String location) {
+        return getJobBoard(query, numberOfResults, location, null);
+    }
     /**
      * Retrieves job records based on the provided query parameters.
      * If any parameter is invalid or not provided, default values are applied:
@@ -86,8 +131,12 @@ public class JobBoardApi {
      */
     public List<JobRecord> getJobBoard(String query, Integer numberOfResults, String location, String industry){
         // getting slug for request, if it breaks we default
-        location = locationsMap.get(location.toLowerCase().trim());
-        industry = industriesMap.get(industry.toLowerCase().trim());
+        if(location != null) {
+            location = locationsMap.get(location.toLowerCase().trim());
+        }
+        if(industry != null) {
+            industry = industriesMap.get(industry.toLowerCase().trim());
+        }
         Boolean location_passed = location != null && !location.isEmpty() && !location.equalsIgnoreCase("anywhere");
         Boolean industry_passed = industry != null && !industry.isEmpty() && !industry.equalsIgnoreCase("all")&& !industry.equalsIgnoreCase("any");
 
