@@ -18,11 +18,9 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
 import skillzhunter.controller.IController;
-import skillzhunter.controller.IJobController;
 import skillzhunter.model.JobRecord;
 import static skillzhunter.view.JobsLoader.getColumnNames;
 import static skillzhunter.view.JobsLoader.getData;
-
 
 public abstract class JobView extends JPanel implements IJobView {
     protected JButton searchButton;
@@ -33,115 +31,75 @@ public abstract class JobView extends JPanel implements IJobView {
     protected List<JobRecord> jobsList = new ArrayList<>();
     protected JButton darkModeToggle;
     protected JButton openJob;
+    protected IController controller; // Declare the controller field
     protected JButton exit;
     protected JPanel topButtonLayout = new JPanel();
-    protected IController controller;
     protected JPanel mainPanel;
     protected boolean savedJobs = false;
 
-    public JobView() {
-    }
+    public JobView() {}
 
-    public void initView(){
-
-        //make the frame & panels and set layout
+    // Initialize the view with components
+    public void initView() {
         setSize(1000, 1000);
         jobsTable = new JobsTable(getColumnNames(), getData(jobsList));
         mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
-
-        // Adding in panels
         mainPanel.add(makeTopButtonPanel());
         mainPanel.add(makeTablePanel());
         mainPanel.add(makeBottomButtonPanel());
         add(mainPanel);
-
     }
 
+    // Method to create the top panel with a search field (customize as needed)
     public JPanel makeTopButtonPanel() {
-
-        //make the panel & set layout
         JPanel topRow = new JPanel();
-        topRow.setLayout(new BoxLayout(topRow, BoxLayout.LINE_AXIS)); //this doesn't seem to get passed to children well?
+        topRow.setLayout(new BoxLayout(topRow, BoxLayout.LINE_AXIS));
         topRow.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-
-        //create fields, buttons, and combos
         TextField searchField = new TextField("!!This is Place Holder Overide this method!!", 20);
-
-        //add fields, buttons, labels, combos, and spaces
         topRow.add(searchField);
-
-        //return the panel
         return topRow;
-
     }
 
+    // Method to create the bottom panel with buttons (customize as needed)
     public JPanel makeBottomButtonPanel() {
-
-        //make the panel & set layout
         JPanel bottomRow = new JPanel();
         bottomRow.setLayout(new BoxLayout(bottomRow, BoxLayout.LINE_AXIS));
         bottomRow.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-
-        //create fields, buttons, and combos
         TextField searchField = new TextField("!!This is Place Holder Overide this method!!", 20);
-
-        //add fields, buttons, labels, combos, and spaces
         bottomRow.add(searchField);
-
-        //return the panel
         return bottomRow;
     }
-    
 
+    // Method to create the table panel to show the list of jobs
     public JPanel makeTablePanel() {
-
-        //make the panel & set layout
         JPanel tablePanel = new JPanel();
-        tablePanel.setLayout(new BorderLayout()); // Use BorderLayout for better handling of the table
-        tablePanel.setPreferredSize(new Dimension(900, 400)); // Set a reasonable preferred size for the table
+        tablePanel.setLayout(new BorderLayout());
+        tablePanel.setPreferredSize(new Dimension(900, 400));
         tablePanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-
-        //create tables
         jobsTable = new JobsTable(getColumnNames(), getData(jobsList));
-        jobsTable.setAutoCreateRowSorter(true); //not working yet
+        jobsTable.setAutoCreateRowSorter(true);
         JScrollPane tablePane = new JScrollPane(jobsTable);
-
-        //add tables
-        tablePanel.add(tablePane, BorderLayout.CENTER); // Add tablePane to the center of the panel
-
-        //return the panel
+        tablePanel.add(tablePane, BorderLayout.CENTER);
         return tablePanel;
     }
 
-
+    // Method to set button properties such as color and hover effects
     public void setButtonProperties(JButton button) {
         Color normalColor = theme.buttonNormal;
         Color hoverColor = theme.buttonHover;
-    
-        // First, set the normal background color for the button
         button.setBackground(normalColor);
         button.setForeground(theme.buttonForeground);
-        
-        // Apply hover effect with the correct hover color
         applyHoverEffect(button, hoverColor, normalColor);
-    
-        // Other properties
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         button.setFocusPainted(false);
         button.setOpaque(true);
         button.setBorderPainted(false);
     }
 
-
+    // Apply theme to the components
     public void applyTheme(ColorTheme theme) {
         setBackground(theme.background);
-        System.out.println("Applying theme: " + theme);
-        // recordText.setBackground(theme.background);
-        // recordText.setForeground(theme.foreground);
-        // Set button colors
-        // searchButton.setBackground(theme.buttonNormal);
-        // searchButton.setForeground(theme.buttonForeground);
         openJob.setBackground(theme.buttonNormal);
         openJob.setForeground(theme.buttonForeground);
         jobsTable.setBackground(theme.fieldBackground);
@@ -152,6 +110,7 @@ public abstract class JobView extends JPanel implements IJobView {
         repaint();
     }
 
+    // Hover effect for buttons (change background color on hover)
     private void applyHoverEffect(JButton button, Color hoverColor, Color normalColor) {
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
@@ -161,46 +120,61 @@ public abstract class JobView extends JPanel implements IJobView {
 
             @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(theme.buttonNormal); // Dynamically retrieve the current normal color
+                button.setBackground(theme.buttonNormal);
             }
         });
     }
 
+    // Set the jobs list to update the table and UI
     public void setJobsList(List<JobRecord> jobsList) {
-       this.jobsList = jobsList;
-       this.jobsTable.setData(getData(jobsList));
-       Object[][] data = getData(jobsList);
-       DefaultTableModel tableData = new DefaultTableModel(data, getColumnNames());
-       this.jobsTable.setModel(tableData);
-       this.jobsTable.repaint();
-       // Enable selection
+        //TESTING: jobsList is entering here with null comments
+
+        System.out.println("Setting jobs list with: " + jobsList);
+        this.jobsList = jobsList;
+        this.jobsTable.setData(getData(jobsList));
+        DefaultTableModel tableData = new DefaultTableModel(getData(jobsList), getColumnNames());
+        this.jobsTable.setModel(tableData);
+        this.jobsTable.repaint();
         this.jobsTable.setRowSelectionAllowed(true);
         this.jobsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-       
     }
 
+    // Get the current jobs list
     public List<JobRecord> getJobsList() {
         return this.jobsList;
     }
 
+    // Set text for job records (not used in this class but can be adapted)
     public void setRecordText(String text) {
         recordText.setText(text);
     }
 
+    // Add a new job record via controller (delegates to controller)
     public void addJobRecord(JobRecord record) {
-        this.jobsList.add(record);
+        controller.getAddJob(record); // Delegate to controller
+        controller.setViewData(); // Update the view after adding a job
+    }
+
+    // Remove a job record via controller (delegates to controller)
+    public void removeJobRecord(int index) {
+        controller.getRemoveJob(index); // Delegate to controller
+    }
+
+    // Update the job list after an operation (like add or remove)
+    public void updateJobsList(List<JobRecord> jobsList) {
+        this.jobsList = jobsList;
         this.jobsTable.setData(getData(jobsList));
     }
 
-    public void removeJobRecord(JobRecord record) {
-        this.jobsList.remove(record);
-        this.jobsTable.setData(getData(jobsList));
+    // Add listeners and features (e.g., search button functionality)
+    public void addFeatures(IController controller) {
+        this.controller = controller; // Set controller
+        searchButton.addActionListener(e -> controller.setViewData());  // Delegate logic to controller for search
+        // You can add other action listeners for other buttons (like add, remove job)
     }
 
+    // Main method (not needed unless you want to test the view)
     public static void main(String[] args) {
         System.out.println("hello");
-    }
-    public void addFeatures(IJobController controller) {
-        searchButton.addActionListener(e -> controller.setViewData());
     }
 }
