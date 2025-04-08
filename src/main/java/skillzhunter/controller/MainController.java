@@ -99,9 +99,13 @@ public class MainController implements IController{
                         StringBuilder capitalizedIndustry = new StringBuilder();
                         for (String word : words) {
                             if (!word.isEmpty()) {
-                                capitalizedIndustry.append(Character.toUpperCase(word.charAt(0)))
-                                                   .append(word.substring(1).toLowerCase())
-                                                   .append(" ");
+                                if (word.equalsIgnoreCase("hr")) {
+                                    capitalizedIndustry.append("HR").append(" ");
+                                } else {
+                                    capitalizedIndustry.append(Character.toUpperCase(word.charAt(0)))
+                                                       .append(word.substring(1).toLowerCase())
+                                                       .append(" ");
+                                }
                             }
                         }
                         return capitalizedIndustry.toString().trim();
