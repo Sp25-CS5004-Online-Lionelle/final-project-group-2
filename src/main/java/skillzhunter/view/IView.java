@@ -2,7 +2,6 @@ package skillzhunter.view;
 
 
 import skillzhunter.controller.IController;
-
 public interface IView {
 /**
  * Runs the view.
@@ -15,5 +14,6 @@ void run();
  * @param controller The controller to be set for the view.
  */
 void addFeatures(IController controller);
+
 
 }
