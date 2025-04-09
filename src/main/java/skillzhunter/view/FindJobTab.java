@@ -1,5 +1,6 @@
 package skillzhunter.view;
 
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.TextField;
@@ -53,6 +54,9 @@ public class FindJobTab extends JobView {
         //create fields, buttons, and combos
         TextField searchField = new TextField("", 20);    
         searchButton = new JButton("Find Jobs");
+        // Set hand cursor for searchButton
+        searchButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
         String[] comboOptions = {"any", "option1", "option2"};//need to make this specific to field
         Integer[] results = {5,10,20,50};
         JComboBox<String> industryCombo = new JComboBox<>(industries);
@@ -98,6 +102,8 @@ public class FindJobTab extends JobView {
 
         //make buttons
         openJob = new JButton("Open Job");
+        // Set hand cursor for openJob button
+        openJob.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         //add fields, buttons, labels, combos, and spaces
         buttonPanel.add(openJob);
