@@ -1,8 +1,6 @@
 package skillzhunter.view;
 
 import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 
 import javax.swing.JTable;
@@ -13,8 +11,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableRowSorter;
 
-import skillzhunter.model.JobRecord;
-
 /**
  * A table for displaying job listings with basic sorting functionality.
  */
@@ -23,6 +19,8 @@ public class JobsTable extends JTable {
   private DefaultTableModel tableModel;
   private TableRowSorter<DefaultTableModel> sorter;
   private String[] columnNames = { "Job Title", "Company", "Level", "Salary Range", "Currency" };
+  private CustomHeader customHeaderRenderer;
+  private ColorTheme currentTheme = ColorTheme.LIGHT; // Default theme
 
   public JobsTable() {
     this(new String[] {}, new Object[0][0]);
@@ -59,13 +57,38 @@ public class JobsTable extends JTable {
   }
   
   /**
+   * Sets the current theme for the table and header.
+   * 
+   * @param theme The color theme to apply
+   */
+  public void applyTheme(ColorTheme theme) {
+    // Store the current theme
+    this.currentTheme = theme;
+    
+    // Update the header renderer with the theme
+    if (customHeaderRenderer != null) {
+      customHeaderRenderer.setDarkMode(theme == ColorTheme.DARK);
+      
+      // Force refresh of the header
+      if (getTableHeader() != null) {
+        getTableHeader().repaint();
+      }
+    }
+  }
+  
+  /**
    * Sets up the custom header renderer for visual indication of sortable columns
    */
   private void setupHeaderRenderer() {
     JTableHeader header = getTableHeader();
     if (header != null) {
       // Apply custom renderer without changing sort behavior
-      header.setDefaultRenderer(new CustomHeader(header.getDefaultRenderer()));
+      customHeaderRenderer = new CustomHeader(header.getDefaultRenderer());
+      
+      // Initialize with the current theme
+      customHeaderRenderer.setDarkMode(currentTheme == ColorTheme.DARK);
+      
+      header.setDefaultRenderer(customHeaderRenderer);
       
       // Add hand cursor to indicate clickable headers
       header.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -84,6 +107,9 @@ public class JobsTable extends JTable {
     
     // Re-apply the custom header renderer
     setupHeaderRenderer();
+    
+    // Re-apply the current theme to ensure consistent styling
+    applyTheme(currentTheme);
   }
 
   /**
@@ -131,6 +157,9 @@ public class JobsTable extends JTable {
   public void setColumnNames(String[] columnNames) {
     tableModel.setColumnIdentifiers(columnNames);
     setupHeaderRenderer(); // Reapply the custom header
+    
+    // Re-apply theme to ensure consistent styling
+    applyTheme(currentTheme);
   }
 
   public void addRow(Object[] rowData) {

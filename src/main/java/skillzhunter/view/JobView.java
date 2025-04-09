@@ -118,6 +118,9 @@ public abstract class JobView extends JPanel implements IJobView {
                 jobsTable.getTableHeader().setBackground(theme.fieldBackground);
                 jobsTable.getTableHeader().setForeground(theme.foreground);
             }
+            
+            // Call the table's applyTheme method
+            jobsTable.applyTheme(theme);
         }
         
         // Repaint to show changes
@@ -179,7 +182,9 @@ public abstract class JobView extends JPanel implements IJobView {
     // Create a new themed button with the specified text
     protected ThemedButton createThemedButton(String text) {
         ThemedButton button = new ThemedButton(text);
-        button.applyTheme(getTheme());
+        if (theme != null) {
+            button.applyTheme(theme);
+        }
         return button;
     }
 }
