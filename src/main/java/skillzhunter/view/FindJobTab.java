@@ -3,7 +3,9 @@ package skillzhunter.view;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.TextField;
-
+import java.awt.Image;
+import java.net.URL;
+import javax.swing.ImageIcon;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -12,6 +14,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 import skillzhunter.controller.IController;
 import skillzhunter.model.JobRecord;
@@ -28,18 +31,43 @@ public class FindJobTab extends JobView {
     private JLabel resultsLabel;
     private JLabel titleLabel;
 
+    //Open image for open job button
+    private ImageIcon openIcon;
     public FindJobTab(IController controller) {
         super();
         
         this.controller = controller;
         this.locations = controller.getLocations().toArray(new String[0]);
         this.industries = controller.getIndustries().toArray(new String[0]);
-
+        this.openIcon = loadIcon("images/open.png");
         super.initView();
 
         // Load initial set of jobs
         searchResults = controller.getApiCall("any", 10, "any", "any");
         setJobsList(searchResults);
+    }
+
+
+    /**
+     * Loads an icon from the resources folder.
+     * 
+     * @param path The path to the icon
+     * @return The loaded icon, or null if it couldn't be loaded
+     */
+    private ImageIcon loadIcon(String path) {
+        try {
+            URL url = getClass().getClassLoader().getResource(path);
+            if (url != null) {
+                ImageIcon icon = new ImageIcon(url);
+                // Scale the image to an appropriate size for the header
+                Image img = icon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
+                return new ImageIcon(img);
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading icon: " + path);
+        }
+        
+        return null;
     }
 
     @Override
@@ -50,7 +78,7 @@ public class FindJobTab extends JobView {
 
         // Create fields, buttons, and combos
         TextField searchField = new TextField("", 20);    
-        searchButton = createThemedButton("Find Jobs");
+        searchButton = createThemedButton("Find Jobs \t🔎");
         
         String[] comboOptions = {"any", "option1", "option2"}; // Need to make this specific to field
         Integer[] results = {5, 10, 20, 50};
@@ -99,6 +127,11 @@ public class FindJobTab extends JobView {
 
         // Create button using the helper method
         openJob = createThemedButton("Open Job");
+        openJob.setIcon(openIcon);
+        openJob.setHorizontalTextPosition(SwingConstants.LEFT);
+        openJob.setIconTextGap(5); // optional: tweak spacing between text and icon
+
+
 
         // Add button to panel
         buttonPanel.add(openJob);
@@ -154,4 +187,5 @@ public class FindJobTab extends JobView {
             super.updateJobsList(jobsList);
         }
     }
+
 }
