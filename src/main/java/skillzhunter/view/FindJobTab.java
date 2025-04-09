@@ -3,20 +3,15 @@ package skillzhunter.view;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.TextField;
-import java.awt.Component;
 
 import java.util.List;
 import java.util.ArrayList;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.JTextArea;
 
 import skillzhunter.controller.IController;
 import skillzhunter.model.JobRecord;
@@ -26,8 +21,14 @@ public class FindJobTab extends JobView {
     private String[] locations;
     private String[] industries;
     private List<JobRecord> searchResults = new ArrayList<>();
+    
+    // Store labels as instance variables
+    private JLabel industryLabel;
+    private JLabel locationLabel;
+    private JLabel resultsLabel;
+    private JLabel titleLabel;
 
-    public FindJobTab(IController controller){
+    public FindJobTab(IController controller) {
         super();
         
         this.controller = controller;
@@ -37,25 +38,22 @@ public class FindJobTab extends JobView {
         super.initView();
 
         // Load initial set of jobs
-        searchResults = controller.getApiCall("any", 10 , "any", "any");
+        searchResults = controller.getApiCall("any", 10, "any", "any");
         setJobsList(searchResults);
     }
 
-
     @Override
     public JPanel makeTopButtonPanel() {
-
-        //make the panel & set layout
+        // Make the panel & set layout
         JPanel searchRow = new JPanel();
         searchRow.setLayout(new BoxLayout(searchRow, BoxLayout.LINE_AXIS));
 
-        //create fields, buttons, and combos
+        // Create fields, buttons, and combos
         TextField searchField = new TextField("", 20);    
-        searchButton = new JButton("Find Jobs");
-        searchButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        searchButton = createThemedButton("Find Jobs");
         
-        String[] comboOptions = {"any", "option1", "option2"};//need to make this specific to field
-        Integer[] results = {5,10,20,50};
+        String[] comboOptions = {"any", "option1", "option2"}; // Need to make this specific to field
+        Integer[] results = {5, 10, 20, 50};
         JComboBox<String> industryCombo = new JComboBox<>(industries);
         industryCombo.setEditable(true);
         JComboBox<String> locationCombo = new JComboBox<>(locations);
@@ -64,50 +62,72 @@ public class FindJobTab extends JobView {
         resultsCombo.setPrototypeDisplayValue(100);
         resultsCombo.setEditable(true);
 
-        //add fields, buttons, labels, combos, and spaces
-        searchRow.add(new JLabel("Industry: "));
+        // Create standard JLabels
+        industryLabel = new JLabel("Industry: ");
+        locationLabel = new JLabel("Location: ");
+        resultsLabel = new JLabel("# of Results: ");
+        titleLabel = new JLabel("Job Title: ");
+
+        // Add fields, buttons, labels, combos, and spaces
+        searchRow.add(industryLabel);
         searchRow.add(industryCombo);
-        searchRow.add(Box.createRigidArea(new Dimension(5, 0))); // these are invisible objects that create spacing
-        searchRow.add(new JLabel("Location: "));
+        searchRow.add(Box.createRigidArea(new Dimension(5, 0))); // These are invisible objects that create spacing
+        searchRow.add(locationLabel);
         searchRow.add(locationCombo);
         searchRow.add(Box.createRigidArea(new Dimension(5, 0)));
-        searchRow.add(new JLabel("# of Results : "));
+        searchRow.add(resultsLabel);
         searchRow.add(resultsCombo);
         searchRow.add(Box.createRigidArea(new Dimension(5, 0)));
-        searchRow.add(new JLabel("Job Title : "));
+        searchRow.add(titleLabel);
         searchRow.add(searchField);
         searchRow.add(searchButton);
 
-
-        //set listeners
+        // Set listeners
         searchButton.addActionListener(e -> {
-            searchResults = controller.getApiCall(searchField.getText(), (Integer) resultsCombo.getSelectedItem() , locationCombo.getSelectedItem().toString(),
-                industryCombo.getSelectedItem().toString());
+            searchResults = controller.getApiCall(searchField.getText(), (Integer) resultsCombo.getSelectedItem(),
+                    locationCombo.getSelectedItem().toString(), industryCombo.getSelectedItem().toString());
             setJobsList(searchResults);
         });
 
-        //return the panel
         return searchRow;
     }
 
     @Override
     public JPanel makeBottomButtonPanel() {
-
-        //make the panel & set layout
+        // Make the panel & set layout
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
-        //make buttons
-        openJob = new JButton("Open Job");
-        openJob.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        // Create button using the helper method
+        openJob = createThemedButton("Open Job");
 
-        //add fields, buttons, labels, combos, and spaces
+        // Add button to panel
         buttonPanel.add(openJob);
 
-        //set listeners
+        // Set listeners
         openJob.addActionListener(e -> openSelectedJob());
 
-        //return the panel
         return buttonPanel;
+    }
+
+    @Override
+    public void applyTheme(ColorTheme theme) {
+        // Call the parent implementation for common styling
+        super.applyTheme(theme);
+        
+        // Use direct class constants instead of the passed theme
+        if (theme == ColorTheme.DARK) {
+            // Dark mode - use DARK theme's labelForeground
+            industryLabel.setForeground(ColorTheme.DARK.labelForeground);
+            locationLabel.setForeground(ColorTheme.DARK.labelForeground);
+            resultsLabel.setForeground(ColorTheme.DARK.labelForeground);
+            titleLabel.setForeground(ColorTheme.DARK.labelForeground);
+        } else {
+            // Light mode - use LIGHT theme's labelForeground
+            industryLabel.setForeground(ColorTheme.LIGHT.labelForeground);
+            locationLabel.setForeground(ColorTheme.LIGHT.labelForeground);
+            resultsLabel.setForeground(ColorTheme.LIGHT.labelForeground);
+            titleLabel.setForeground(ColorTheme.LIGHT.labelForeground);
+        }
     }
 
     private void openSelectedJob() {
@@ -133,9 +153,5 @@ public class FindJobTab extends JobView {
         } else {
             super.updateJobsList(jobsList);
         }
-    }
-
-    public static void main(String[] args) {
-        System.out.println("hello");
     }
 }
