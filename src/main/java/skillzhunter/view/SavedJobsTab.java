@@ -15,6 +15,10 @@ import skillzhunter.model.JobRecord;
 
 public class SavedJobsTab extends JobView {
     
+    // Store buttons as fields to apply theme later
+    private ThemedButton loadButton;
+    private ThemedButton saveButton;
+    
     public SavedJobsTab(IController controller, List<JobRecord> savedJobs) {
         super();
         // set inherited field from jobview
@@ -27,8 +31,8 @@ public class SavedJobsTab extends JobView {
     public JPanel makeTopButtonPanel() {
         JPanel topRow = new JPanel();
         
-        // Create the load button using the helper method
-        ThemedButton loadButton = createThemedButton("Load Job List from File");
+        // Create the load button and store it as field
+        loadButton = new ThemedButton("Load Job List from File");
         topRow.add(loadButton);
 
         loadButton.addActionListener(e -> {
@@ -58,9 +62,8 @@ public class SavedJobsTab extends JobView {
     public JPanel makeBottomButtonPanel() {
         JPanel bottomRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
         
-        // Create save button using the helper method
-        ThemedButton saveButton = createThemedButton("Save Jobs");
-        saveButton.applyTheme(getTheme());
+        // Create save button and store it as field
+        saveButton = new ThemedButton("Save Jobs");
         bottomRow.add(saveButton);
 
         saveButton.addActionListener(e -> {
@@ -104,5 +107,18 @@ public class SavedJobsTab extends JobView {
     public void applyTheme(ColorTheme theme) {
         // Call parent implementation for common styling
         super.applyTheme(theme);
+        
+        // Explicitly apply theme to our buttons
+        if (loadButton != null) {
+            loadButton.applyTheme(theme);
+        }
+        
+        if (saveButton != null) {
+            saveButton.applyTheme(theme);
+        }
+        
+        // Make sure changes are visible
+        this.revalidate();
+        this.repaint();
     }
 }
