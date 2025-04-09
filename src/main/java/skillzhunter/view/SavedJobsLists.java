@@ -1,6 +1,7 @@
 package skillzhunter.view;
 
 import skillzhunter.controller.IController;
+import skillzhunter.controller.MainController;
 import skillzhunter.model.JobRecord;
 
 import java.util.ArrayList;
@@ -12,12 +13,12 @@ import java.util.List;
  */
 public class SavedJobsLists {
     
+    // List of observers that will be notified of changes
     private static final List<JobView> observers = new ArrayList<>();
     private static IController controller;
-    private static List<JobRecord> savedJobs = new ArrayList<>();
 
     /**
-     * Get the current list of saved jobs
+     * Get the current list of saved jobs from the controller
      * @return The list of saved jobs
      */
     public static List<JobRecord> getSavedJobs() {
@@ -28,11 +29,11 @@ public class SavedJobsLists {
     }
 
     /**
-     * Add a job to the saved jobs list
+     * Add a job to the saved jobs list 
      * @param job The job record to add
      */
     public static void addSavedJob(JobRecord job) {
-        System.out.println("SAVEDJOBSLIST.JAVA - add saved job:" + job);
+        System.out.println("SAVEDJOBSLIST.JAVA - add saved job: " + job);
         
         // Ensure we have a controller
         if (controller == null) {
@@ -40,11 +41,11 @@ public class SavedJobsLists {
             return;
         }
         
-        // First make a direct add to the model
+        // Add to model through controller
         controller.getAddJob(job);
         
-        // Then explicitly update with values we want
-        if (controller instanceof skillzhunter.controller.MainController) {
+        // Update comments and rating
+        if (controller instanceof MainController) {
             String comments = job.comments();
             int rating = job.rating();
             
@@ -52,19 +53,13 @@ public class SavedJobsLists {
                 comments = "No comments provided";
             }
             
-            if (rating < 0 || rating > 5) {
-                rating = 0;
-            }
-            
             System.out.println("Updating job with comments: " + comments + " and rating: " + rating);
-            ((skillzhunter.controller.MainController) controller).getUpdateJob(job.id(), comments, rating);
+            ((MainController) controller).getUpdateJob(job.id(), comments, rating);
         }
         
-        // Get the updated job list from the model
-        List<JobRecord> updatedList = controller.getSavedJobs();
-        
-        // Update all observers
-        System.out.println("SAVEDJOBSLIST.JAVA - setting view jobsList to:" + updatedList);
+        // Get updated list and notify observers
+        List<JobRecord> updatedList = getSavedJobs();
+        System.out.println("SAVEDJOBSLIST.JAVA - setting view jobsList to: " + updatedList);
         for (JobView observer : observers) {
             observer.updateJobsList(updatedList);
         }
@@ -75,7 +70,7 @@ public class SavedJobsLists {
      * @param job The job record to remove
      */
     public static void removeSavedJob(JobRecord job) {
-        System.out.println("SAVEDJOBSLIST.JAVA - remove saved job:" + job);
+        System.out.println("SAVEDJOBSLIST.JAVA - remove saved job: " + job);
         
         // Ensure we have a controller
         if (controller == null) {
@@ -83,14 +78,12 @@ public class SavedJobsLists {
             return;
         }
         
-        // Remove the job from the model
+        // Remove from model through controller
         controller.getRemoveJob(job.id());
         
-        // Get the updated job list to ensure we have the most recent data
-        List<JobRecord> updatedList = controller.getSavedJobs();
-        
-        // Update all observers
-        System.out.println("SAVEDJOBSLIST.JAVA - setting view jobsList to:" + updatedList);
+        // Get updated list and notify observers
+        List<JobRecord> updatedList = getSavedJobs();
+        System.out.println("SAVEDJOBSLIST.JAVA - setting view jobsList to: " + updatedList);
         for (JobView observer : observers) {
             observer.updateJobsList(updatedList);
         }
