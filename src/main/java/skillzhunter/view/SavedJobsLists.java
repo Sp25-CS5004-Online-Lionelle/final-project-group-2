@@ -1,62 +1,107 @@
-//A static utility class to help out SavedJobView allowing FindJobView change the saved job list
 package skillzhunter.view;
+
+import skillzhunter.controller.IController;
+import skillzhunter.controller.MainController;
+import skillzhunter.model.JobRecord;
 
 import java.util.ArrayList;
 import java.util.List;
-import skillzhunter.model.JobRecord;
-import skillzhunter.controller.IController;
 
+/**
+ * Static utility class for managing saved jobs across the application.
+ * Works as a temporary bridge between views.
+ */
 public class SavedJobsLists {
-  private static List<JobRecord> savedJobs = new ArrayList<>();
-  private static IController controller;
+    
+    // List of observers that will be notified of changes
+    private static final List<JobView> observers = new ArrayList<>();
+    private static IController controller;
 
-  //observer pattern to notify views when the list changes
-  private static List<JobView> observers = new ArrayList<>();
-
-  public static void setController(IController newController) {
-    SavedJobsLists.controller = newController;
-  }
-
-  public static void addObserver(JobView view) {
-    if (!observers.contains(view)) {
-      observers.add(view);
+    /**
+     * Get the current list of saved jobs from the controller
+     * @return The list of saved jobs
+     */
+    public static List<JobRecord> getSavedJobs() {
+        if (controller != null) {
+            return controller.getSavedJobs();
+        }
+        return new ArrayList<>();
     }
-  }
 
-  public static void removeObserver(JobView view) {
-    observers.remove(view);
-  }
-
-  public static void addSavedJob(JobRecord job) {
-    System.out.println("SAVEDJOBSLIST.JAVA - add saved job:" + job);
-    if (!savedJobs.contains(job)) {
-      controller.getAddJob(job);
-      savedJobs = controller.getSavedJobs();
-      notifyObservers();
+    /**
+     * Add a job to the saved jobs list 
+     * @param job The job record to add
+     */
+    public static void addSavedJob(JobRecord job) {
+        System.out.println("SAVEDJOBSLIST.JAVA - add saved job: " + job);
+        
+        // Ensure we have a controller
+        if (controller == null) {
+            System.err.println("Controller not set in SavedJobsLists");
+            return;
+        }
+        
+        // Add to model through controller
+        controller.getAddJob(job);
+        
+        // Update comments and rating
+        if (controller instanceof MainController) {
+            String comments = job.comments();
+            int rating = job.rating();
+            
+            if (comments == null || comments.isEmpty()) {
+                comments = "No comments provided";
+            }
+            
+            System.out.println("Updating job with comments: " + comments + " and rating: " + rating);
+            ((MainController) controller).getUpdateJob(job.id(), comments, rating);
+        }
+        
+        // Get updated list and notify observers
+        List<JobRecord> updatedList = getSavedJobs();
+        System.out.println("SAVEDJOBSLIST.JAVA - setting view jobsList to: " + updatedList);
+        for (JobView observer : observers) {
+            observer.updateJobsList(updatedList);
+        }
     }
-  }
 
-  public static void removeSavedJob(JobRecord job) {
-    if (savedJobs.contains(job)) {
-      //savedJobs.remove(job);
-      controller.getRemoveJob(job.id());
-      savedJobs = controller.getSavedJobs();
-      System.out.println("\tRemoved job new list list");
-      notifyObservers();
+    /**
+     * Remove a job from the saved jobs list
+     * @param job The job record to remove
+     */
+    public static void removeSavedJob(JobRecord job) {
+        System.out.println("SAVEDJOBSLIST.JAVA - remove saved job: " + job);
+        
+        // Ensure we have a controller
+        if (controller == null) {
+            System.err.println("Controller not set in SavedJobsLists");
+            return;
+        }
+        
+        // Remove from model through controller
+        controller.getRemoveJob(job.id());
+        
+        // Get updated list and notify observers
+        List<JobRecord> updatedList = getSavedJobs();
+        System.out.println("SAVEDJOBSLIST.JAVA - setting view jobsList to: " + updatedList);
+        for (JobView observer : observers) {
+            observer.updateJobsList(updatedList);
+        }
     }
-  }
 
-  public static List<JobRecord> getSavedJobs() {
-    return new ArrayList<>(savedJobs); // Return a copy to prevent direct modification
-  }
-
-  private static void notifyObservers() {
-
-    for (JobView observer : observers) {
-      if (observer instanceof SavedJobsTab) {
-        System.out.println("SAVEDJOBSLIST.JAVA - setting view jobsList to:" + getSavedJobs());
-        observer.setJobsList(getSavedJobs());
-      }
+    /**
+     * Add an observer to be notified of changes to the saved jobs list
+     * @param observer The observer to add
+     */
+    public static void addObserver(JobView observer) {
+        observers.add(observer);
     }
-  }
+
+    /**
+     * Set the controller for this utility class
+     * @param newController The controller to set
+     */
+    public static void setController(IController newController) {
+        controller = newController;
+    }
 }

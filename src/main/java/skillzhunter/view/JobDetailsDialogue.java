@@ -10,6 +10,7 @@ import java.util.List;
 
 import skillzhunter.model.JobRecord;
 import skillzhunter.controller.IController;
+import skillzhunter.controller.MainController;
 
 public class JobDetailsDialogue {
 
@@ -18,7 +19,7 @@ public class JobDetailsDialogue {
             JOptionPane.showMessageDialog(parent, "Job or controller not provided.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
+        
         boolean jobPresent = savedJobs != null && savedJobs.contains(job);
         String dialogMsg = jobPresent ? "Remove this Job?" : "Save this Job?";
 
@@ -59,67 +60,102 @@ public class JobDetailsDialogue {
         );
         JTextArea jobPubDate = readOnlyArea(job.pubDate());
 
-        // Rating Slider
-        JSlider jobRating = new JSlider(0, 5, 2);
-        jobRating.setMajorTickSpacing(5);
+        // Rating Slider - Initialize with current rating if available
+        JSlider jobRating = new JSlider(0, 5, job.rating() > 0 ? job.rating() : 0);
+        jobRating.setMajorTickSpacing(1);  
         jobRating.setMinorTickSpacing(1);
         jobRating.setPaintTicks(true);
         jobRating.setPaintLabels(true);
 
-        jobRating.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                int ratingValue = jobRating.getValue();
-                controller.updateRating(job.id(), ratingValue);
-            }
-        });
-
-        // Comments Box
+        // Comments Box - Initialize with existing comments if available
         JTextArea comments = new JTextArea(5, 20);
         comments.setLineWrap(true);
         comments.setWrapStyleWord(true);
         comments.setBorder(BorderFactory.createTitledBorder("Your Comments"));
+        
+        // Only set comments if they exist and aren't the default
+        if (job.comments() != null && !job.comments().isEmpty() && !job.comments().equals("No comments provided")) {
+            comments.setText(job.comments());
+        }
 
-        comments.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                String commentText = comments.getText();
-                controller.updateComments(job.id(), commentText); //telling controller to tell model to update this job
-                System.out.printf("JOBDETAILSDIALOGUE - focus lost and updated comment with controller\n\t%s\n", job); //TESTING
-
-                /*
-                this view object has a local JobRecord that it cannot change
-                the view tells the controller to update this job, but the local JobRecord doesn't reflect this
-                so when we get to YES_OPTION and SavedJobsLists.addSavedJob(job) the JobRecord we're giving it doesn't have any of our updates
-
-                - check if controller.updateComments() is doing what we want.
-                    maybe we are trying to update a job too early? has this job even been added to the model yet?
-
-                - possible idea: have the controller/model return a JobRecord after it updates a job so the view has an accurate JobRecord
-                */
-            }
-        });
+        // Create panels for organization
+        JPanel ratingPanel = new JPanel();
+        ratingPanel.setBorder(BorderFactory.createTitledBorder("Rating"));
+        ratingPanel.add(jobRating);
 
         Object[] obj = {
             "Job Title: ", jobTitle, "Company: ", jobCompany, "Industry: ", jobIndustry,
             "Type: ", jobType, "Location: ", jobGeo, "Level: ", jobLevel, "Salary: ", jobSalaryRange,
-            "Currency: ", jobCurrency, "Published: ", jobPubDate, "Rate this Job: ", jobRating,
-            "Comments:", comments, dialogMsg
+            "Currency: ", jobCurrency, "Published: ", jobPubDate, ratingPanel,
+            new JScrollPane(comments), dialogMsg
         };
 
+        // Show the dialog and get user's action
         int result = JOptionPane.showConfirmDialog(parent, obj, "Job Details: ", JOptionPane.YES_NO_OPTION);
 
+        // Get the final values
+        final int finalRating = jobRating.getValue();
+        final String finalComments = comments.getText();
+        
+        // Create a new job record with the updated values
+        JobRecord updatedJob = new JobRecord(
+            job.id(), job.url(), job.jobSlug(), job.jobTitle(), job.companyName(),
+            job.companyLogo(), job.jobIndustry(), job.jobType(), job.jobGeo(),
+            job.jobLevel(), job.jobExcerpt(), job.jobDescription(), job.pubDate(),
+            job.annualSalaryMin(), job.annualSalaryMax(), job.salaryCurrency(),
+            finalRating, finalComments
+        );
+
+        // Handle the user's choice
         if (result == JOptionPane.YES_OPTION) {
-            System.out.printf("JOBDETAILSDIALOGUE - detected yes option\n\t%s\n", job); //TESTING
             if (jobPresent) {
-                SavedJobsLists.removeSavedJob(job);
+                SavedJobsLists.removeSavedJob(updatedJob);
             } else {
-                SavedJobsLists.addSavedJob(job);
+                SavedJobsLists.addSavedJob(updatedJob);
+                
+                // Find the tabbed pane and switch to Saved Jobs
+                switchToSavedJobsTab(parent);
             }
         }
     }
 
-    // 👇 This helper method must be inside the class, and static
+    /**
+     * Helper method to find the main JTabbedPane and switch to the Saved Jobs tab
+     */
+    private static void switchToSavedJobsTab(Component component) {
+        // Get the window ancestor (JFrame)
+        JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(component);
+        if (frame == null) return;
+        
+        // Find the JTabbedPane directly from the frame's content pane
+        JTabbedPane tabbedPane = null;
+        for (Component c : frame.getContentPane().getComponents()) {
+            if (c instanceof JPanel) {
+                for (Component innerComp : ((JPanel) c).getComponents()) {
+                    if (innerComp instanceof JTabbedPane) {
+                        tabbedPane = (JTabbedPane) innerComp;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        if (tabbedPane != null) {
+            // Find the index of the "Saved Jobs" tab
+            for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+                if (tabbedPane.getTitleAt(i).equals("Saved Jobs")) {
+                    tabbedPane.setSelectedIndex(i);
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * Helper method to create a read-only JTextArea
+     * @param text
+     * @return
+     */
     private static JTextArea readOnlyArea(String text) {
         JTextArea area = new JTextArea(text != null ? text : "N/A");
         area.setEditable(false);

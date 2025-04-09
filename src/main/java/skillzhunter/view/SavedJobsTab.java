@@ -5,6 +5,7 @@ import java.awt.Frame;
 import java.io.File;
 import java.util.List;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import skillzhunter.controller.IController;
@@ -55,19 +56,36 @@ public class SavedJobsTab extends JobView {
         bottomRow.add(saveButton);
 
         saveButton.addActionListener(e -> {
-            // Save to data/SavedJobs.csv in a fixed location (overwrite each time)
-            String filePath = "data/SavedJobs.csv";
+            // Get the list of saved jobs
             List<JobRecord> savedJobs = controller.getSavedJobs();
             
             if (savedJobs.isEmpty()) {
-                System.out.println("No jobs to save.");
+                JOptionPane.showMessageDialog(bottomRow, 
+                    "No jobs to save.", 
+                    "Save Jobs", 
+                    JOptionPane.INFORMATION_MESSAGE);
             } else {
-                controller.getSavedJobsToCsv(filePath);
-                System.out.println("Saved to " + filePath);
+                // Ask for confirmation before saving
+                int result = JOptionPane.showConfirmDialog(
+                    bottomRow,
+                    "Are you sure you want to save " + savedJobs.size() + " job(s) to file?",
+                    "Confirm Save",
+                    JOptionPane.YES_NO_OPTION
+                );
+                
+                if (result == JOptionPane.YES_OPTION) {
+                    // Save to data/SavedJobs.csv in a fixed location (overwrite each time)
+                    String filePath = "data/SavedJobs.csv";
+                    controller.getSavedJobsToCsv(filePath);
+                    JOptionPane.showMessageDialog(bottomRow, 
+                        "Jobs successfully saved to " + filePath, 
+                        "Save Complete", 
+                        JOptionPane.INFORMATION_MESSAGE);
+                    System.out.println("Saved to " + filePath);
+                }
             }
         });
         
-
         return bottomRow;
     }
 

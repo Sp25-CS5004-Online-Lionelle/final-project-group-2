@@ -104,7 +104,6 @@ public class MainController implements IController {
         return savedJobsList;
     }
 
-    //FIXME?
     @Override
     public void getAddJob(JobRecord jobRecord) {
         model.addJob(jobRecord);
@@ -115,10 +114,25 @@ public class MainController implements IController {
         model.removeJob(index);
     }
 
-    //FIXME?
-    public void getUpdateJob(int id, String comments, int rating) {
+    /**
+     * Updates a job with new comments and rating
+     * 
+     * @param id The ID of the job to update
+     * @param comments The comments to set
+     * @param rating The rating to set
+     * @return The updated JobRecord
+     */
+    public JobRecord getUpdateJob(int id, String comments, int rating) {
         model.updateJob(id, comments, rating);
         savedJobsTab.updateJobsList(model.getJobRecords());
+        
+        // Return the updated job record so the view can use it
+        for (JobRecord job : model.getJobRecords()) {
+            if (job.id() == id) {
+                return job;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -135,24 +149,64 @@ public class MainController implements IController {
         // Optional, depending on your logic
     }
 
-    //updates rating in the record
     /**
      * Updates the rating of a job record.
-     * @param id
-     * @param rating
+     * Now preserves any existing comments.
+     * 
+     * @param id The job ID
+     * @param rating The new rating
+     * @return The updated job record
      */
-    public void updateRating(int id, int rating) {
-        model.updateJob(id, null, rating);
+    public JobRecord updateRating(int id, int rating) {
+        // Get the current job record to preserve existing comments
+        String existingComments = null;
+        for (JobRecord job : model.getJobRecords()) {
+            if (job.id() == id) {
+                existingComments = job.comments();
+                break;
+            }
+        }
+        
+        // Update with existing comments and new rating
+        model.updateJob(id, existingComments, rating);
+        
+        // Return the updated job
+        for (JobRecord job : model.getJobRecords()) {
+            if (job.id() == id) {
+                return job;
+            }
+        }
+        return null;
     }
 
-    //updates comments in the record
     /**
      * Updates the comments of a job record.
-     * @param id
-     * @param comments
+     * Now preserves any existing rating.
+     * 
+     * @param id The job ID
+     * @param comments The new comments
+     * @return The updated job record
      */
-    public void updateComments(int id, String comments) {
-        model.updateJob(id, comments, 0);
+    public JobRecord updateComments(int id, String comments) {
+        // Get the current job record to preserve existing rating
+        int existingRating = 0;
+        for (JobRecord job : model.getJobRecords()) {
+            if (job.id() == id) {
+                existingRating = job.rating();
+                break;
+            }
+        }
+        
+        // Update with new comments and existing rating
+        model.updateJob(id, comments, existingRating);
+        
+        // Return the updated job
+        for (JobRecord job : model.getJobRecords()) {
+            if (job.id() == id) {
+                return job;
+            }
+        }
+        return null;
     }
 
     public static void main(String[] args) {
