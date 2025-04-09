@@ -5,12 +5,14 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.TextField;
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -85,50 +87,94 @@ public abstract class JobView extends JPanel implements IJobView {
     }
 
     // Method to set button properties such as color and hover effects
-    public void setButtonProperties(JButton button) {
-        Color normalColor = theme.buttonNormal;
-        Color hoverColor = theme.buttonHover;
-        button.setBackground(normalColor);
+    protected void setButtonProperties(JButton button) {
+        if (theme == null) {
+            theme = ColorTheme.LIGHT; // Default to light theme if not set
+        }
+        
+        button.setBackground(theme.buttonNormal);
         button.setForeground(theme.buttonForeground);
-        applyHoverEffect(button, hoverColor, normalColor);
+        applyHoverEffect(button);
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         button.setFocusPainted(false);
         button.setOpaque(true);
         button.setBorderPainted(false);
     }
 
-    // Apply theme to the components
+    // Apply theme to the components - this is the main method for applying a theme
     public void applyTheme(ColorTheme theme) {
+        this.theme = theme;
+        
+        // Apply to the panel itself
         setBackground(theme.background);
-        openJob.setBackground(theme.buttonNormal);
-        openJob.setForeground(theme.buttonForeground);
-        jobsTable.setBackground(theme.fieldBackground);
-        jobsTable.setForeground(theme.fieldForeground);
-        jobsTable.setBorder(BorderFactory.createLineBorder(theme.buttonNormal));
-        jobsTable.getTableHeader().setBackground(theme.fieldBackground);
-        jobsTable.getTableHeader().setForeground(theme.foreground);
+        
+        // Apply to main panel
+        if (mainPanel != null) {
+            mainPanel.setBackground(theme.background);
+            
+            // Apply to all sub-panels
+            for (Component comp : mainPanel.getComponents()) {
+                if (comp instanceof JPanel) {
+                    JPanel panel = (JPanel)comp;
+                    panel.setBackground(theme.background);
+                    
+                    // Apply theme to labels in the panel
+                    for (Component c : panel.getComponents()) {
+                        if (c instanceof JLabel) {
+                            JLabel label = (JLabel)c;
+                            label.setForeground(theme.foreground);
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Apply to buttons
+        if (openJob != null) {
+            setButtonProperties(openJob);
+        }
+        
+        if (searchButton != null) {
+            setButtonProperties(searchButton);
+        }
+        
+        // Apply to table
+        if (jobsTable != null) {
+            jobsTable.setBackground(theme.fieldBackground);
+            jobsTable.setForeground(theme.fieldForeground);
+            jobsTable.setBorder(BorderFactory.createLineBorder(theme.buttonNormal));
+            
+            if (jobsTable.getTableHeader() != null) {
+                jobsTable.getTableHeader().setBackground(theme.fieldBackground);
+                jobsTable.getTableHeader().setForeground(theme.foreground);
+            }
+        }
+        
+        // Repaint to show changes
         repaint();
     }
 
     // Hover effect for buttons (change background color on hover)
-    private void applyHoverEffect(JButton button, Color hoverColor, Color normalColor) {
+    private void applyHoverEffect(JButton button) {
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(theme.buttonHover);
+                if (theme != null) {
+                    button.setBackground(theme.buttonHover);
+                }
             }
 
             @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(theme.buttonNormal);
+                if (theme != null) {
+                    button.setBackground(theme.buttonNormal);
+                }
             }
         });
     }
 
     // Set the jobs list to update the table and UI
     public void setJobsList(List<JobRecord> jobsList) {
-        //TESTING: jobsList is entering here with null comments
-
         System.out.println("Setting jobs list with: " + jobsList);
         this.jobsList = jobsList;
         this.jobsTable.setData(getData(jobsList));
@@ -169,8 +215,18 @@ public abstract class JobView extends JPanel implements IJobView {
     // Add listeners and features (e.g., search button functionality)
     public void addFeatures(IController controller) {
         this.controller = controller; // Set controller
-        searchButton.addActionListener(e -> controller.setViewData());  // Delegate logic to controller for search
+        if (searchButton != null) {
+            searchButton.addActionListener(e -> controller.setViewData());  // Delegate logic to controller for search
+        }
         // You can add other action listeners for other buttons (like add, remove job)
+    }
+
+    // Get the current theme - useful for subclasses
+    protected ColorTheme getTheme() {
+        if (theme == null) {
+            theme = ColorTheme.LIGHT; // Default to light theme
+        }
+        return theme;
     }
 
     // Main method (not needed unless you want to test the view)
