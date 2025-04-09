@@ -28,7 +28,8 @@ public class ColorTheme {
     public final Color unselectedTabBackground;
     /** The unselected tab foreground color */
     public final Color unselectedTabForeground;
-
+    /** The label color */
+    public final Color labelForeground;
     /**
      * Constructor for ColorTheme
      */
@@ -36,7 +37,7 @@ public class ColorTheme {
                        Color foreground, Color fieldBackground, Color fieldForeground,
                        Color buttonForeground, Color selectedTabBackground, 
                        Color selectedTabForeground, Color unselectedTabBackground, 
-                       Color unselectedTabForeground) {
+                       Color unselectedTabForeground, Color labelForeground) {
         this.buttonNormal = buttonNormal;
         this.buttonHover = buttonHover;
         this.background = background;
@@ -48,6 +49,7 @@ public class ColorTheme {
         this.selectedTabForeground = selectedTabForeground;
         this.unselectedTabBackground = unselectedTabBackground;
         this.unselectedTabForeground = unselectedTabForeground;
+        this.labelForeground = labelForeground;
     }
 
     /** The light color theme for the application. */
@@ -62,7 +64,8 @@ public class ColorTheme {
         Color.WHITE,                // Selected tab background: White
         Color.BLACK,                // Selected tab foreground: Black
         new Color(235, 235, 235),   // Unselected tab background: Slightly darker gray
-        Color.BLACK                 // Unselected tab foreground: Black
+        Color.BLACK,                // Unselected tab foreground: Black
+        Color.BLACK                // Label foreground: Black
     );
 
     /** The dark color theme for the application. */
@@ -77,6 +80,7 @@ public class ColorTheme {
         new Color(203, 203, 203),      // Selected tab background: Gray to match your screenshot
         new Color(0, 183, 195),     // Selected tab foreground: Teal (same as button normal)
         new Color(43, 43, 43),      // Unselected tab background: Same as main bg
-        new Color(240, 240, 240)    // Unselected tab foreground: Light gray text
+        new Color(240, 240, 240),    // Unselected tab foreground: Light gray text
+        Color.WHITE                // Label foreground: White
     );
 }
