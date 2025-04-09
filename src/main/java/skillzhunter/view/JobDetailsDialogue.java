@@ -1,8 +1,6 @@
 package skillzhunter.view;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.Component;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -60,12 +58,8 @@ public class JobDetailsDialogue {
         );
         JTextArea jobPubDate = readOnlyArea(job.pubDate());
 
-        // Rating Slider - Initialize with current rating if available
-        JSlider jobRating = new JSlider(0, 5, job.rating() > 0 ? job.rating() : 0);
-        jobRating.setMajorTickSpacing(1);  
-        jobRating.setMinorTickSpacing(1);
-        jobRating.setPaintTicks(true);
-        jobRating.setPaintLabels(true);
+        // Create star rating panel instead of slider
+        StarRatingPanel starRating = new StarRatingPanel(job.rating() > 0 ? job.rating() : 0);
 
         // Comments Box - Initialize with existing comments if available
         JTextArea comments = new JTextArea(5, 20);
@@ -78,15 +72,10 @@ public class JobDetailsDialogue {
             comments.setText(job.comments());
         }
 
-        // Create panels for organization
-        JPanel ratingPanel = new JPanel();
-        ratingPanel.setBorder(BorderFactory.createTitledBorder("Rating"));
-        ratingPanel.add(jobRating);
-
         Object[] obj = {
             "Job Title: ", jobTitle, "Company: ", jobCompany, "Industry: ", jobIndustry,
             "Type: ", jobType, "Location: ", jobGeo, "Level: ", jobLevel, "Salary: ", jobSalaryRange,
-            "Currency: ", jobCurrency, "Published: ", jobPubDate, ratingPanel,
+            "Currency: ", jobCurrency, "Published: ", jobPubDate, starRating,
             new JScrollPane(comments), dialogMsg
         };
 
@@ -94,7 +83,7 @@ public class JobDetailsDialogue {
         int result = JOptionPane.showConfirmDialog(parent, obj, "Job Details: ", JOptionPane.YES_NO_OPTION);
 
         // Get the final values
-        final int finalRating = jobRating.getValue();
+        final int finalRating = starRating.getRating();
         final String finalComments = comments.getText();
         
         // Create a new job record with the updated values
@@ -151,11 +140,7 @@ public class JobDetailsDialogue {
         }
     }
 
-    /**
-     * Helper method to create a read-only JTextArea
-     * @param text
-     * @return
-     */
+    // 👇 This helper method must be inside the class, and static
     private static JTextArea readOnlyArea(String text) {
         JTextArea area = new JTextArea(text != null ? text : "N/A");
         area.setEditable(false);
