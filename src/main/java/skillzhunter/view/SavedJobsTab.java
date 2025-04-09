@@ -1,5 +1,6 @@
 package skillzhunter.view;
 
+import java.awt.Cursor;
 import java.awt.FileDialog;
 import java.awt.Frame;
 import java.io.File;
@@ -24,6 +25,8 @@ public class SavedJobsTab extends JobView {
     public JPanel makeTopButtonPanel() {
         JPanel topRow = new JPanel();
         JButton loadButton = new JButton("Load Job List from File");
+        // Set hand cursor for the load button
+        loadButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         topRow.add(loadButton);
 
         loadButton.addActionListener(e -> {
@@ -53,6 +56,8 @@ public class SavedJobsTab extends JobView {
     public JPanel makeBottomButtonPanel() {
         JPanel bottomRow = new JPanel();
         JButton saveButton = new JButton("Save Jobs");
+        // Set hand cursor for the save button
+        saveButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         bottomRow.add(saveButton);
 
         saveButton.addActionListener(e -> {
