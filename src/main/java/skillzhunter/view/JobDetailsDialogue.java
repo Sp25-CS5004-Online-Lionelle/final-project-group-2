@@ -2,8 +2,8 @@ package skillzhunter.view;
 
 import javax.swing.*;
 import java.awt.Component;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import java.awt.Container;
+import java.awt.Font;
 import java.util.List;
 
 import skillzhunter.model.JobRecord;
@@ -102,45 +102,60 @@ public class JobDetailsDialogue {
             } else {
                 SavedJobsLists.addSavedJob(updatedJob);
                 
-                // Find the tabbed pane and switch to Saved Jobs
+                // Switch to "Saved Jobs" tab after adding a job
                 switchToSavedJobsTab(parent);
             }
         }
     }
 
     /**
-     * Helper method to find the main JTabbedPane and switch to the Saved Jobs tab
+     * Switches to the Saved Jobs tab
+     * @param component The component used to find the main window
      */
     private static void switchToSavedJobsTab(Component component) {
-        // Get the window ancestor (JFrame)
+        // Find the main window containing the tabs
         JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(component);
-        if (frame == null) return;
-        
-        // Find the JTabbedPane directly from the frame's content pane
-        JTabbedPane tabbedPane = null;
-        for (Component c : frame.getContentPane().getComponents()) {
-            if (c instanceof JPanel) {
-                for (Component innerComp : ((JPanel) c).getComponents()) {
-                    if (innerComp instanceof JTabbedPane) {
-                        tabbedPane = (JTabbedPane) innerComp;
+        if (frame != null) {
+            // Look for the tabbed pane in the component hierarchy
+            JTabbedPane tabbedPane = findTabbedPane(frame.getContentPane());
+            if (tabbedPane != null) {
+                // Find and select the "Saved Jobs" tab
+                for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+                    String title = tabbedPane.getTitleAt(i);
+                    Component comp = tabbedPane.getTabComponentAt(i);
+                    
+                    // Check both the tab title and any custom tab components
+                    if ("Saved Jobs".equals(title) || 
+                        (comp instanceof JLabel && "Saved Jobs".equals(((JLabel)comp).getText()))) {
+                        tabbedPane.setSelectedIndex(i);
                         break;
                     }
                 }
             }
         }
-        
-        if (tabbedPane != null) {
-            // Find the index of the "Saved Jobs" tab
-            for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-                if (tabbedPane.getTitleAt(i).equals("Saved Jobs")) {
-                    tabbedPane.setSelectedIndex(i);
-                    break;
+    }
+    
+    /**
+     * Recursively searches for a JTabbedPane in the component hierarchy
+     * @param component The component to search within
+     * @return The found JTabbedPane or null if none is found
+     */
+    private static JTabbedPane findTabbedPane(Component component) {
+        if (component instanceof JTabbedPane) {
+            return (JTabbedPane) component;
+        } else if (component instanceof Container) {
+            Container container = (Container) component;
+            for (int i = 0; i < container.getComponentCount(); i++) {
+                JTabbedPane found = findTabbedPane(container.getComponent(i));
+                if (found != null) {
+                    return found;
                 }
             }
         }
+        return null;
     }
 
-    // 👇 This helper method must be inside the class, and static
+    // Helper method to create read-only text areas
     private static JTextArea readOnlyArea(String text) {
         JTextArea area = new JTextArea(text != null ? text : "N/A");
         area.setEditable(false);

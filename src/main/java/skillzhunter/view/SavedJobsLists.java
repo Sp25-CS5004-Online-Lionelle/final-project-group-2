@@ -33,8 +33,6 @@ public class SavedJobsLists {
      * @param job The job record to add
      */
     public static void addSavedJob(JobRecord job) {
-        System.out.println("SAVEDJOBSLIST.JAVA - add saved job: " + job);
-        
         // Ensure we have a controller
         if (controller == null) {
             System.err.println("Controller not set in SavedJobsLists");
@@ -52,14 +50,11 @@ public class SavedJobsLists {
             if (comments == null || comments.isEmpty()) {
                 comments = "No comments provided";
             }
-            
-            System.out.println("Updating job with comments: " + comments + " and rating: " + rating);
             ((MainController) controller).getUpdateJob(job.id(), comments, rating);
         }
         
         // Get updated list and notify observers
         List<JobRecord> updatedList = getSavedJobs();
-        System.out.println("SAVEDJOBSLIST.JAVA - setting view jobsList to: " + updatedList);
         for (JobView observer : observers) {
             observer.updateJobsList(updatedList);
         }
@@ -70,7 +65,6 @@ public class SavedJobsLists {
      * @param job The job record to remove
      */
     public static void removeSavedJob(JobRecord job) {
-        System.out.println("SAVEDJOBSLIST.JAVA - remove saved job: " + job);
         
         // Ensure we have a controller
         if (controller == null) {
@@ -83,7 +77,6 @@ public class SavedJobsLists {
         
         // Get updated list and notify observers
         List<JobRecord> updatedList = getSavedJobs();
-        System.out.println("SAVEDJOBSLIST.JAVA - setting view jobsList to: " + updatedList);
         for (JobView observer : observers) {
             observer.updateJobsList(updatedList);
         }

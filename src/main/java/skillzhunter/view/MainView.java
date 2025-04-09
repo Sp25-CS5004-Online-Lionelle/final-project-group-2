@@ -4,10 +4,8 @@ import static skillzhunter.view.JobsLoader.getColumnNames;
 import static skillzhunter.view.JobsLoader.getData;
 
 import java.awt.BorderLayout;
-import java.awt.Insets;
 import java.util.List;
 
-import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -15,24 +13,18 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
 
-import javax.swing.UIManager;
 import skillzhunter.controller.IController;
 import skillzhunter.model.JobRecord;
 
-
 public class MainView extends JFrame implements IView {
 
-//    /** Main pane for the entire program */
-//    private Container mainPane = this.getContentPane();
     private JPanel mainPane = new JPanel();
     final private JobView findJobTab;
-    //private JobsTable findJobsTable = new JobsTable();
     final private JobView savedJobTab;
-    /** Pane to host findJobs and searchJobs*/
     private JTabbedPane tabbedPane;
+    private TabStyleManager tabStyleManager;
     final private IController controller;
     private JMenuItem exit;
     private JMenuItem csvDownload;
@@ -42,39 +34,47 @@ public class MainView extends JFrame implements IView {
     private JMenuItem darkMode;
     private ColorTheme theme;
 
-
-
-
-
     public MainView(IController controller) {
         super("Jobz Hunter App");
         this.controller = controller;
         this.setLocation(200, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // building tabs
+        // Set default theme (light mode) early
+        theme = ColorTheme.LIGHT;
+
+        // Building tabs
         findJobTab = new FindJobTab(controller);
         savedJobTab = new SavedJobsTab(controller, controller.getSavedJobs());
 
-        // building tabbed pane
-        tabbedPane  = buildTabbedPane(findJobTab, savedJobTab);
+        // Building tabbed pane
+        tabbedPane = buildTabbedPane(findJobTab, savedJobTab);
 
-        //Adds tabs to main view
+        // Adds tabs to main view
         mainPane.add(tabbedPane);
         add(mainPane);
+
+        // Create tab style manager
+        String[] tabNames = {"Find Jobs", "Saved Jobs"};
+        tabStyleManager = new TabStyleManager(tabbedPane, tabNames);
 
         // Adding menu bar
         JMenuBar menuBar = createMenuBar();
         setJMenuBar(menuBar);
+        
+        // Apply the theme after everything is set up
+        applyTheme(theme);
+        
+        // Apply theme once more after showing the frame to ensure it takes effect
+        SwingUtilities.invokeLater(() -> {
+            applyTheme(theme);
+        });
 
         pack();
     }
 
     /**
      * Builds the tabbed pane for the main view.
-     * @param findJobTab The tab for finding jobs.
-     * @param savedJobTab The tab for saved jobs.
-     * @return The tabbed pane containing the two tabs.
      */
     private JTabbedPane buildTabbedPane(JobView findJobTab, JobView savedJobTab) {
         // Create the tabbed pane
@@ -84,24 +84,13 @@ public class MainView extends JFrame implements IView {
         SavedJobsLists.addObserver(savedJobTab);
         SavedJobsLists.addObserver(findJobTab);
 
-        //TA: make sure SavedJobsList actually has a controller
+        // Set controller
         SavedJobsLists.setController(controller);
-    
-        tabbedPane.add("Find Jobs", findJobTab);
-        tabbedPane.add("Saved Jobs", savedJobTab);
-    
-        // Set hand cursor for tabs
-        tabbedPane.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent e) {
-                tabbedPane.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-            }
-    
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent e) {
-                tabbedPane.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-            }
-        });
+        
+        // Add tabs with components
+        tabbedPane.add(findJobTab);
+        tabbedPane.add(savedJobTab);
+        
         return tabbedPane;
     }
 
@@ -119,7 +108,6 @@ public class MainView extends JFrame implements IView {
                 java.awt.Image scaledImage = icon.getImage().getScaledInstance(24, 24, java.awt.Image.SCALE_SMOOTH);
                 settings.setIcon(new javax.swing.ImageIcon(scaledImage));
                 
-                // 👇 This is the key change
                 settings.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 0, 10, 0)); // Top, Left, Bottom, Right
                 
                 settings.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR)); // Set hand cursor
@@ -193,24 +181,45 @@ public class MainView extends JFrame implements IView {
             theme = ColorTheme.DARK;
             applyTheme(theme);
             SwingUtilities.updateComponentTreeUI(this);
+            
+            // Apply theme once more after UI update to ensure styling is applied
+            SwingUtilities.invokeLater(() -> {
+                applyTheme(theme);
+            });
         });
 
         lightMode.addActionListener(e -> {
             theme = ColorTheme.LIGHT;
             applyTheme(theme);
             SwingUtilities.updateComponentTreeUI(this);
+            
+            // Apply theme once more after UI update to ensure styling is applied
+            SwingUtilities.invokeLater(() -> {
+                applyTheme(theme);
+            });
         });
-
-
     }
+    
+    /**
+     * Applies the specified color theme to all components in the view hierarchy.
+     */
     private void applyTheme(ColorTheme theme) {
+        // Apply theme to main frame components
         getContentPane().setBackground(theme.background);
+        mainPane.setBackground(theme.background);
         
+        // Apply to menu bar
         if (getJMenuBar() != null) {
             getJMenuBar().setBackground(theme.background);
             getJMenuBar().setForeground(theme.foreground);
         }
         
+        // Apply theme to tabs using the TabStyleManager
+        if (tabStyleManager != null) {
+            tabStyleManager.applyTheme(theme);
+        }
+        
+        // Apply theme to tab contents
         if (findJobTab != null) {
             findJobTab.applyTheme(theme);
         }
@@ -219,35 +228,22 @@ public class MainView extends JFrame implements IView {
             savedJobTab.applyTheme(theme);
         }
         
-        tabbedPane.setBackground(theme.background);
-        tabbedPane.setForeground(theme.foreground);
-        
+        // Repaint to show changes
         repaint();
     }
 
-
-    /**
-     * Adds features to the view.
-     */
     @Override
     public void addFeatures(IController controller) {
-    //   this.findJobTab.addFeatures(controller);
-    //   this.searchJobTabbed.addFeatures(controller);
+        // Not needed
     } 
 
-    /**
-     * Runs the view.
-     * This method is used to start the view and display it to the user.
-     * It should be called after the view has been set up and configured.
-     */
     @Override
     public void run(){
         setVisible(true);
+        
+        // Apply theme once more after becoming visible
+        SwingUtilities.invokeLater(() -> {
+            applyTheme(theme);
+        });
     }
-    public static void main(String[] args) {
-//        for(UIManager.LookAndFeelInfo lnFinfo: UIManager.getInstalledLookAndFeels()) {
-//            System.out.println(lnFinfo.getClassName());
-//        }
-    }
-
 }

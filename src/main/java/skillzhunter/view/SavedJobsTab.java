@@ -1,19 +1,20 @@
 package skillzhunter.view;
 
-import java.awt.Cursor;
 import java.awt.FileDialog;
 import java.awt.Frame;
+import java.awt.FlowLayout;
 import java.io.File;
 import java.util.List;
-import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.JFrame;
 import skillzhunter.controller.IController;
 import skillzhunter.model.JobRecord;
 
 public class SavedJobsTab extends JobView {
+    
     public SavedJobsTab(IController controller, List<JobRecord> savedJobs) {
         super();
         // set inherited field from jobview
@@ -25,9 +26,9 @@ public class SavedJobsTab extends JobView {
     @Override
     public JPanel makeTopButtonPanel() {
         JPanel topRow = new JPanel();
-        JButton loadButton = new JButton("Load Job List from File");
-        // Set hand cursor for the load button
-        loadButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        // Create the load button using the helper method
+        ThemedButton loadButton = createThemedButton("Load Job List from File");
         topRow.add(loadButton);
 
         loadButton.addActionListener(e -> {
@@ -55,13 +56,15 @@ public class SavedJobsTab extends JobView {
 
     @Override
     public JPanel makeBottomButtonPanel() {
-        JPanel bottomRow = new JPanel();
-        JButton saveButton = new JButton("Save Jobs");
-        // Set hand cursor for the save button
-        saveButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        JPanel bottomRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        
+        // Create save button using the helper method
+        ThemedButton saveButton = createThemedButton("Save Jobs");
+        saveButton.applyTheme(getTheme());
         bottomRow.add(saveButton);
 
         saveButton.addActionListener(e -> {
+            
             // Get the list of saved jobs
             List<JobRecord> savedJobs = controller.getSavedJobs();
             
@@ -74,7 +77,7 @@ public class SavedJobsTab extends JobView {
                     "Save Jobs", 
                     JOptionPane.INFORMATION_MESSAGE);
             } else {
-                // Ask for confirmation before saving - use parentFrame instead of bottomRow
+                // Ask for confirmation before saving - use parentFrame for centering
                 int result = JOptionPane.showConfirmDialog(
                     parentFrame,
                     "Are you sure you want to save " + savedJobs.size() + " job(s) to file?",
@@ -86,20 +89,20 @@ public class SavedJobsTab extends JobView {
                     // Save to data/SavedJobs.csv in a fixed location (overwrite each time)
                     String filePath = "data/SavedJobs.csv";
                     controller.getSavedJobsToCsv(filePath);
-                    // Use parentFrame instead of bottomRow for centering
                     JOptionPane.showMessageDialog(parentFrame, 
                         "Jobs successfully saved to " + filePath, 
                         "Save Complete", 
                         JOptionPane.INFORMATION_MESSAGE);
-                    System.out.println("Saved to " + filePath);
                 }
             }
         });
         
         return bottomRow;
     }
-
-    public static void main(String[] args) {
-        System.out.println("hello");
+    
+    @Override
+    public void applyTheme(ColorTheme theme) {
+        // Call parent implementation for common styling
+        super.applyTheme(theme);
     }
 }
