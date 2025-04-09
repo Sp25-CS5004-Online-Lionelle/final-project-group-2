@@ -1,6 +1,5 @@
 package skillzhunter.view;
 
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.TextField;
@@ -9,7 +8,6 @@ import java.awt.Component;
 import java.util.List;
 import java.util.ArrayList;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -54,8 +52,7 @@ public class FindJobTab extends JobView {
         //create fields, buttons, and combos
         TextField searchField = new TextField("", 20);    
         searchButton = new JButton("Find Jobs");
-        // Set hand cursor for searchButton
-        searchButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        searchButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         
         String[] comboOptions = {"any", "option1", "option2"};//need to make this specific to field
         Integer[] results = {5,10,20,50};
@@ -91,7 +88,6 @@ public class FindJobTab extends JobView {
 
         //return the panel
         return searchRow;
-
     }
 
     @Override
@@ -102,8 +98,7 @@ public class FindJobTab extends JobView {
 
         //make buttons
         openJob = new JButton("Open Job");
-        // Set hand cursor for openJob button
-        openJob.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        openJob.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         //add fields, buttons, labels, combos, and spaces
         buttonPanel.add(openJob);
@@ -113,24 +108,6 @@ public class FindJobTab extends JobView {
 
         //return the panel
         return buttonPanel;
-    }
-
-
-    @Override
-    public void applyTheme(ColorTheme theme) {
-        super.applyTheme(theme);
-        System.out.println("Applying theme: " + theme);
-        setBackground(theme.background);
-        openJob.setBackground(theme.buttonNormal);
-        openJob.setForeground(theme.buttonForeground);
-        // searchButton.setBackground(theme.buttonNormal);
-        // searchButton.setForeground(theme.buttonForeground);
-        jobsTable.setBackground(theme.fieldBackground);
-        jobsTable.setForeground(theme.fieldForeground);
-        jobsTable.setBorder(BorderFactory.createLineBorder(theme.buttonNormal));
-        jobsTable.getTableHeader().setBackground(theme.fieldBackground);
-        jobsTable.getTableHeader().setForeground(theme.foreground);
-        repaint();
     }
 
     private void openSelectedJob() {
