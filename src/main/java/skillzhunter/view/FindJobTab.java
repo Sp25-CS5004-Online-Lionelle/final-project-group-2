@@ -6,6 +6,7 @@ import java.awt.TextField;
 import java.awt.Component;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -25,6 +26,7 @@ public class FindJobTab extends JobView {
     private IController controller;
     private String[] locations;
     private String[] industries;
+    private List<JobRecord> searchResults = new ArrayList<>();
 
     public FindJobTab(IController controller){
         super();
@@ -35,7 +37,9 @@ public class FindJobTab extends JobView {
 
         super.initView();
 
-        setJobsList(controller.getApiCall("any", 10 , "any", "any"));
+        // Load initial set of jobs
+        searchResults = controller.getApiCall("any", 10 , "any", "any");
+        setJobsList(searchResults);
     }
 
 
@@ -76,11 +80,10 @@ public class FindJobTab extends JobView {
 
         //set listeners
         searchButton.addActionListener(e -> {
-            List<JobRecord> jobs = controller.getApiCall(searchField.getText(), (Integer) resultsCombo.getSelectedItem() , locationCombo.getSelectedItem().toString(),
+            searchResults = controller.getApiCall(searchField.getText(), (Integer) resultsCombo.getSelectedItem() , locationCombo.getSelectedItem().toString(),
                 industryCombo.getSelectedItem().toString());
-            setJobsList(jobs);
-        }
-            );
+            setJobsList(searchResults);
+        });
 
         //return the panel
         return searchRow;
@@ -133,10 +136,23 @@ public class FindJobTab extends JobView {
         }
     }
     
-
+    /**
+     * Override the updateJobsList method to maintain our search results
+     * but still observe saved jobs changes for any UI updates needed
+     */
+    @Override
+    public void updateJobsList(List<JobRecord> jobsList) {
+        // Don't replace our search results with saved jobs
+        // Instead, keep our search results but update the UI if needed
+        // This ensures the Find Jobs tab keeps showing search results
+        if (searchResults != null && !searchResults.isEmpty()) {
+            super.setJobsList(searchResults);
+        } else {
+            super.updateJobsList(jobsList);
+        }
+    }
 
     public static void main(String[] args) {
         System.out.println("hello");
     }
-
 }
