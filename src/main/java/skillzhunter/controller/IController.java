@@ -29,8 +29,8 @@ public interface IController {
     /** gets saved jobs */
     List<JobRecord> getSavedJobs();
     /** updates comments */
-    void updateComments(int id, String comments);
+    JobRecord updateComments(int id, String comments);
     /** updates rating */
-    void updateRating(int id, int rating);
+    JobRecord updateRating(int id, int rating);
 
 }
