@@ -2,6 +2,9 @@ package skillzhunter.view;
 
 import java.awt.Component;
 import java.awt.Image;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.net.URL;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -16,8 +19,11 @@ import javax.swing.table.TableCellRenderer;
  */
 public class CustomHeader implements TableCellRenderer {
     private final TableCellRenderer defaultRenderer;
-    private final ImageIcon upArrow;
-    private final ImageIcon downArrow;
+    private ImageIcon upArrowLight;
+    private ImageIcon downArrowLight;
+    private ImageIcon upArrowDark;
+    private ImageIcon downArrowDark;
+    private boolean isDarkMode = false;
     
     /**
      * Creates a new sortable header renderer with the specified renderer.
@@ -27,9 +33,58 @@ public class CustomHeader implements TableCellRenderer {
     public CustomHeader(TableCellRenderer defaultRenderer) {
         this.defaultRenderer = defaultRenderer;
         
-        // Load arrow images
-        this.upArrow = loadIcon("images/arrow-up.png");
-        this.downArrow = loadIcon("images/arrow-down.png");
+        // Load arrow images for both light and dark modes
+        this.upArrowLight = loadIcon("images/arrow-up.png");
+        this.downArrowLight = loadIcon("images/arrow-down.png");
+        
+        // Create white versions for dark mode
+        this.upArrowDark = createColoredArrow(upArrowLight, Color.WHITE);
+        this.downArrowDark = createColoredArrow(downArrowLight, Color.WHITE);
+    }
+    
+    /**
+     * Sets the current theme mode.
+     * 
+     * @param isDarkMode True if dark mode is active
+     */
+    public void setDarkMode(boolean isDarkMode) {
+        this.isDarkMode = isDarkMode;
+    }
+    
+    /**
+     * Creates a colored version of an arrow icon.
+     * 
+     * @param originalIcon The original icon
+     * @param color The color to use
+     * @return A new icon with the specified color
+     */
+    private ImageIcon createColoredArrow(ImageIcon originalIcon, Color color) {
+        if (originalIcon == null) return null;
+        
+        int width = originalIcon.getIconWidth();
+        int height = originalIcon.getIconHeight();
+        
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = image.createGraphics();
+        
+        // Draw the original icon
+        originalIcon.paintIcon(null, g2d, 0, 0);
+        
+        // Apply color filter
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int rgba = image.getRGB(x, y);
+                int alpha = (rgba >> 24) & 0xff;
+                if (alpha > 0) {
+                    // Keep the alpha but use the new color
+                    image.setRGB(x, y, (alpha << 24) | (color.getRed() << 16) | 
+                                      (color.getGreen() << 8) | color.getBlue());
+                }
+            }
+        }
+        
+        g2d.dispose();
+        return new ImageIcon(image);
     }
     
     /**
@@ -64,6 +119,10 @@ public class CustomHeader implements TableCellRenderer {
         
         if (comp instanceof JLabel) {
             JLabel label = (JLabel) comp;
+            
+            // Choose icons based on the current theme
+            ImageIcon downArrow = isDarkMode ? downArrowDark : downArrowLight;
+            ImageIcon upArrow = isDarkMode ? upArrowDark : upArrowLight;
             
             // By default, show the down arrow to indicate the column is sortable
             ImageIcon icon = downArrow;
