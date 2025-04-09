@@ -6,6 +6,7 @@ import java.awt.Frame;
 import java.io.File;
 import java.util.List;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -64,15 +65,18 @@ public class SavedJobsTab extends JobView {
             // Get the list of saved jobs
             List<JobRecord> savedJobs = controller.getSavedJobs();
             
+            // Find the parent frame for centering dialogs
+            JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+            
             if (savedJobs.isEmpty()) {
-                JOptionPane.showMessageDialog(bottomRow, 
+                JOptionPane.showMessageDialog(parentFrame, 
                     "No jobs to save.", 
                     "Save Jobs", 
                     JOptionPane.INFORMATION_MESSAGE);
             } else {
-                // Ask for confirmation before saving
+                // Ask for confirmation before saving - use parentFrame instead of bottomRow
                 int result = JOptionPane.showConfirmDialog(
-                    bottomRow,
+                    parentFrame,
                     "Are you sure you want to save " + savedJobs.size() + " job(s) to file?",
                     "Confirm Save",
                     JOptionPane.YES_NO_OPTION
@@ -82,7 +86,8 @@ public class SavedJobsTab extends JobView {
                     // Save to data/SavedJobs.csv in a fixed location (overwrite each time)
                     String filePath = "data/SavedJobs.csv";
                     controller.getSavedJobsToCsv(filePath);
-                    JOptionPane.showMessageDialog(bottomRow, 
+                    // Use parentFrame instead of bottomRow for centering
+                    JOptionPane.showMessageDialog(parentFrame, 
                         "Jobs successfully saved to " + filePath, 
                         "Save Complete", 
                         JOptionPane.INFORMATION_MESSAGE);
