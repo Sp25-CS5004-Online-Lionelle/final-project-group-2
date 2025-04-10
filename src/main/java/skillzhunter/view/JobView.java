@@ -130,9 +130,11 @@ public abstract class JobView extends JPanel {
     // Set the jobs list to update the table and UI
     public void setJobsList(List<JobRecord> jobsList) {
         this.jobsList = jobsList;
+        
+        // Update the table with job data including logos
         this.jobsTable.setData(getData(jobsList));
-        DefaultTableModel tableData = new DefaultTableModel(getData(jobsList), getColumnNames());
-        this.jobsTable.setModel(tableData);
+        
+        // Make sure the table is configured correctly
         this.jobsTable.repaint();
         this.jobsTable.setRowSelectionAllowed(true);
         this.jobsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
