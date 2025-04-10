@@ -35,7 +35,7 @@ public class Jobs implements IModel {
     }
 
     /**
-     * Getter for industries.
+     * Gets the industries to be used in the search in a list.
      * @return Map of industries based on keys and is sorted to a list.
      */
     public List<String> getIndustries() {
@@ -43,9 +43,7 @@ public class Jobs implements IModel {
     }
 
     /**
-     * TODO Java doc - this is terrible
-     * retries pretty name for location.
-     * @return List<String> pretty name for location
+     * Gets locations to be used in the search in a list.
      */
     public List<String> getLocations() {
         return locationsMap.keySet().stream().sorted().toList();
@@ -58,11 +56,6 @@ public class Jobs implements IModel {
      */
     public void addJob(JobRecord job) {
         JobBean jobBean = new JobBean();
-
-        //idea: move this into a second constructor for the JobBean
-        //idea: private helper to replace all the tertiary operators
-        //  helper(job.getValue(), defaultValue) --> either the job value or the default value if the job value was empty or null
-
         jobBean.setId(job.id());
         jobBean.setJobTitle(job.jobTitle() != null && !job.jobTitle().isBlank() ? job.jobTitle() : "");
         jobBean.setCompanyName(job.companyName() != null && !job.companyName().isBlank() ? job.companyName() : "");
@@ -126,8 +119,6 @@ public class Jobs implements IModel {
             if (job.id() == id) {
                 //make job into bean
                 JobBean jobBean = new JobBean();
-
-                //IDEA: condense this, similar to addJob method above
                 jobBean.setId(job.id());
                 jobBean.setJobTitle(job.jobTitle());
                 jobBean.setCompanyName(job.companyName());
@@ -232,7 +223,6 @@ public class Jobs implements IModel {
         System.out.println("Searched job: " + searchedJob);
         System.out.println(searchedJob);
 
-       
         // Remove job
         System.out.println("Removing job with ID 1");
         jobs.removeJob(1);
