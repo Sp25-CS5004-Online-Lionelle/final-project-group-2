@@ -19,7 +19,7 @@ import skillzhunter.model.JobRecord;
 import static skillzhunter.view.JobsLoader.getColumnNames;
 import static skillzhunter.view.JobsLoader.getData;
 
-public abstract class JobView extends JPanel implements IJobView {
+public abstract class JobView extends JPanel {
     protected ThemedButton searchButton;
     protected JTextArea searchField;
     protected JTextArea recordText;
