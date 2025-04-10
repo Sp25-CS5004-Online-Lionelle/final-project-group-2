@@ -33,7 +33,6 @@ public class SalaryVisualizationPanel extends JPanel {
     private List<Point2D> dataPoints = new ArrayList<>();
     private List<Rectangle2D> hitBoxes = new ArrayList<>();
     private int hoveredIndex = -1;
-    private JToolTip tooltip;
     private ColorTheme theme = ColorTheme.LIGHT; // Default theme
     
     /**
@@ -45,11 +44,6 @@ public class SalaryVisualizationPanel extends JPanel {
         this.jobs = new ArrayList<>(jobs);
         setPreferredSize(new Dimension(800, 200));
         setBackground(Color.WHITE);
-        
-        // Set up tooltip
-        tooltip = new JToolTip();
-        tooltip.setComponent(this);
-        setToolTipText(""); // Enable tooltips
         
         // Sort jobs by average salary
         sortJobsBySalary();
@@ -65,11 +59,7 @@ public class SalaryVisualizationPanel extends JPanel {
                 for (int i = 0; i < hitBoxes.size(); i++) {
                     if (hitBoxes.get(i).contains(e.getPoint())) {
                         hoveredIndex = i;
-                        
-                        // Show custom tooltip
                         JobRecord job = jobs.get(i);
-                        String tooltipText = createTooltipText(job);
-                        setToolTipText(tooltipText);
                         break;
                     }
                 }
@@ -80,30 +70,6 @@ public class SalaryVisualizationPanel extends JPanel {
                 }
             }
         });
-    }
-    
-    /**
-     * Creates tooltip text for the specified job.
-     */
-    private String createTooltipText(JobRecord job) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<html>");
-        sb.append("<b>").append(job.jobTitle()).append("</b><br>");
-        sb.append("Company: ").append(job.companyName()).append("<br>");
-        sb.append("Level: ").append(job.jobLevel()).append("<br>");
-        
-        // Format salary numbers with commas
-        NumberFormat nf = NumberFormat.getNumberInstance(Locale.US);
-        String minSalary = job.annualSalaryMin() > 0 ? nf.format(job.annualSalaryMin()) : "N/A";
-        String maxSalary = job.annualSalaryMax() > 0 ? nf.format(job.annualSalaryMax()) : "N/A";
-        
-        sb.append("Salary Range: ").append(minSalary).append(" - ").append(maxSalary);
-        if (job.salaryCurrency() != null && !job.salaryCurrency().isEmpty()) {
-            sb.append(" ").append(job.salaryCurrency());
-        }
-        sb.append("</html>");
-        
-        return sb.toString();
     }
     
     /**
