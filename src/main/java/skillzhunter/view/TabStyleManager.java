@@ -17,29 +17,6 @@ public class TabStyleManager {
     private ColorTheme theme;
     private final boolean isMacOS;
     
-    // Platform-specific colors for Windows/Linux
-    private final Color WIN_SELECTED_BG_LIGHT = new Color(202,220,245);
-    private final Color WIN_SELECTED_FG_LIGHT = Color.BLACK;
-    private final Color WIN_UNSELECTED_BG_LIGHT = new Color(235, 235, 235);
-    private final Color WIN_UNSELECTED_FG_LIGHT = Color.BLACK;
-    
-    private final Color WIN_SELECTED_BG_DARK = new Color(197,218,240);
-    private final Color WIN_SELECTED_FG_DARK = Color.BLACK;
-    private final Color WIN_UNSELECTED_BG_DARK = new Color(43, 43, 43);
-    private final Color WIN_UNSELECTED_FG_DARK = Color.WHITE;
-    
-    // Platform-specific colors for macOS - revised based on screenshot
-    private final Color MAC_SELECTED_BG_LIGHT = new Color(255, 255, 255);
-    private final Color MAC_SELECTED_FG_LIGHT = new Color(0, 120, 215);
-    private final Color MAC_UNSELECTED_BG_LIGHT = new Color(235, 235, 235);
-    private final Color MAC_UNSELECTED_FG_LIGHT = Color.DARK_GRAY;
-    
-    // Updated Mac dark mode colors to match screenshot
-    private final Color MAC_SELECTED_BG_DARK = new Color(201,201,201); // Match the background
-    private final Color MAC_SELECTED_FG_DARK = Color.BLACK; // White text for selected tab
-    private final Color MAC_UNSELECTED_BG_DARK = new Color(33, 33, 33);
-    private final Color MAC_UNSELECTED_FG_DARK = new Color(180, 180, 180); // Lighter grey for unselected
-    
     /**
      * Creates a new TabStyleManager for the given tabbed pane.
      * 
@@ -109,10 +86,10 @@ public class TabStyleManager {
         
         if (isMacOS) {
             tabPaneBackground = (theme == ColorTheme.DARK) ? 
-                                new Color(33, 33, 33) : new Color(245, 245, 245);
+                                theme.macTabPaneBgDark : theme.macTabPaneBgLight;
         } else {
             tabPaneBackground = (theme == ColorTheme.DARK) ? 
-                                new Color(43, 43, 43) : new Color(240, 240, 240);
+                                theme.winTabPaneBgDark : theme.winTabPaneBgLight;
         }
         
         // Apply background color to tabbedPane
@@ -136,38 +113,38 @@ public class TabStyleManager {
             // macOS coloring
             if (theme == ColorTheme.DARK) {
                 if (isSelected) {
-                    bg = MAC_SELECTED_BG_DARK;
-                    fg = MAC_SELECTED_FG_DARK;
+                    bg = theme.macSelectedBgDark;
+                    fg = theme.macSelectedFgDark;
                 } else {
-                    bg = MAC_UNSELECTED_BG_DARK;
-                    fg = MAC_UNSELECTED_FG_DARK;
+                    bg = theme.macUnselectedBgDark;
+                    fg = theme.macUnselectedFgDark;
                 }
             } else {
                 if (isSelected) {
-                    bg = MAC_SELECTED_BG_LIGHT;
-                    fg = MAC_SELECTED_FG_LIGHT; 
+                    bg = theme.macSelectedBgLight;
+                    fg = theme.macSelectedFgLight; 
                 } else {
-                    bg = MAC_UNSELECTED_BG_LIGHT;
-                    fg = MAC_UNSELECTED_FG_LIGHT;
+                    bg = theme.macUnselectedBgLight;
+                    fg = theme.macUnselectedFgLight;
                 }
             }
         } else {
-            // Windows/Linux coloring - also set selected tab text to white in dark mode
+            // Windows/Linux coloring
             if (theme == ColorTheme.DARK) {
                 if (isSelected) {
-                    bg = WIN_SELECTED_BG_DARK;
-                    fg = WIN_SELECTED_FG_DARK;
+                    bg = theme.winSelectedBgDark;
+                    fg = theme.winSelectedFgDark;
                 } else {
-                    bg = WIN_UNSELECTED_BG_DARK;
-                    fg = WIN_UNSELECTED_FG_DARK;
+                    bg = theme.winUnselectedBgDark;
+                    fg = theme.winUnselectedFgDark;
                 }
             } else {
                 if (isSelected) {
-                    bg = WIN_SELECTED_BG_LIGHT;
-                    fg = WIN_SELECTED_FG_LIGHT;
+                    bg = theme.winSelectedBgLight;
+                    fg = theme.winSelectedFgLight;
                 } else {
-                    bg = WIN_UNSELECTED_BG_LIGHT;
-                    fg = WIN_UNSELECTED_FG_LIGHT;
+                    bg = theme.winUnselectedBgLight;
+                    fg = theme.winUnselectedFgLight;
                 }
             }
         }
