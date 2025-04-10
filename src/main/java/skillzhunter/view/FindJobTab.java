@@ -212,7 +212,7 @@ public class FindJobTab extends JobView {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
         // Create and configure button
-        openJob = createThemedButton("Open Job");
+        openJob = createThemedButton("Open");
         openJob.setIcon(openIcon);
         openJob.setHorizontalTextPosition(SwingConstants.LEFT);
         openJob.setIconTextGap(5);
