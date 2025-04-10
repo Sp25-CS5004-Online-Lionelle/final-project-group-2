@@ -50,6 +50,10 @@ public class MainController implements IController {
         return model;
     }
 
+// if location do this by location if industry do same thing by industry
+// noun is location or industry and do these things but with those names?
+//  could create enum then have case switch OR might be able to use method reference class::methodName OR something else
+// or everything in the map after lambda could be helper
     @Override
     public List<String> getLocations() {
         return model.getLocations().stream()
@@ -119,34 +123,17 @@ public class MainController implements IController {
         model.removeJob(index);
     }
 
-    /**
-     * Updates a job with new comments and rating
-     * 
-     * @param id The ID of the job to update
-     * @param comments The comments to set
-     * @param rating The rating to set
-     * @return The updated JobRecord
-     */
-    public JobRecord getUpdateJob(int id, String comments, int rating) {
-        model.updateJob(id, comments, rating);
-        savedJobsTab.updateJobsList(model.getJobRecords());
-        
-        // Return the updated job record so the view can use it
-        for (JobRecord job : model.getJobRecords()) {
-            if (job.id() == id) {
-                return job;
-            }
-        }
-        return null;
-    }
 
+    //IDEA: maybe maybe saveJobsToCsv can be generalized with the exportSavedJobs
     @Override
     public void getSavedJobsToCsv(String filePath) {
         model.saveJobsToCsv(filePath);
     }
 
+    
     @Override
     public void exportSavedJobs(List<JobRecord> jobs, String formatStr, String filePath) {
+        //IDEA: move code in here to IModel and what if we made CSV the default format..?
         Formats format = Formats.containsValues(formatStr); // Check if the format is valid
         
         // Handle unsupported formats
@@ -162,65 +149,25 @@ public class MainController implements IController {
         }
     }
 
-    
-
 
     public SavedJobsTab getSavedJobsTab() {
         return savedJobsTab;
     }
+    
 
     /**
-     * Updates the rating of a job record.
-     * Now preserves any existing comments.
+     * Updates a job with new comments and rating
      * 
-     * @param id The job ID
-     * @param rating The new rating
-     * @return The updated job record
+     * @param id The ID of the job to update
+     * @param comments The comments to set
+     * @param rating The rating to set
+     * @return The updated JobRecord
      */
-    public JobRecord updateRating(int id, int rating) {
-        // Get the current job record to preserve existing comments
-        String existingComments = null;
-        for (JobRecord job : model.getJobRecords()) {
-            if (job.id() == id) {
-                existingComments = job.comments();
-                break;
-            }
-        }
+    public JobRecord getUpdateJob(int id, String comments, int rating) {
+        model.updateJob(id, comments, rating); //IDEA: if model.updateJob returns a record then you can delete the loop at the end
+        savedJobsTab.updateJobsList(model.getJobRecords());
         
-        // Update with existing comments and new rating
-        model.updateJob(id, existingComments, rating);
-        
-        // Return the updated job
-        for (JobRecord job : model.getJobRecords()) {
-            if (job.id() == id) {
-                return job;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Updates the comments of a job record.
-     * Now preserves any existing rating.
-     * 
-     * @param id The job ID
-     * @param comments The new comments
-     * @return The updated job record
-     */
-    public JobRecord updateComments(int id, String comments) {
-        // Get the current job record to preserve existing rating
-        int existingRating = 0;
-        for (JobRecord job : model.getJobRecords()) {
-            if (job.id() == id) {
-                existingRating = job.rating();
-                break;
-            }
-        }
-        
-        // Update with new comments and existing rating
-        model.updateJob(id, comments, existingRating);
-        
-        // Return the updated job
+        // Return the updated job record so the view can use it
         for (JobRecord job : model.getJobRecords()) {
             if (job.id() == id) {
                 return job;
