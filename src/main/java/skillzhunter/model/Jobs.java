@@ -34,17 +34,16 @@ public class Jobs implements IModel {
         this.jobList = new ArrayList<>();
     }
 
-       /**
-     * retries pretty name for industry.
-     * @return List<String> pretty name for industry
+    /**
+     * Gets the industries to be used in the search in a list.
+     * @return Map of industries based on keys and is sorted to a list.
      */
     public List<String> getIndustries() {
         return industriesMap.keySet().stream().sorted().toList();
     }
 
     /**
-     * retries pretty name for location.
-     * @return List<String> pretty name for location
+     * Gets locations to be used in the search in a list.
      */
     public List<String> getLocations() {
         return locationsMap.keySet().stream().sorted().toList();
@@ -94,8 +93,6 @@ public class Jobs implements IModel {
     public List<JobRecord> getJobRecords() {
         if (jobList.isEmpty()) {
             System.out.println("Job List is empty. Ensure jobs are added before retrieving.");
-        } else {
-            //System.out.println("Job List: " + jobList);
         }
         return new ArrayList<>(jobList);
     }
@@ -107,16 +104,6 @@ public class Jobs implements IModel {
      */
     public boolean removeJob(int id) {
         return jobList.removeIf(job -> job.id() == id);
-    }
-
-    public List<JobRecord> searchByQuery(String query) {
-        List<JobRecord> result = new ArrayList<>();
-        for (JobRecord job : jobList) {
-            if (job.jobTitle().toLowerCase().contains(query.toLowerCase())) {
-                result.add(job);
-            }
-        }
-        return result;
     }
 
     //update comments and rating
@@ -143,6 +130,7 @@ public class Jobs implements IModel {
                 jobBean.setAnnualSalaryMax(job.annualSalaryMax());
                 jobBean.setSalaryCurrency(job.salaryCurrency());
                 jobBean.setPubDate(job.pubDate());
+
                 //setcomments and rating in bean
                 jobBean.setComments(comments);
                 jobBean.setRating(rating);
@@ -163,30 +151,7 @@ public class Jobs implements IModel {
             }
         }
     }
-    /**
-     * Searches for jobs based on the given location.
-     * @param location The location to search for jobs in.
-     * @return A list of JobRecord objects representing the search results.
-     */
-    public List<JobRecord> searchByLocation(String location) {
-        List<JobRecord> result = new ArrayList<>();
-        for (JobRecord job : jobList) {
-            if (job.jobGeo().toLowerCase().contains(location.toLowerCase())) {
-                result.add(job);
-            }
-        }
-        return result;
-    }
 
-    public List<JobRecord> searchByIndustry(String industry) {
-        List<JobRecord> result = new ArrayList<>();
-        for (JobRecord job : jobList) {
-            if (job.jobIndustry().contains(industry)) {
-                result.add(job);
-            }
-        }
-        return result;
-    }
     /**
      * Searches for jobs based on the given parameters.
      * @param query The search query (e.g., job title, keywords).
@@ -220,8 +185,27 @@ public class Jobs implements IModel {
             throw new RuntimeException("Error writing to CSV file", e);
         }
     }
+    /**
+     * Exports the saved jobs to a specified format and file path.
+     * @param jobs List of JobRecord objects to export
+     * @param formatStr Format string (e.g., "CSV", "JSON")
+     * @param filePath Path to the output file
+     */
+    @Override
+    public void exportSavedJobs(List<JobRecord> jobs, String formatStr, String filePath) {
+        // Check if the format is valid
+        Formats format = Formats.containsValues(formatStr);
+        if (format == null) {
+            throw new IllegalArgumentException("Unsupported format: " + formatStr);
+        }
 
-   
+        // Export the jobs to the specified file
+        try (OutputStream out = new FileOutputStream(filePath)) {
+            DataFormatter.write(jobs, format, out);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to export jobs: " + e.getMessage(), e);
+        }
+    }
     /**
      * Main method for testing purposes.
      * @param args Command line arguments (not used).
@@ -239,24 +223,6 @@ public class Jobs implements IModel {
         System.out.println("Searched job: " + searchedJob);
         System.out.println(searchedJob);
 
-        // Search job by query
-        List<JobRecord> searchResults = jobs.searchByQuery("Python");
-        System.out.println("Search results for 'Python': " + searchResults);
-        for (JobRecord j : searchResults) {
-            System.out.println(j);
-        }
-        // Search job by location
-        List<JobRecord> locationResults = jobs.searchByLocation("NYC");
-        System.out.println("Search results for 'NYC': " + locationResults);
-        for (JobRecord j : locationResults) {
-            System.out.println(j);
-        }
-        // Search job by industry
-        List<JobRecord> industryResults = jobs.searchByIndustry("Tech");
-        System.out.println("Search results for 'Tech': " + industryResults);
-        for (JobRecord j : industryResults) {
-            System.out.println(j);
-        }
         // Remove job
         System.out.println("Removing job with ID 1");
         jobs.removeJob(1);

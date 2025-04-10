@@ -30,6 +30,11 @@ public class JobBean {
         // no-arg constructor for Jackson and JavaBeans
     }
 
+    //IDEA:
+    //constructor that accepts a JobRecord
+    //OR
+    //public void fromRecord(JobRecord record){...}
+
     // Getters and setters for all fields
 
     /**
@@ -326,4 +331,5 @@ public class JobBean {
                 this.getComments()
         );
     }
+
 }

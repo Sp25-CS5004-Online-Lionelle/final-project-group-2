@@ -3,7 +3,10 @@ package skillzhunter.controller;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import skillzhunter.model.IModel;
 import skillzhunter.model.JobRecord;
@@ -16,10 +19,17 @@ import skillzhunter.view.SavedJobsTab;
 
 public class MainController implements IController {
 
+    /** Model */
     private IModel model;
+    /** View */
     private IView view;
+    /** Saved jobs tab */
     private SavedJobsTab savedJobsTab;
 
+    /**
+     * Constructor for MainController.
+     * Initializes the model and view.
+     */
     public MainController() {
         // Model
         model = new Jobs();
@@ -31,75 +41,130 @@ public class MainController implements IController {
         view = new MainView(this);  // You might want to make sure MainView takes savedJobsTab
     }
 
-    protected void setView(IView view) {
-        this.view = view;
-    }
-
-    protected void setModel(IModel model) {
-        this.model = model;
-        savedJobsTab.updateJobsList(model.getJobRecords());
-    }
-
+    /**
+     * Returns the view.
+     * 
+     * @return The view
+     */
     @Override
     public IView getView() {
         return view;
     }
 
+    /**
+     * Sets the view and updates the saved jobs tab.
+     * 
+     * @param view The view to set
+     */
+    protected void setView(IView view) {
+        this.view = view;
+    }
+
+    /**
+     * Returns the model.
+     */
     @Override
     public IModel getModel() {
         return model;
     }
 
+    /**
+     * Sets the model and updates the saved jobs tab.
+     * 
+     * @param model The model to set
+     */
+    protected void setModel(IModel model) {
+        this.model = model;
+        savedJobsTab.updateJobsList(model.getJobRecords());
+    }
+    
+
+    /**
+     * Gets the locations from the API and capitalizes them appropriately.
+     */
     @Override
     public List<String> getLocations() {
-        return model.getLocations().stream()
-                .map(location -> {
-                    String[] words = location.split(" ");
-                    StringBuilder capitalizedLocation = new StringBuilder();
-                    for (String word : words) {
-                        if (!word.isEmpty()) {
-                            capitalizedLocation.append(Character.toUpperCase(word.charAt(0)))
-                                    .append(word.substring(1).toLowerCase())
-                                    .append(" ");
-                        }
-                    }
-                    return capitalizedLocation.toString().trim();
-                })
-                .toList();
+        return capitalizeItems(model.getLocations(), Collections.emptyMap());
     }
 
+    /**
+     * Gets the industries from the API and capitalizes them appropriately.
+     */
     @Override
     public List<String> getIndustries() {
-        return model.getIndustries().stream()
-                .map(industry -> {
-                    String[] words = industry.split(" ");
-                    StringBuilder capitalizedIndustry = new StringBuilder();
+        Map<String, String> specialCases = new HashMap<>();
+        specialCases.put("hr", "HR");
+        return capitalizeItems(model.getIndustries(), specialCases);
+    }
+
+    /**
+     * Capitalizes the items in the list.
+     * Handles multi-word strings and keeps in mind any special cases for capitalization.
+     * @param items List of strings to capitalize
+     * @param specialCases Map of special case words and their capitalization
+     * @return List of capitalized strings
+     */
+    private List<String> capitalizeItems(List<String> items, Map<String, String> specialCases) {
+        return items.stream()
+                .map(item -> {
+                    String[] words = item.split(" ");
+                    StringBuilder result = new StringBuilder();
+                    
                     for (String word : words) {
                         if (!word.isEmpty()) {
-                            if (word.equalsIgnoreCase("hr")) {
-                                capitalizedIndustry.append("HR").append(" ");
-                            } else {
-                                capitalizedIndustry.append(Character.toUpperCase(word.charAt(0)))
-                                        .append(word.substring(1).toLowerCase())
-                                        .append(" ");
-                            }
+                            String lowerWord = word.toLowerCase();
+                            String capitalizedWord = specialCases.getOrDefault(lowerWord, capitalizeWord(word));
+                            result.append(capitalizedWord).append(" ");
                         }
                     }
-                    return capitalizedIndustry.toString().trim();
+                    
+                    return result.toString().trim();
                 })
                 .toList();
     }
 
+    /**
+     * Capitalizes a single word.
+     * @param word The word to capitalize
+     * @return The capitalized word
+     */
+    private String capitalizeWord(String word) {
+        if (word.isEmpty()) {
+            return word;
+        }
+        return Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase();
+    }
+
+    /**
+     * Gets the API call for job search.
+     * 
+     * @param query The search query
+     * @param numberOfResults The number of results to return
+     * @param location The location to filter by
+     * @param industry The industry to filter by
+     * @return List of JobRecord objects
+     */
     @Override
     public List<JobRecord> getApiCall(String query, Integer numberOfResults, String location, String industry) {
         return model.searchJobs(query, numberOfResults, location, industry);
     }
 
+    /**
+     * Gets the saved jobs.
+     * 
+     * @return List of JobRecord objects
+     */
     @Override
     public List<JobRecord> getSavedJobs() {
         return model.getJobRecords();
     }
 
+    /**
+     * Sets the saved jobs.
+     * 
+     * @param savedJobs List of JobRecord objects to set
+     * @return List of JobRecord objects
+     */
     public List<JobRecord> setSavedJobs(List<JobRecord> savedJobs) {
         for (JobRecord job : savedJobs) {
             model.addJob(job);
@@ -109,15 +174,52 @@ public class MainController implements IController {
         return savedJobsList;
     }
 
+    /**
+     * Adds a job to the saved jobs list.
+     * 
+     * @param jobRecord The JobRecord object to add
+     */
     @Override
     public void getAddJob(JobRecord jobRecord) {
         model.addJob(jobRecord);
     }
 
+    /**
+     * Removes a job from the saved jobs list.
+     * 
+     * @param index The index of the job to remove
+     */
     @Override
     public void getRemoveJob(int index) {
         model.removeJob(index);
     }
+
+
+    /**
+     * Saves the job records to a CSV file.
+     */
+    @Override
+    public void getSavedJobsToCsv(String filePath) {
+        model.saveJobsToCsv(filePath);
+    }
+
+    /**
+     * Exports the saved jobs to a specified format and file path.
+     */
+    @Override
+    public void getExportSavedJobs(List<JobRecord> jobs, String formatStr, String filePath) {
+        model.exportSavedJobs(jobs, formatStr, filePath);
+    }
+
+    /**
+     * Gets the saved jobs tab.
+     * 
+     * @return The saved jobs tab
+     */
+    public SavedJobsTab getSavedJobsTab() {
+        return savedJobsTab;
+    }
+    
 
     /**
      * Updates a job with new comments and rating
@@ -128,104 +230,10 @@ public class MainController implements IController {
      * @return The updated JobRecord
      */
     public JobRecord getUpdateJob(int id, String comments, int rating) {
-        model.updateJob(id, comments, rating);
+        model.updateJob(id, comments, rating); //IDEA: if model.updateJob returns a record then you can delete the loop at the end
         savedJobsTab.updateJobsList(model.getJobRecords());
         
         // Return the updated job record so the view can use it
-        for (JobRecord job : model.getJobRecords()) {
-            if (job.id() == id) {
-                return job;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public void getSavedJobsToCsv(String filePath) {
-        model.saveJobsToCsv(filePath);
-    }
-
-    @Override
-    public void exportSavedJobs(List<JobRecord> jobs, String formatStr, String filePath) {
-        Formats format = Formats.containsValues(formatStr); // Check if the format is valid
-        
-        // Handle unsupported formats
-        if (format == null) {
-            throw new IllegalArgumentException("Unsupported format: " + formatStr);
-        }
-
-        // Export the jobs to the specified file
-        try (OutputStream out = new FileOutputStream(filePath)) {
-            DataFormatter.write(jobs, format, out);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to export jobs: " + e.getMessage(), e);
-        }
-    }
-
-    
-
-
-    public SavedJobsTab getSavedJobsTab() {
-        return savedJobsTab;
-    }
-
-    @Override
-    public void setViewData() {
-        // Optional, depending on your logic
-    }
-
-    /**
-     * Updates the rating of a job record.
-     * Now preserves any existing comments.
-     * 
-     * @param id The job ID
-     * @param rating The new rating
-     * @return The updated job record
-     */
-    public JobRecord updateRating(int id, int rating) {
-        // Get the current job record to preserve existing comments
-        String existingComments = null;
-        for (JobRecord job : model.getJobRecords()) {
-            if (job.id() == id) {
-                existingComments = job.comments();
-                break;
-            }
-        }
-        
-        // Update with existing comments and new rating
-        model.updateJob(id, existingComments, rating);
-        
-        // Return the updated job
-        for (JobRecord job : model.getJobRecords()) {
-            if (job.id() == id) {
-                return job;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Updates the comments of a job record.
-     * Now preserves any existing rating.
-     * 
-     * @param id The job ID
-     * @param comments The new comments
-     * @return The updated job record
-     */
-    public JobRecord updateComments(int id, String comments) {
-        // Get the current job record to preserve existing rating
-        int existingRating = 0;
-        for (JobRecord job : model.getJobRecords()) {
-            if (job.id() == id) {
-                existingRating = job.rating();
-                break;
-            }
-        }
-        
-        // Update with new comments and existing rating
-        model.updateJob(id, comments, existingRating);
-        
-        // Return the updated job
         for (JobRecord job : model.getJobRecords()) {
             if (job.id() == id) {
                 return job;

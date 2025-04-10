@@ -19,7 +19,6 @@ public interface IController {
     List<String> getLocations();
     /** gets industries */
     List<String> getIndustries();
-    void setViewData();
     /** gets add job */
     void getAddJob(JobRecord job);
     /** gets remove job */
@@ -27,12 +26,8 @@ public interface IController {
     /** gets saved jobs that need to be made into a csv */
     void getSavedJobsToCsv(String filePath);
     /** exports saved jobs into selected format */
-    void exportSavedJobs(List<JobRecord> jobs, String formatStr, String filePath);
+    void getExportSavedJobs(List<JobRecord> jobs, String formatStr, String filePath);
     /** gets saved jobs */
     List<JobRecord> getSavedJobs();
-    /** updates comments */
-    JobRecord updateComments(int id, String comments);
-    /** updates rating */
-    JobRecord updateRating(int id, int rating);
-
+    
 }

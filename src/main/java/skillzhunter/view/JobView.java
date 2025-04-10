@@ -19,7 +19,7 @@ import skillzhunter.model.JobRecord;
 import static skillzhunter.view.JobsLoader.getColumnNames;
 import static skillzhunter.view.JobsLoader.getData;
 
-public abstract class JobView extends JPanel implements IJobView {
+public abstract class JobView extends JPanel {
     protected ThemedButton searchButton;
     protected JTextArea searchField;
     protected JTextArea recordText;
@@ -151,7 +151,6 @@ public abstract class JobView extends JPanel implements IJobView {
     // Add a new job record via controller (delegates to controller)
     public void addJobRecord(JobRecord record) {
         controller.getAddJob(record); // Delegate to controller
-        controller.setViewData(); // Update the view after adding a job
     }
 
     // Remove a job record via controller (delegates to controller)
@@ -168,9 +167,9 @@ public abstract class JobView extends JPanel implements IJobView {
     // Add listeners and features (e.g., search button functionality)
     public void addFeatures(IController controller) {
         this.controller = controller; // Set controller
-        if (searchButton != null) {
-            searchButton.addActionListener(e -> controller.setViewData());  // Delegate logic to controller for search
-        }
+        // if (searchButton != null) {
+        //     searchButton.addActionListener(e -> controller.setViewData());  // Delegate logic to controller for search
+        // }
         // You can add other action listeners for other buttons (like add, remove job)
     }
 
