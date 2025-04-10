@@ -96,7 +96,7 @@ public class MainController implements IController {
         specialCases.put("hr", "HR");
         return capitalizeItems(model.getIndustries(), specialCases);
     }
-    
+
     /**
      * Capitalizes the items in the list.
      * Handles multi-word strings and keeps in mind any special cases for capitalization.
@@ -135,16 +135,36 @@ public class MainController implements IController {
         return Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase();
     }
 
+    /**
+     * Gets the API call for job search.
+     * 
+     * @param query The search query
+     * @param numberOfResults The number of results to return
+     * @param location The location to filter by
+     * @param industry The industry to filter by
+     * @return List of JobRecord objects
+     */
     @Override
     public List<JobRecord> getApiCall(String query, Integer numberOfResults, String location, String industry) {
         return model.searchJobs(query, numberOfResults, location, industry);
     }
 
+    /**
+     * Gets the saved jobs.
+     * 
+     * @return List of JobRecord objects
+     */
     @Override
     public List<JobRecord> getSavedJobs() {
         return model.getJobRecords();
     }
 
+    /**
+     * Sets the saved jobs.
+     * 
+     * @param savedJobs List of JobRecord objects to set
+     * @return List of JobRecord objects
+     */
     public List<JobRecord> setSavedJobs(List<JobRecord> savedJobs) {
         for (JobRecord job : savedJobs) {
             model.addJob(job);
@@ -154,30 +174,48 @@ public class MainController implements IController {
         return savedJobsList;
     }
 
+    /**
+     * Adds a job to the saved jobs list.
+     * 
+     * @param jobRecord The JobRecord object to add
+     */
     @Override
     public void getAddJob(JobRecord jobRecord) {
         model.addJob(jobRecord);
     }
 
+    /**
+     * Removes a job from the saved jobs list.
+     * 
+     * @param index The index of the job to remove
+     */
     @Override
     public void getRemoveJob(int index) {
         model.removeJob(index);
     }
 
 
-    //IDEA: maybe maybe saveJobsToCsv can be generalized with the exportSavedJobs
+    /**
+     * Saves the job records to a CSV file.
+     */
     @Override
     public void getSavedJobsToCsv(String filePath) {
         model.saveJobsToCsv(filePath);
     }
 
-    
+    /**
+     * Exports the saved jobs to a specified format and file path.
+     */
     @Override
     public void getExportSavedJobs(List<JobRecord> jobs, String formatStr, String filePath) {
         model.exportSavedJobs(jobs, formatStr, filePath);
     }
 
-
+    /**
+     * Gets the saved jobs tab.
+     * 
+     * @return The saved jobs tab
+     */
     public SavedJobsTab getSavedJobsTab() {
         return savedJobsTab;
     }
