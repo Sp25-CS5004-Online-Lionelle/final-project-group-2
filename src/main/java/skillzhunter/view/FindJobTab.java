@@ -203,7 +203,7 @@ public class FindJobTab extends JobView {
             } else {
                 // Show friendly message if no results found
                 JOptionPane.showMessageDialog(this,
-                        "No jobs found or search failed.\nTry different keywords, a smaller result size, or another location.",
+                        "No jobs found.\nTry different keywords, a smaller result size, or another location.",
                         "No Results Found",
                         JOptionPane.INFORMATION_MESSAGE);
             }
