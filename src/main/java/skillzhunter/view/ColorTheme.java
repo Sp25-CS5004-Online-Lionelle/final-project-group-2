@@ -20,10 +20,19 @@ public class ColorTheme {
     public final Color fieldForeground;
     /** The button foreground color */
     public final Color buttonForeground;
-    // Platform-specific tab colors replace these generic ones
     /** The label color */
     public final Color labelForeground;
-
+    
+    // Menu bar colors
+    /** The menu bar background for light theme */
+    public final Color menuBarBackgroundLight;
+    /** The menu bar foreground for light theme */
+    public final Color menuBarForegroundLight;
+    /** The menu bar background for dark theme */
+    public final Color menuBarBackgroundDark;
+    /** The menu bar foreground for dark theme */
+    public final Color menuBarForegroundDark;
+    
     // Platform-specific tab colors for Windows/Linux
     /** Selected tab background color for Windows/Linux in Light theme */
     public final Color winSelectedBgLight;
@@ -77,6 +86,8 @@ public class ColorTheme {
     private ColorTheme(Color buttonNormal, Color buttonHover, Color background,
                        Color foreground, Color fieldBackground, Color fieldForeground,
                        Color buttonForeground, Color labelForeground,
+                       Color menuBarBackgroundLight, Color menuBarForegroundLight,
+                       Color menuBarBackgroundDark, Color menuBarForegroundDark,
                        Color winSelectedBgLight, Color winSelectedFgLight,
                        Color winUnselectedBgLight, Color winUnselectedFgLight,
                        Color winSelectedBgDark, Color winSelectedFgDark,
@@ -95,6 +106,12 @@ public class ColorTheme {
         this.fieldForeground = fieldForeground;
         this.buttonForeground = buttonForeground;
         this.labelForeground = labelForeground;
+        
+        // Menu bar colors
+        this.menuBarBackgroundLight = menuBarBackgroundLight;
+        this.menuBarForegroundLight = menuBarForegroundLight;
+        this.menuBarBackgroundDark = menuBarBackgroundDark;
+        this.menuBarForegroundDark = menuBarForegroundDark;
         
         // Platform-specific tab colors
         this.winSelectedBgLight = winSelectedBgLight;
@@ -131,6 +148,12 @@ public class ColorTheme {
         Color.BLACK,                // Field foreground: Black text
         Color.WHITE,                // Button foreground: White text
         Color.BLACK,                // Label foreground: Black
+        
+        // Menu bar colors - Light theme
+        Color.WHITE,                // Menu bar background - Light theme
+        Color.BLACK,                // Menu bar foreground - Light theme
+        new Color(43, 43, 43),      // Menu bar background - Dark theme
+        Color.WHITE,                // Menu bar foreground - Dark theme
         
         // Windows/Linux tab colors - Light theme
         new Color(202, 220, 245),   // WIN_SELECTED_BG_LIGHT
@@ -173,6 +196,12 @@ public class ColorTheme {
         new Color(240, 240, 240),   // Field foreground: Light gray text
         Color.WHITE,                // Button foreground: White text
         Color.WHITE,                // Label foreground: White
+        
+        // Menu bar colors - Light theme
+        Color.WHITE,                // Menu bar background - Light theme
+        Color.BLACK,                // Menu bar foreground - Light theme
+        new Color(43, 43, 43),      // Menu bar background - Dark theme
+        Color.WHITE,                // Menu bar foreground - Dark theme
         
         // Windows/Linux tab colors - Light theme
         new Color(202, 220, 245),   // WIN_SELECTED_BG_LIGHT
