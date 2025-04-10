@@ -135,6 +135,13 @@ public class CustomHeader implements TableCellRenderer {
         if (comp instanceof JLabel) {
             JLabel label = (JLabel) comp;
             
+            // Special case for Logo column - don't show any sort icon
+            if (column == 0 && "Logo".equals(value)) {
+                label.setIcon(null);
+                label.setHorizontalAlignment(JLabel.CENTER); // Center the Logo text
+                return label;
+            }
+            
             // Choose icons based on the current theme
             ImageIcon downArrow = isDarkMode ? downArrowDark : downArrowLight;
             ImageIcon upArrow = isDarkMode ? upArrowDark : upArrowLight;
