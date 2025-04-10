@@ -194,7 +194,27 @@ public class Jobs implements IModel {
             throw new RuntimeException("Error writing to CSV file", e);
         }
     }
+    /**
+     * Exports the saved jobs to a specified format and file path.
+     * @param jobs List of JobRecord objects to export
+     * @param formatStr Format string (e.g., "CSV", "JSON")
+     * @param filePath Path to the output file
+     */
+    @Override
+    public void exportSavedJobs(List<JobRecord> jobs, String formatStr, String filePath) {
+        // Check if the format is valid
+        Formats format = Formats.containsValues(formatStr);
+        if (format == null) {
+            throw new IllegalArgumentException("Unsupported format: " + formatStr);
+        }
 
+        // Export the jobs to the specified file
+        try (OutputStream out = new FileOutputStream(filePath)) {
+            DataFormatter.write(jobs, format, out);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to export jobs: " + e.getMessage(), e);
+        }
+    }
     /**
      * Main method for testing purposes.
      * @param args Command line arguments (not used).

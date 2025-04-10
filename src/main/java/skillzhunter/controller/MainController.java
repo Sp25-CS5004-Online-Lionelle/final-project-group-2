@@ -132,21 +132,8 @@ public class MainController implements IController {
 
     
     @Override
-    public void exportSavedJobs(List<JobRecord> jobs, String formatStr, String filePath) {
-        //IDEA: move code in here to IModel and what if we made CSV the default format..?
-        Formats format = Formats.containsValues(formatStr); // Check if the format is valid
-        
-        // Handle unsupported formats
-        if (format == null) {
-            throw new IllegalArgumentException("Unsupported format: " + formatStr);
-        }
-
-        // Export the jobs to the specified file
-        try (OutputStream out = new FileOutputStream(filePath)) {
-            DataFormatter.write(jobs, format, out);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to export jobs: " + e.getMessage(), e);
-        }
+    public void getExportSavedJobs(List<JobRecord> jobs, String formatStr, String filePath) {
+        model.exportSavedJobs(jobs, formatStr, filePath);
     }
 
 
