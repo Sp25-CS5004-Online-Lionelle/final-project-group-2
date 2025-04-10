@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -25,10 +26,12 @@ public class SavedJobsTab extends JobView {
     private ThemedButton saveButton;
     private ThemedButton exportButton;
 
-    //Open image for open job button
+    //Icons for buttons and dialogs
     private ImageIcon openIcon;
     private ImageIcon saveIcon;
     private ImageIcon exportIcon;
+    private ImageIcon warningIcon;
+    private ImageIcon successIcon;
     
     public SavedJobsTab(IController controller, List<JobRecord> savedJobs) {
         super();
@@ -37,9 +40,10 @@ public class SavedJobsTab extends JobView {
         this.openIcon = loadIcon("images/open.png");
         this.saveIcon = loadIcon("images/saveIcon.png");
         this.exportIcon = loadIcon("images/exportIcon.png");
+        this.warningIcon = loadIcon("images/warning.png");
+        this.successIcon = loadIcon("images/success.png");  // You may need to create this icon or use an existing one
         super.initView();
         updateJobsList(savedJobs);
-
     }
 
     /**
@@ -63,6 +67,7 @@ public class SavedJobsTab extends JobView {
 
         return null;
     }
+    
     @Override
     public JPanel makeTopButtonPanel() {
         //Blank top row override
@@ -109,27 +114,41 @@ public class SavedJobsTab extends JobView {
             JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
 
             if (savedJobs.isEmpty()) {
+                // Use warning icon for empty list notification
                 JOptionPane.showMessageDialog(parentFrame,
                     "No jobs to save.",
                     "Save Jobs",
-                    JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.INFORMATION_MESSAGE,
+                    warningIcon);
             } else {
-                // Ask for confirmation before saving - use parentFrame for centering
-                int result = JOptionPane.showConfirmDialog(
-                    parentFrame,
+                // Create a custom confirm dialog using JOptionPane
+                JOptionPane optionPane = new JOptionPane(
                     "Are you sure you want to save " + savedJobs.size() + " job(s) to file?",
-                    "Confirm Save",
-                    JOptionPane.YES_NO_OPTION
-                );
+                    JOptionPane.QUESTION_MESSAGE,
+                    JOptionPane.YES_NO_OPTION);
+                
+                // Set a custom icon for the dialog
+                optionPane.setIcon(saveIcon);
+                
+                // Create and display the dialog
+                JDialog dialog = optionPane.createDialog(parentFrame, "Confirm Save");
+                dialog.setVisible(true);
+                
+                // Get the result
+                Object value = optionPane.getValue();
+                int result = (value instanceof Integer) ? (Integer) value : JOptionPane.CLOSED_OPTION;
 
                 if (result == JOptionPane.YES_OPTION) {
                     // Save to data/SavedJobs.csv in a fixed location (overwrite each time)
                     String filePath = "data/SavedJobs.csv";
                     controller.getSavedJobsToCsv(filePath);
+                    
+                    // Use save icon for success message
                     JOptionPane.showMessageDialog(parentFrame,
                         "Jobs successfully saved to " + filePath,
                         "Save Complete",
-                        JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.INFORMATION_MESSAGE,
+                        successIcon);
                 }
             }
         });
@@ -145,23 +164,33 @@ public class SavedJobsTab extends JobView {
             // Find the parent frame for centering dialogs
             JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
 
-
             if (savedJobs.isEmpty()) {
+                // Use warning icon for empty list notification
                 JOptionPane.showMessageDialog(parentFrame,
-                "No jobs to export.",
-                "Export Jobs",
-                JOptionPane.INFORMATION_MESSAGE);
+                    "No jobs to export.",
+                    "Export Jobs",
+                    JOptionPane.INFORMATION_MESSAGE,
+                    warningIcon);
                 return;
             }
 
             if (selectedFormat != null) {
-                // Ask for confirmation before exporting - use parentFrame for centering
-                int result = JOptionPane.showConfirmDialog(
-                    parentFrame,
+                // Create a custom confirm dialog using JOptionPane for export
+                JOptionPane optionPane = new JOptionPane(
                     "Are you sure you want to export to " + selectedFormat + "?",
-                    "Confirm Export",
-                    JOptionPane.YES_NO_OPTION
-                );
+                    JOptionPane.QUESTION_MESSAGE,
+                    JOptionPane.YES_NO_OPTION);
+                
+                // Set export icon for the dialog
+                optionPane.setIcon(exportIcon);
+                
+                // Create and display the dialog
+                JDialog dialog = optionPane.createDialog(parentFrame, "Confirm Export");
+                dialog.setVisible(true);
+                
+                // Get the result
+                Object value = optionPane.getValue();
+                int result = (value instanceof Integer) ? (Integer) value : JOptionPane.CLOSED_OPTION;
 
                 if (result == JOptionPane.YES_OPTION) {
                     // Export to a file
@@ -174,20 +203,19 @@ public class SavedJobsTab extends JobView {
                         String filePath = fd.getDirectory() + fd.getFile();
                         controller.getExportSavedJobs(savedJobs, selectedFormat, filePath);
 
-                        // Show success message
+                        // Show success message with export icon
                         JOptionPane.showMessageDialog(parentFrame,
                             "Jobs successfully exported in " + selectedFormat + " format to:\n" + filePath,
                             "Export Complete",
-                            JOptionPane.INFORMATION_MESSAGE);
+                            JOptionPane.INFORMATION_MESSAGE,
+                            exportIcon);
                     }
                 }
             }
         });
 
-
         return bottomRow;
     }
-
 
     private void openSelectedJob() {
         int viewIdx = jobsTable.getSelectedRow();
