@@ -7,9 +7,6 @@ import java.awt.BorderLayout;
 import java.util.List;
 
 import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -26,12 +23,7 @@ public class MainView extends JFrame implements IView {
     private JTabbedPane tabbedPane;
     private TabStyleManager tabStyleManager;
     final private IController controller;
-    private JMenuItem exit;
-    private JMenuItem csvDownload;
-    private JMenuItem jsonDownload;
-    private JMenuItem xmlDownload;
-    private JMenuItem lightMode;
-    private JMenuItem darkMode;
+    private CustomMenuBar customMenuBar;
     private ColorTheme theme;
 
     public MainView(IController controller) {
@@ -52,15 +44,14 @@ public class MainView extends JFrame implements IView {
 
         // Adds tabs to main view
         mainPane.add(tabbedPane);
-        add(mainPane);
+        add(mainPane, BorderLayout.CENTER);
 
         // Create tab style manager
         String[] tabNames = {"Find Jobs", "Saved Jobs"};
         tabStyleManager = new TabStyleManager(tabbedPane, tabNames);
 
-        // Adding menu bar
-        JMenuBar menuBar = createMenuBar();
-        setJMenuBar(menuBar);
+        // Create custom menu
+        createCustomMenu();
         
         // Apply the theme after everything is set up
         applyTheme(theme);
@@ -95,89 +86,33 @@ public class MainView extends JFrame implements IView {
     }
 
     /**
-     * Returns menu logic for the main view
+     * Creates and adds the custom menu bar to the frame
      */
-    private JMenuBar createMenuBar() {
-        // settings
-        JMenuBar menuBar = new JMenuBar();
-        JMenu settings = new JMenu();
-        try {
-            java.net.URL imgURL = getClass().getClassLoader().getResource("images/SettingsIcon.png");
-            if (imgURL != null) {
-                javax.swing.ImageIcon icon = new javax.swing.ImageIcon(imgURL);
-                java.awt.Image scaledImage = icon.getImage().getScaledInstance(24, 24, java.awt.Image.SCALE_SMOOTH);
-                settings.setIcon(new javax.swing.ImageIcon(scaledImage));
-                
-                settings.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 0, 10, 0)); // Top, Left, Bottom, Right
-                
-                settings.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR)); // Set hand cursor
-            } else {
-                System.err.println("Couldn't find file: images/SettingsIcon.png");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    
-        exit = new JMenuItem("Exit");
-    
-        // download
-        JMenu menuDownload = new JMenu("Download Data");
-        csvDownload = new JMenuItem("csv");
-        jsonDownload = new JMenuItem("json");
-        xmlDownload = new JMenuItem("xml");
-        menuDownload.add(xmlDownload);
-        menuDownload.add(jsonDownload);
-        menuDownload.add(csvDownload);
-    
-        // view mode
-        JMenu viewMenu = new JMenu("View Mode");
-        try {
-            java.net.URL lightModeImgURL = getClass().getClassLoader().getResource("images/LightModeIcon.png");
-            if (lightModeImgURL != null) {
-            javax.swing.ImageIcon lightModeIcon = new javax.swing.ImageIcon(lightModeImgURL);
-            java.awt.Image scaledLightModeImage = lightModeIcon.getImage().getScaledInstance(12, 12, java.awt.Image.SCALE_SMOOTH);
-            lightMode = new JMenuItem(new javax.swing.ImageIcon(scaledLightModeImage));
-            } else {
-            System.err.println("Couldn't find file: images/LightModeIcon.png");
-            lightMode = new JMenuItem("Light Mode");
-            }
-
-            java.net.URL darkModeImgURL = getClass().getClassLoader().getResource("images/DarkModeIcon.png");
-            if (darkModeImgURL != null) {
-            javax.swing.ImageIcon darkModeIcon = new javax.swing.ImageIcon(darkModeImgURL);
-            java.awt.Image scaledDarkModeImage = darkModeIcon.getImage().getScaledInstance(12, 12, java.awt.Image.SCALE_SMOOTH);
-            darkMode = new JMenuItem(new javax.swing.ImageIcon(scaledDarkModeImage));
-            } else {
-            System.err.println("Couldn't find file: images/DarkModeIcon.png");
-            darkMode = new JMenuItem("Dark Mode");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            lightMode = new JMenuItem("Light Mode");
-            darkMode = new JMenuItem("Dark Mode");
-        }
-        viewMenu.add(lightMode);
-        viewMenu.add(darkMode);
-    
-        // add menu items to settings
-        settings.add(menuDownload);
-        settings.add(viewMenu);
-        settings.add(exit);
-        menuBar.add(settings);
-    
+    private void createCustomMenu() {
+        // Create our custom menu bar
+        customMenuBar = new CustomMenuBar();
+        
+        // Add the custom menu to the top of the frame
+        getContentPane().add(customMenuBar, BorderLayout.NORTH);
+        
+        // Map menu events
         mapMenuEvents();
-        return menuBar;
-    }    
+    }
 
-    private void mapMenuEvents(){
+    /**
+     * Maps action listeners to menu items
+     */
+    private void mapMenuEvents() {
         // Exit Functionality
-        exit.addActionListener(exitEvent -> {
+        customMenuBar.getExitItem().addActionListener(exitEvent -> {
             int result = JOptionPane.showConfirmDialog(tabbedPane, "Are you sure you want to exit?", "Exit", JOptionPane.YES_NO_OPTION);
             if (result == JOptionPane.YES_OPTION) {
                 System.exit(0);
             }
         });
-        darkMode.addActionListener(e -> {
+        
+        // Theme switching
+        customMenuBar.getDarkModeItem().addActionListener(e -> {
             theme = ColorTheme.DARK;
             applyTheme(theme);
             SwingUtilities.updateComponentTreeUI(this);
@@ -188,7 +123,7 @@ public class MainView extends JFrame implements IView {
             });
         });
 
-        lightMode.addActionListener(e -> {
+        customMenuBar.getLightModeItem().addActionListener(e -> {
             theme = ColorTheme.LIGHT;
             applyTheme(theme);
             SwingUtilities.updateComponentTreeUI(this);
@@ -198,6 +133,8 @@ public class MainView extends JFrame implements IView {
                 applyTheme(theme);
             });
         });
+        
+        // Download options could be added here if needed
     }
     
     /**
@@ -208,10 +145,9 @@ public class MainView extends JFrame implements IView {
         getContentPane().setBackground(theme.background);
         mainPane.setBackground(theme.background);
         
-        // Apply to menu bar
-        if (getJMenuBar() != null) {
-            getJMenuBar().setBackground(theme.background);
-            getJMenuBar().setForeground(theme.foreground);
+        // Apply theme to custom menu
+        if (customMenuBar != null) {
+            customMenuBar.applyTheme(theme);
         }
         
         // Apply theme to tabs using the TabStyleManager
@@ -228,7 +164,7 @@ public class MainView extends JFrame implements IView {
             savedJobTab.applyTheme(theme);
         }
         
-        // Repaint to show changes
+        // Force UI update and repaint
         repaint();
     }
 
@@ -238,7 +174,7 @@ public class MainView extends JFrame implements IView {
     } 
 
     @Override
-    public void run(){
+    public void run() {
         setVisible(true);
         
         // Apply theme once more after becoming visible
