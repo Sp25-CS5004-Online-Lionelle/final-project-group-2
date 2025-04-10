@@ -14,6 +14,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.JCheckBox;
@@ -172,12 +173,40 @@ public class FindJobTab extends JobView {
 
         // Set search action
         searchButton.addActionListener(e -> {
+            Object locationObj = locationCombo.getSelectedItem();
+            Object industryObj = industryCombo.getSelectedItem();
+            Object resultsObj = resultsCombo.getSelectedItem();
+            int numberOfResults = 10;
+
+            // If null, set to default values
+            String location = (locationObj != null) ? locationObj.toString() : "any";
+            String industry = (industryObj != null) ? industryObj.toString() : "any";
+
+            // If resultsObj is null, set to default
+            if (resultsObj instanceof Integer) {
+                numberOfResults = (Integer) resultsObj;
+            } else if (resultsObj instanceof String) {
+                try {
+                    numberOfResults = Integer.parseInt((String) resultsObj);
+                } catch (NumberFormatException ex) {
+                    numberOfResults = 10;
+                }
+            }
+            
+            // Perform search
             searchResults = controller.getApiCall(searchField.getText(), 
-                    (Integer) resultsCombo.getSelectedItem(),
-                    locationCombo.getSelectedItem().toString(), 
-                    industryCombo.getSelectedItem().toString());
-            setJobsList(searchResults);
-            updateVisualizationIfNeeded(searchResults);
+                    numberOfResults, location, industry);
+
+            if (searchResults != null && !searchResults.isEmpty()) {
+                setJobsList(searchResults);
+                updateVisualizationIfNeeded(searchResults);
+            } else {
+                // Show friendly message if no results found
+                JOptionPane.showMessageDialog(this,
+                        "No jobs found.\nTry different keywords, a smaller result size, or another location.",
+                        "No Results Found",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
         });
 
         return searchRow;
