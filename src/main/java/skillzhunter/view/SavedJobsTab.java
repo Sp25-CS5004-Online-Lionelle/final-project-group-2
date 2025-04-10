@@ -8,6 +8,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.List;
 import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -100,14 +101,19 @@ public class SavedJobsTab extends JobView {
         saveButton = new ThemedButton("Save Jobs");
         exportButton = new ThemedButton("Export Saved List");
 
+        // Create a dropdown for export formats
+        String[] formats = {"CSV", "JSON", "XML"};
+        JComboBox<String> formatDropdown = new JComboBox<>(formats);
+
         // Add buttons to panel
         bottomRow.add(openButton);
         bottomRow.add(saveButton);
         bottomRow.add(exportButton);
+        bottomRow.add(formatDropdown);
 
         // Set listeners
         openButton.addActionListener(e -> openSelectedJob());
-        //exportButton.addActionListener();
+
         saveButton.addActionListener(e -> {
             
             // Get the list of saved jobs
@@ -141,9 +147,60 @@ public class SavedJobsTab extends JobView {
                 }
             }
         });
+
+        exportButton.addActionListener(e -> {
+
+            // Get the selected format from the dropdown
+            String selectedFormat = (String) formatDropdown.getSelectedItem();
+
+            // Get the list of saved jobs
+            List<JobRecord> savedJobs = controller.getSavedJobs();
+            
+            // Find the parent frame for centering dialogs
+            JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+
         
+            if (savedJobs.isEmpty()) {
+                JOptionPane.showMessageDialog(parentFrame,
+                "No jobs to export.", 
+                "Export Jobs",
+                JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            
+            if (selectedFormat != null) {
+                // Ask for confirmation before exporting - use parentFrame for centering
+                int result = JOptionPane.showConfirmDialog(
+                    parentFrame,
+                    "Are you sure you want to export to " + selectedFormat + "?",
+                    "Confirm Export",
+                    JOptionPane.YES_NO_OPTION
+                );
+                
+                if (result == JOptionPane.YES_OPTION) {
+                    // Export to a file
+                    FileDialog fd = new FileDialog(parentFrame, "Save File", FileDialog.SAVE);
+                    fd.setFile("SavedJobs." + selectedFormat.toLowerCase());
+                    fd.setVisible(true);
+
+                    // Get the selected file path
+                    if (fd.getFile() != null) {
+                        String filePath = fd.getDirectory() + fd.getFile();
+                        controller.exportSavedJobs(savedJobs, selectedFormat, filePath);
+        
+                        // Show success message
+                        JOptionPane.showMessageDialog(parentFrame,
+                            "Jobs successfully exported in " + selectedFormat + " format to:\n" + filePath,
+                            "Export Complete",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }
+            }
+        });
+
         return bottomRow;
     }
+
 
     private void openSelectedJob() {
         int viewIdx = jobsTable.getSelectedRow();
