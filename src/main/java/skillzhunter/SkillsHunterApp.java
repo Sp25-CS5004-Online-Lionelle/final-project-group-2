@@ -29,7 +29,6 @@ public class SkillsHunterApp {
         IModel model = mainController.getModel();
         IView mainView = mainController.getView();
         mainView.run();
-        //have controller start the application
     }
 
 }

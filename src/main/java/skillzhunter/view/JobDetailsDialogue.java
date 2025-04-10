@@ -5,14 +5,24 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.Dimension;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.net.URL;
+import java.net.HttpURLConnection;
+import java.io.InputStream;
 import java.util.List;
+import javax.imageio.ImageIO;
 
 import skillzhunter.model.JobRecord;
 import skillzhunter.controller.IController;
 import skillzhunter.controller.MainController;
 
 public class JobDetailsDialogue {
+
+    // The size for company logos
+    private static final int LOGO_WIDTH = 64;
+    private static final int LOGO_HEIGHT = 64;
 
     /**
      * Loads an icon from the resources folder.
@@ -35,6 +45,58 @@ public class JobDetailsDialogue {
         return null;
     }
 
+    /**
+     * Attempts to load a company logo from a URL.
+     * If loading fails, returns the default icon.
+     * 
+     * @param logoUrl The URL of the company logo
+     * @return The loaded logo as an ImageIcon, or a default icon if loading fails
+     */
+    private static ImageIcon loadCompanyLogo(String logoUrl) {
+        if (logoUrl == null || logoUrl.isEmpty()) {
+            return loadIcon("images/idea.png"); // Default fallback
+        }
+        
+        try {
+            // Create URL
+            URL url = new URL(logoUrl);
+            
+            // Open connection
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+            
+            // Set browser-like headers to avoid being blocked
+            connection.setRequestProperty("User-Agent", 
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36");
+            
+            // Connect and check response
+            int responseCode = connection.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                System.err.println("HTTP error when loading logo: " + responseCode);
+                return loadIcon("images/idea.png"); // Fallback to default
+            }
+            
+            // Read the image
+            try (InputStream in = connection.getInputStream()) {
+                Image image = ImageIO.read(in);
+                
+                if (image != null) {
+                    // Resize the image
+                    Image resized = image.getScaledInstance(LOGO_WIDTH, LOGO_HEIGHT, Image.SCALE_SMOOTH);
+                    return new ImageIcon(resized);
+                } else {
+                    System.err.println("Failed to decode logo image");
+                    return loadIcon("images/idea.png"); // Fallback to default
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading company logo from " + logoUrl + ": " + e.getMessage());
+            return loadIcon("images/idea.png"); // Fallback to default
+        }
+    }
+
     public static void showJobDetails(Component parent, JobRecord job, List<JobRecord> savedJobs, IController controller) {
         if (job == null || controller == null) {
             ImageIcon errorIcon = loadIcon("images/warning.png");
@@ -49,9 +111,34 @@ public class JobDetailsDialogue {
         boolean jobPresent = savedJobs != null && savedJobs.contains(job);
         String dialogMsg = jobPresent ? "Remove this Job?" : "Save this Job?";
 
+        // Load company logo (or default icon if no logo available)
+        ImageIcon companyLogo = loadCompanyLogo(job.companyLogo());
+        JLabel logoLabel = new JLabel(companyLogo);
+        logoLabel.setHorizontalAlignment(JLabel.CENTER);
+        logoLabel.setPreferredSize(new Dimension(LOGO_WIDTH + 10, LOGO_HEIGHT + 10));
+        
+        // Create company header panel with logo and name - using vertical BoxLayout to maintain centering
+        JPanel companyPanel = new JPanel();
+        companyPanel.setLayout(new BoxLayout(companyPanel, BoxLayout.Y_AXIS));
+        
+        // Create a panel just for the logo to control its alignment
+        JPanel logoPanel = new JPanel();
+        logoPanel.add(logoLabel);
+        
+        // Company name with larger font
+        JLabel companyNameLabel = new JLabel(job.companyName());
+        companyNameLabel.setFont(new Font("Dialog", Font.BOLD, 16));
+        companyNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        // Add components to company panel with proper alignment
+        companyPanel.add(logoPanel);
+        companyPanel.add(Box.createVerticalStrut(5)); // Add spacing
+        companyPanel.add(companyNameLabel);
+
         // Use helper method to make non-editable JTextAreas
         JTextArea jobTitle = readOnlyArea(job.jobTitle());
-        JTextArea jobCompany = readOnlyArea(job.companyName());
+        jobTitle.setFont(new Font("Dialog", Font.BOLD, 14));
+        
         JTextArea jobIndustry = readOnlyArea(
             job.jobIndustry() != null ? 
                 String.join(", ", job.jobIndustry().stream()
@@ -100,47 +187,33 @@ public class JobDetailsDialogue {
             comments.setText(job.comments());
         }
 
-        // Create a panel with icon for the confirmation message
+        // Create a panel for the confirmation message using just text (no icon)
         JPanel confirmPanel = new JPanel();
         confirmPanel.setLayout(new BoxLayout(confirmPanel, BoxLayout.X_AXIS));
-        
-        // Load appropriate icon based on whether job is being saved or removed
-        ImageIcon actionIcon = jobPresent ? 
-            loadIcon("images/idea.png") : loadIcon("images/saveIcon.png");
-        
-        if (actionIcon != null) {
-            JLabel iconLabel = new JLabel(actionIcon);
-            confirmPanel.add(iconLabel);
-            confirmPanel.add(Box.createHorizontalStrut(10)); // Add some spacing
-        }
         
         JLabel confirmLabel = new JLabel(dialogMsg);
         confirmLabel.setFont(confirmLabel.getFont().deriveFont(Font.BOLD));
         confirmPanel.add(confirmLabel);
 
         Object[] obj = {
-            "Job Title: ", jobTitle, "Company: ", jobCompany, "Industry: ", jobIndustry,
+            companyPanel,
+            "Job Title: ", jobTitle, "Industry: ", jobIndustry,
             "Type: ", jobType, "Location: ", jobGeo, "Level: ", jobLevel, "Salary: ", jobSalaryRange,
             "Currency: ", jobCurrency, "Published: ", jobPubDate, starRating,
-            new JScrollPane(comments), confirmPanel  // Use the custom panel with icon instead of just text
+            new JScrollPane(comments), confirmPanel
         };
 
-        // Create a JOptionPane with custom icon for the dialog itself
+        // Create a JOptionPane without a custom icon for the dialog itself
         JOptionPane optionPane = new JOptionPane(
             obj,
-            JOptionPane.QUESTION_MESSAGE,
+            JOptionPane.PLAIN_MESSAGE,  // Changed to PLAIN_MESSAGE to remove default icon
             JOptionPane.YES_NO_OPTION
         );
-        
-        // Set a custom icon for the entire dialog
-        ImageIcon dialogIcon = loadIcon("images/idea.png");
-        if (dialogIcon != null) {
-            optionPane.setIcon(dialogIcon);
-        }
         
         // Create and display the dialog
         JDialog dialog = optionPane.createDialog(parent, "Job Details: ");
         dialog.setResizable(true);
+        dialog.setLocationRelativeTo(parent); // Explicitly center the dialog on the parent
         dialog.setVisible(true);
         
         // Get the result (return value is an Integer or null if closed)
