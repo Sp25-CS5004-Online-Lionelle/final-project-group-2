@@ -8,6 +8,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.List;
 import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -26,14 +27,19 @@ public class SavedJobsTab extends JobView {
 
     //Open image for open job button
     private ImageIcon openIcon;
+    private ImageIcon saveIcon;
+    private ImageIcon exportIcon;
     
     public SavedJobsTab(IController controller, List<JobRecord> savedJobs) {
         super();
         // set inherited field from jobview
         this.controller = controller;
-        super.initView();
         this.openIcon = loadIcon("images/open.png");
+        this.saveIcon = loadIcon("images/saveIcon.png");
+        this.exportIcon = loadIcon("images/exportIcon.png");
+        super.initView();
         updateJobsList(savedJobs);
+
     }
 
     /**
@@ -59,67 +65,53 @@ public class SavedJobsTab extends JobView {
     }
     @Override
     public JPanel makeTopButtonPanel() {
+        //Blank top row override
         JPanel topRow = new JPanel();
-        
-//        // Create the load button and store it as field
-//        loadButton = new ThemedButton("Load Job List from File");
-//        topRow.add(loadButton);
-//
-//        loadButton.addActionListener(e -> {
-//            Frame parentFrame = (Frame) SwingUtilities.getWindowAncestor(topRow);
-//            FileDialog fd = new FileDialog(parentFrame, "Pick file to load", FileDialog.LOAD);
-//            fd.setVisible(true);
-//
-//            String path = null;
-//            if (fd.getFile() != null) {
-//                File file = new File(fd.getDirectory(), fd.getFile());
-//                path = file.getPath();
-//            }
-//
-//            if (path != null) {
-//                // You can wire this up later to actually read the file into the model
-//                // For now, let's simulate grabbing the saved jobs from model
-//                List<JobRecord> savedJobs = controller.getSavedJobs();
-//            } else {
-//                System.out.println("No file selected.");
-//            }
-//        });
-
         return topRow;
     }
 
     @Override
     public JPanel makeBottomButtonPanel() {
         JPanel bottomRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        
+
         // Create save button and store it as field
         openButton = createThemedButton("Open Job");
         openButton.setIcon(openIcon);
         openButton.setHorizontalTextPosition(SwingConstants.LEFT);
         openButton.setIconTextGap(5); // optional: tweak spacing between text and icon
         saveButton = new ThemedButton("Save Jobs");
+        saveButton.setIcon(saveIcon);
+        saveButton.setHorizontalTextPosition(SwingConstants.LEFT);
+        saveButton.setIconTextGap(5);
         exportButton = new ThemedButton("Export Saved List");
+        exportButton.setIcon(exportIcon);
+        exportButton.setHorizontalTextPosition(SwingConstants.LEFT);
+        exportButton.setIconTextGap(5);
+
+        // Create a dropdown for export formats
+        String[] formats = {"CSV", "JSON", "XML"};
+        JComboBox<String> formatDropdown = new JComboBox<>(formats);
 
         // Add buttons to panel
         bottomRow.add(openButton);
         bottomRow.add(saveButton);
         bottomRow.add(exportButton);
+        bottomRow.add(formatDropdown);
 
         // Set listeners
         openButton.addActionListener(e -> openSelectedJob());
-        //exportButton.addActionListener();
         saveButton.addActionListener(e -> {
-            
+
             // Get the list of saved jobs
             List<JobRecord> savedJobs = controller.getSavedJobs();
-            
+
             // Find the parent frame for centering dialogs
             JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-            
+
             if (savedJobs.isEmpty()) {
-                JOptionPane.showMessageDialog(parentFrame, 
-                    "No jobs to save.", 
-                    "Save Jobs", 
+                JOptionPane.showMessageDialog(parentFrame,
+                    "No jobs to save.",
+                    "Save Jobs",
                     JOptionPane.INFORMATION_MESSAGE);
             } else {
                 // Ask for confirmation before saving - use parentFrame for centering
@@ -129,21 +121,73 @@ public class SavedJobsTab extends JobView {
                     "Confirm Save",
                     JOptionPane.YES_NO_OPTION
                 );
-                
+
                 if (result == JOptionPane.YES_OPTION) {
                     // Save to data/SavedJobs.csv in a fixed location (overwrite each time)
                     String filePath = "data/SavedJobs.csv";
                     controller.getSavedJobsToCsv(filePath);
-                    JOptionPane.showMessageDialog(parentFrame, 
-                        "Jobs successfully saved to " + filePath, 
-                        "Save Complete", 
+                    JOptionPane.showMessageDialog(parentFrame,
+                        "Jobs successfully saved to " + filePath,
+                        "Save Complete",
                         JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         });
-        
+
+        exportButton.addActionListener(e -> {
+
+            // Get the selected format from the dropdown
+            String selectedFormat = (String) formatDropdown.getSelectedItem();
+
+            // Get the list of saved jobs
+            List<JobRecord> savedJobs = controller.getSavedJobs();
+
+            // Find the parent frame for centering dialogs
+            JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+
+
+            if (savedJobs.isEmpty()) {
+                JOptionPane.showMessageDialog(parentFrame,
+                "No jobs to export.",
+                "Export Jobs",
+                JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
+            if (selectedFormat != null) {
+                // Ask for confirmation before exporting - use parentFrame for centering
+                int result = JOptionPane.showConfirmDialog(
+                    parentFrame,
+                    "Are you sure you want to export to " + selectedFormat + "?",
+                    "Confirm Export",
+                    JOptionPane.YES_NO_OPTION
+                );
+
+                if (result == JOptionPane.YES_OPTION) {
+                    // Export to a file
+                    FileDialog fd = new FileDialog(parentFrame, "Save File", FileDialog.SAVE);
+                    fd.setFile("SavedJobs." + selectedFormat.toLowerCase());
+                    fd.setVisible(true);
+
+                    // Get the selected file path
+                    if (fd.getFile() != null) {
+                        String filePath = fd.getDirectory() + fd.getFile();
+                        controller.exportSavedJobs(savedJobs, selectedFormat, filePath);
+
+                        // Show success message
+                        JOptionPane.showMessageDialog(parentFrame,
+                            "Jobs successfully exported in " + selectedFormat + " format to:\n" + filePath,
+                            "Export Complete",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }
+            }
+        });
+
+
         return bottomRow;
     }
+
 
     private void openSelectedJob() {
         int viewIdx = jobsTable.getSelectedRow();
@@ -163,7 +207,7 @@ public class SavedJobsTab extends JobView {
         if (openButton != null) {
             openButton.applyTheme(theme);
         }
-        
+
         if (saveButton != null) {
             saveButton.applyTheme(theme);
         }
