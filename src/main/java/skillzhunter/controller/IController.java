@@ -29,9 +29,4 @@ public interface IController {
     void exportSavedJobs(List<JobRecord> jobs, String formatStr, String filePath);
     /** gets saved jobs */
     List<JobRecord> getSavedJobs();
-    /** updates comments */
-    JobRecord updateComments(int id, String comments);
-    /** updates rating */
-    JobRecord updateRating(int id, int rating);
-
 }
