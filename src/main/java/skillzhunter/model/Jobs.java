@@ -58,6 +58,11 @@ public class Jobs implements IModel {
      */
     public void addJob(JobRecord job) {
         JobBean jobBean = new JobBean();
+
+        //idea: move this into a second constructor for the JobBean
+        //idea: private helper to replace all the tertiary operators
+        //  helper(job.getValue(), defaultValue) --> either the job value or the default value if the job value was empty or null
+
         jobBean.setId(job.id());
         jobBean.setJobTitle(job.jobTitle() != null && !job.jobTitle().isBlank() ? job.jobTitle() : "");
         jobBean.setCompanyName(job.companyName() != null && !job.companyName().isBlank() ? job.companyName() : "");
@@ -95,8 +100,6 @@ public class Jobs implements IModel {
     public List<JobRecord> getJobRecords() {
         if (jobList.isEmpty()) {
             System.out.println("Job List is empty. Ensure jobs are added before retrieving.");
-        } else {
-            //System.out.println("Job List: " + jobList);
         }
         return new ArrayList<>(jobList);
     }
@@ -123,6 +126,8 @@ public class Jobs implements IModel {
             if (job.id() == id) {
                 //make job into bean
                 JobBean jobBean = new JobBean();
+
+                //IDEA: condense this, similar to addJob method above
                 jobBean.setId(job.id());
                 jobBean.setJobTitle(job.jobTitle());
                 jobBean.setCompanyName(job.companyName());
@@ -134,6 +139,7 @@ public class Jobs implements IModel {
                 jobBean.setAnnualSalaryMax(job.annualSalaryMax());
                 jobBean.setSalaryCurrency(job.salaryCurrency());
                 jobBean.setPubDate(job.pubDate());
+
                 //setcomments and rating in bean
                 jobBean.setComments(comments);
                 jobBean.setRating(rating);
@@ -189,7 +195,6 @@ public class Jobs implements IModel {
         }
     }
 
-   
     /**
      * Main method for testing purposes.
      * @param args Command line arguments (not used).
