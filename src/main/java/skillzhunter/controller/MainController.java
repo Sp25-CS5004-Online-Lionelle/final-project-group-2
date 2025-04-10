@@ -3,7 +3,10 @@ package skillzhunter.controller;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import skillzhunter.model.IModel;
 import skillzhunter.model.JobRecord;
@@ -16,10 +19,17 @@ import skillzhunter.view.SavedJobsTab;
 
 public class MainController implements IController {
 
+    /** Model */
     private IModel model;
+    /** View */
     private IView view;
+    /** Saved jobs tab */
     private SavedJobsTab savedJobsTab;
 
+    /**
+     * Constructor for MainController.
+     * Initializes the model and view.
+     */
     public MainController() {
         // Model
         model = new Jobs();
@@ -31,67 +41,98 @@ public class MainController implements IController {
         view = new MainView(this);  // You might want to make sure MainView takes savedJobsTab
     }
 
-    protected void setView(IView view) {
-        this.view = view;
-    }
-
-    protected void setModel(IModel model) {
-        this.model = model;
-        savedJobsTab.updateJobsList(model.getJobRecords());
-    }
-
+    /**
+     * Returns the view.
+     * 
+     * @return The view
+     */
     @Override
     public IView getView() {
         return view;
     }
 
+    /**
+     * Sets the view and updates the saved jobs tab.
+     * 
+     * @param view The view to set
+     */
+    protected void setView(IView view) {
+        this.view = view;
+    }
+
+    /**
+     * Returns the model.
+     */
     @Override
     public IModel getModel() {
         return model;
     }
 
-// if location do this by location if industry do same thing by industry
-// noun is location or industry and do these things but with those names?
-//  could create enum then have case switch OR might be able to use method reference class::methodName OR something else
-// or everything in the map after lambda could be helper
+    /**
+     * Sets the model and updates the saved jobs tab.
+     * 
+     * @param model The model to set
+     */
+    protected void setModel(IModel model) {
+        this.model = model;
+        savedJobsTab.updateJobsList(model.getJobRecords());
+    }
+    
+
+    /**
+     * Gets the locations from the API and capitalizes them appropriately.
+     */
     @Override
     public List<String> getLocations() {
-        return model.getLocations().stream()
-                .map(location -> {
-                    String[] words = location.split(" ");
-                    StringBuilder capitalizedLocation = new StringBuilder();
+        return capitalizeItems(model.getLocations(), Collections.emptyMap());
+    }
+
+    /**
+     * Gets the industries from the API and capitalizes them appropriately.
+     */
+    @Override
+    public List<String> getIndustries() {
+        Map<String, String> specialCases = new HashMap<>();
+        specialCases.put("hr", "HR");
+        return capitalizeItems(model.getIndustries(), specialCases);
+    }
+    
+    /**
+     * Capitalizes the items in the list.
+     * Handles multi-word strings and keeps in mind any special cases for capitalization.
+     * @param items List of strings to capitalize
+     * @param specialCases Map of special case words and their capitalization
+     * @return List of capitalized strings
+     */
+    private List<String> capitalizeItems(List<String> items, Map<String, String> specialCases) {
+        return items.stream()
+                .map(item -> {
+                    String[] words = item.split(" ");
+                    StringBuilder result = new StringBuilder();
+                    
                     for (String word : words) {
                         if (!word.isEmpty()) {
-                            capitalizedLocation.append(Character.toUpperCase(word.charAt(0)))
-                                    .append(word.substring(1).toLowerCase())
-                                    .append(" ");
+                            String lowerWord = word.toLowerCase();
+                            String capitalizedWord = specialCases.getOrDefault(lowerWord, capitalizeWord(word));
+                            result.append(capitalizedWord).append(" ");
                         }
                     }
-                    return capitalizedLocation.toString().trim();
+                    
+                    return result.toString().trim();
                 })
                 .toList();
     }
 
-    @Override
-    public List<String> getIndustries() {
-        return model.getIndustries().stream()
-                .map(industry -> {
-                    String[] words = industry.split(" ");
-                    StringBuilder capitalizedIndustry = new StringBuilder();
-                    for (String word : words) {
-                        if (!word.isEmpty()) {
-                            if (word.equalsIgnoreCase("hr")) {
-                                capitalizedIndustry.append("HR").append(" ");
-                            } else {
-                                capitalizedIndustry.append(Character.toUpperCase(word.charAt(0)))
-                                        .append(word.substring(1).toLowerCase())
-                                        .append(" ");
-                            }
-                        }
-                    }
-                    return capitalizedIndustry.toString().trim();
-                })
-                .toList();
+    /**
+     * Capitalizes a single word.
+     * @param word The word to capitalize
+     * @return The capitalized word
+     */
+    private String capitalizeWord(String word) {
+        if (word.isEmpty()) {
+            return word;
+        }
+        return Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase();
     }
 
     @Override
