@@ -186,7 +186,7 @@ public class FindJobTab extends JobView {
             searchResults = controller.getApiCall(searchField.getText(), 
                     numberOfResults, location, industry);
 
-            if (searchResults != null)) {
+            if (searchResults != null && !searchResults.isEmpty()) {
                 setJobsList(searchResults);
                 updateVisualizationIfNeeded(searchResults);
             } else {
