@@ -8,8 +8,8 @@ import skillzhunter.model.JobRecord;
 //* Static utility class to convert JobRecord collections into Object arrays for JTables */
 public final class JobsLoader {
 
-
-  private static String[] columnNames = { "Job Title", "Company",
+  // Updated to include Logo column
+  private static String[] columnNames = { "Logo", "Job Title", "Company",
       "Level", "Salary Range", "Currency" };
   private final Collection<JobRecord> jobs = new ArrayList<>();
 
@@ -31,7 +31,7 @@ public final class JobsLoader {
   //Converts a collection of jobs into a type that JTable can understand
   public static Object[][] getData(Collection<JobRecord> jobs) {
     List<JobRecord> jobList = jobs.stream().toList();
-    Object[][] data = new Object[jobList.size()][12];
+    Object[][] data = new Object[jobList.size()][6]; // 6 columns including logo
 
     for (int i = 0; i < jobList.size(); i++) {
       JobRecord record = jobList.get(i);
@@ -52,21 +52,35 @@ public final class JobsLoader {
       String salaryCurrency = (record.salaryCurrency() == null || record.salaryCurrency().isEmpty()) 
                 ? "N/A" 
                 : record.salaryCurrency();    
-      // Add data for each column
-      //data[i][0] = record.id();
-      data[i][0] = record.jobTitle();
-      data[i][1] = record.companyName();
-      //data[i][3] = industry;
-      //data[i][4] = jobType;
-      //data[i][5] = record.jobGeo();
-      data[i][2] = record.jobLevel();
-      data[i][3] = salaryRange;
-      data[i][4] = salaryCurrency;
-      //data[i][9] = record.pubDate();
-      //data[i][10] = record.rating();
-      //data[i][11] = record.comments();
+      
+      // Add data for each column including logo URL
+      data[i][0] = record.companyLogo(); // Logo URL in first column
+      data[i][1] = record.jobTitle();
+      data[i][2] = record.companyName();
+      data[i][3] = record.jobLevel();
+      data[i][4] = salaryRange;
+      data[i][5] = salaryCurrency;
     }
 
     return data;
+  }
+  
+  /**
+   * Gets the logo URLs from a collection of job records.
+   * This method can be useful for testing or debugging.
+   * 
+   * @param jobs Collection of job records
+   * @return Array of logo URLs
+   */
+  public static String[] getLogoUrls(Collection<JobRecord> jobs) {
+    List<JobRecord> jobList = jobs.stream().toList();
+    String[] logoUrls = new String[jobList.size()];
+    
+    for (int i = 0; i < jobList.size(); i++) {
+      JobRecord record = jobList.get(i);
+      logoUrls[i] = record.companyLogo();
+    }
+    
+    return logoUrls;
   }
 }

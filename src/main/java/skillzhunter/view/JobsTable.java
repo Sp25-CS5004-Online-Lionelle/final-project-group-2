@@ -1,6 +1,7 @@
 package skillzhunter.view;
 
 import java.awt.Dimension;
+import java.awt.Component;
 import java.util.Comparator;
 
 import javax.swing.JTable;
@@ -10,6 +11,7 @@ import javax.swing.SortOrder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 /**
@@ -19,9 +21,10 @@ public class JobsTable extends JTable {
 
   private DefaultTableModel tableModel;
   private TableRowSorter<DefaultTableModel> sorter;
-  private String[] columnNames = { "Job Title", "Company", "Level", "Salary Range", "Currency" };
+  private String[] columnNames = { "Logo", "Job Title", "Company", "Level", "Salary Range", "Currency" };
   private CustomHeader customHeaderRenderer;
   private ColorTheme currentTheme = ColorTheme.LIGHT; // Default theme
+  private ImageCellRenderer imageCellRenderer = new ImageCellRenderer();
 
   public JobsTable() {
     this(new String[] {}, new Object[0][0]);
@@ -55,6 +58,28 @@ public class JobsTable extends JTable {
     
     // Set up custom header renderer
     setupHeaderRenderer();
+    
+    // Set up custom cell renderer for image column
+    setupColumnRenderers();
+    
+    // Increase row height to give more space for images
+    setRowHeight(44);
+  }
+  
+  /**
+   * Sets up custom renderers for specific columns
+   */
+  private void setupColumnRenderers() {
+    // Set the logo column renderer (column 0)
+    if (getColumnCount() > 0) {
+      TableColumn logoColumn = getColumnModel().getColumn(0);
+      logoColumn.setCellRenderer(imageCellRenderer);
+      
+      // Set a fixed width for the logo column - wider to show "Logo" text fully
+      logoColumn.setPreferredWidth(60);
+      logoColumn.setMaxWidth(60);
+      logoColumn.setMinWidth(60);
+    }
   }
   
   /**
@@ -116,8 +141,14 @@ public class JobsTable extends JTable {
     // Re-apply the custom header renderer
     setupHeaderRenderer();
     
+    // Re-apply column renderers for logos
+    setupColumnRenderers();
+    
     // Re-apply the current theme to ensure consistent styling
     applyTheme(currentTheme);
+    
+    // Make sure we maintain the increased row height
+    setRowHeight(44);
   }
 
   /**
@@ -125,8 +156,8 @@ public class JobsTable extends JTable {
    */
   private void configureColumnSorters() {
     if (sorter != null) {
-      // Add special comparator for the Salary Range column (index 3)
-      sorter.setComparator(3, new Comparator<String>() {
+      // Add special comparator for the Salary Range column (index 4)
+      sorter.setComparator(4, new Comparator<String>() {
         @Override
         public int compare(String s1, String s2) {
           if (s1.equals("N/A") && s2.equals("N/A")) {
@@ -144,6 +175,9 @@ public class JobsTable extends JTable {
           return Integer.compare(min1, min2);
         }
       });
+      
+      // Disable sorting for the logo column
+      sorter.setSortable(0, false);
       
       // Enable single-column sorting mode
       sorter.setSortsOnUpdates(true);
@@ -168,6 +202,7 @@ public class JobsTable extends JTable {
   public void setColumnNames(String[] columnNames) {
     tableModel.setColumnIdentifiers(columnNames);
     setupHeaderRenderer(); // Reapply the custom header
+    setupColumnRenderers(); // Set up the image renderer for logo column
     
     // Re-apply theme to ensure consistent styling
     applyTheme(currentTheme);
@@ -199,5 +234,14 @@ public class JobsTable extends JTable {
 
   public String[] getColumnNames() {
     return this.columnNames;
+  }
+  
+  /**
+   * Clean up resources when the table is no longer needed
+   */
+  public void cleanup() {
+    if (imageCellRenderer != null) {
+      imageCellRenderer.clearCache();
+    }
   }
 }
