@@ -3,9 +3,7 @@ package skillzhunter.view;
 import java.awt.FileDialog;
 import java.awt.Frame;
 import java.awt.FlowLayout;
-import java.awt.Image;
 import java.io.File;
-import java.net.URL;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
@@ -37,35 +35,16 @@ public class SavedJobsTab extends JobView {
         super();
         // set inherited field from jobview
         this.controller = controller;
-        this.openIcon = loadIcon("images/open.png");
-        this.saveIcon = loadIcon("images/saveIcon.png");
-        this.exportIcon = loadIcon("images/exportIcon.png");
-        this.warningIcon = loadIcon("images/warning.png");
-        this.successIcon = loadIcon("images/success.png");  // You may need to create this icon or use an existing one
+        
+        // Use IconLoader to load icons
+        this.openIcon = IconLoader.loadIcon("images/open.png");
+        this.saveIcon = IconLoader.loadIcon("images/saveIcon.png");
+        this.exportIcon = IconLoader.loadIcon("images/exportIcon.png");
+        this.warningIcon = IconLoader.loadIcon("images/warning.png");
+        this.successIcon = IconLoader.loadIcon("images/success.png");
+        
         super.initView();
         updateJobsList(savedJobs);
-    }
-
-    /**
-     * Loads an icon from the resources folder.
-     *
-     * @param path The path to the icon
-     * @return The loaded icon, or null if it couldn't be loaded
-     */
-    private ImageIcon loadIcon(String path) {
-        try {
-            URL url = getClass().getClassLoader().getResource(path);
-            if (url != null) {
-                ImageIcon icon = new ImageIcon(url);
-                // Scale the image to an appropriate size for the header
-                Image img = icon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
-                return new ImageIcon(img);
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading icon: " + path);
-        }
-
-        return null;
     }
     
     @Override
