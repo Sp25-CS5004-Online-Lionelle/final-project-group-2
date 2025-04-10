@@ -23,7 +23,19 @@ public class SavedJobsLists {
      */
     public static List<JobRecord> getSavedJobs() {
         if (controller != null) {
-            return controller.getSavedJobs();
+            List<JobRecord> jobs = controller.getSavedJobs();
+            
+            // Debug code to check saved jobs for logo URLs
+            if (jobs != null && !jobs.isEmpty()) {
+                System.out.println("getSavedJobs() - Number of saved jobs: " + jobs.size());
+                for (JobRecord job : jobs) {
+                    System.out.println("Saved job: " + job.jobTitle() + ", Logo: " + job.companyLogo());
+                }
+            } else {
+                System.out.println("getSavedJobs() - No saved jobs found or jobs list is null");
+            }
+            
+            return jobs;
         }
         return new ArrayList<>();
     }
@@ -38,6 +50,11 @@ public class SavedJobsLists {
             System.err.println("Controller not set in SavedJobsLists");
             return;
         }
+        
+        // Debug log the job being saved
+        System.out.println("Adding job to saved list: " + job.jobTitle());
+        System.out.println("Company: " + job.companyName());
+        System.out.println("Logo URL: " + job.companyLogo());
         
         // Add to model through controller
         controller.getAddJob(job);
@@ -71,6 +88,9 @@ public class SavedJobsLists {
             System.err.println("Controller not set in SavedJobsLists");
             return;
         }
+        
+        // Debug log
+        System.out.println("Removing job from saved list: " + job.jobTitle());
         
         // Remove from model through controller
         controller.getRemoveJob(job.id());
