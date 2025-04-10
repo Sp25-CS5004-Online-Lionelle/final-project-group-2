@@ -117,30 +117,6 @@ public class TestJobs {
         assertTrue(removed);
         assertEquals(2, jobList.getJobRecords().size());  // After removal, there should be 2 jobs left
     }
-    @Test
-    public void testSearchByQuery() {
-        List<JobRecord> results = jobList.searchByQuery("AI");
-        assertEquals(1, results.size());
-        assertEquals(jobRecord1, results.get(0));
-    }
-    @Test
-    public void testSearchByLocation() {
-        List<JobRecord> results = jobList.searchByLocation("New York");
-        assertEquals(1, results.size());
-        assertEquals(jobRecord1, results.get(0));
-    }
-    @Test
-    public void testSearchByIndustry() {
-        List<JobRecord> results = jobList.searchByIndustry("Technology");
-        assertEquals(2, results.size());
-        assertTrue(results.contains(jobRecord1));
-        assertTrue(results.contains(jobRecord2));
-    }
-    @Test
-    public void testSearchByIndustryNotFound() {
-        List<JobRecord> results = jobList.searchByIndustry("Nonexistent Industry");
-        assertEquals(0, results.size());
-    }
 
     //add test for update jobs
     @Test

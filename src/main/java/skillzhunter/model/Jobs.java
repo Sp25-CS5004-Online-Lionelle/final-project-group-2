@@ -34,15 +34,16 @@ public class Jobs implements IModel {
         this.jobList = new ArrayList<>();
     }
 
-       /**
-     * retries pretty name for industry.
-     * @return List<String> pretty name for industry
+    /**
+     * Getter for industries.
+     * @return Map of industries based on keys and is sorted to a list.
      */
     public List<String> getIndustries() {
         return industriesMap.keySet().stream().sorted().toList();
     }
 
     /**
+     * TODO Java doc - this is terrible
      * retries pretty name for location.
      * @return List<String> pretty name for location
      */
@@ -109,16 +110,6 @@ public class Jobs implements IModel {
         return jobList.removeIf(job -> job.id() == id);
     }
 
-    public List<JobRecord> searchByQuery(String query) {
-        List<JobRecord> result = new ArrayList<>();
-        for (JobRecord job : jobList) {
-            if (job.jobTitle().toLowerCase().contains(query.toLowerCase())) {
-                result.add(job);
-            }
-        }
-        return result;
-    }
-
     //update comments and rating
     /**
      * Update a job's comments and rating.
@@ -163,30 +154,7 @@ public class Jobs implements IModel {
             }
         }
     }
-    /**
-     * Searches for jobs based on the given location.
-     * @param location The location to search for jobs in.
-     * @return A list of JobRecord objects representing the search results.
-     */
-    public List<JobRecord> searchByLocation(String location) {
-        List<JobRecord> result = new ArrayList<>();
-        for (JobRecord job : jobList) {
-            if (job.jobGeo().toLowerCase().contains(location.toLowerCase())) {
-                result.add(job);
-            }
-        }
-        return result;
-    }
 
-    public List<JobRecord> searchByIndustry(String industry) {
-        List<JobRecord> result = new ArrayList<>();
-        for (JobRecord job : jobList) {
-            if (job.jobIndustry().contains(industry)) {
-                result.add(job);
-            }
-        }
-        return result;
-    }
     /**
      * Searches for jobs based on the given parameters.
      * @param query The search query (e.g., job title, keywords).
@@ -239,24 +207,7 @@ public class Jobs implements IModel {
         System.out.println("Searched job: " + searchedJob);
         System.out.println(searchedJob);
 
-        // Search job by query
-        List<JobRecord> searchResults = jobs.searchByQuery("Python");
-        System.out.println("Search results for 'Python': " + searchResults);
-        for (JobRecord j : searchResults) {
-            System.out.println(j);
-        }
-        // Search job by location
-        List<JobRecord> locationResults = jobs.searchByLocation("NYC");
-        System.out.println("Search results for 'NYC': " + locationResults);
-        for (JobRecord j : locationResults) {
-            System.out.println(j);
-        }
-        // Search job by industry
-        List<JobRecord> industryResults = jobs.searchByIndustry("Tech");
-        System.out.println("Search results for 'Tech': " + industryResults);
-        for (JobRecord j : industryResults) {
-            System.out.println(j);
-        }
+       
         // Remove job
         System.out.println("Removing job with ID 1");
         jobs.removeJob(1);
