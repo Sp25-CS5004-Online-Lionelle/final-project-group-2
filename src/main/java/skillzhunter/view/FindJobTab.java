@@ -201,11 +201,23 @@ public class FindJobTab extends JobView {
                 setJobsList(searchResults);
                 updateVisualizationIfNeeded(searchResults);
             } else {
-                // Show friendly message if no results found
-                JOptionPane.showMessageDialog(this,
-                        "No jobs found.\nTry different keywords, a smaller result size, or another location.",
-                        "No Results Found",
-                        JOptionPane.INFORMATION_MESSAGE);
+                // Check if the number of results requested is too large
+                if (numberOfResults > 50) {
+                    ImageIcon warningIcon = loadIcon("images/warning.png");
+                    JOptionPane.showMessageDialog(this,
+                            "The number of results requested is too large.\nPlease try a smaller number.",
+                            "Too Many Results Requested",
+                            JOptionPane.WARNING_MESSAGE,
+                            warningIcon);
+                } else {
+                    // Show custom popup if no results found for the query
+                    ImageIcon errorIcon = loadIcon("images/warning.png");
+                    JOptionPane.showMessageDialog(this,
+                            "No jobs found for the given query.\nTry different keywords or filters.",
+                            "No Results Found",
+                            JOptionPane.INFORMATION_MESSAGE,
+                            errorIcon);
+                }
             }
         });
 
