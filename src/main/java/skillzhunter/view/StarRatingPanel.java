@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 
 /**
  * A custom JPanel that displays a star rating system.
@@ -130,27 +129,17 @@ public class StarRatingPanel extends JPanel {
     
     /**
      * Gets the icon for an empty (unfilled) star.
+     * Using IconLoader utility class.
      * 
      * @return The empty star icon
      */
     private ImageIcon getEmptyStar() {
-        // Try to load the star-empty.png image
-        ImageIcon icon = null;
-        try {
-            java.net.URL imgURL = getClass().getClassLoader().getResource("images/star-empty.png");
-            if (imgURL != null) {
-                icon = new ImageIcon(imgURL);
-                // Scale the image if needed
-                Image img = icon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
-                icon = new ImageIcon(img);
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading empty star icon: " + e.getMessage());
-        }
+        // Try to load the star-empty.png image using IconLoader
+        ImageIcon icon = IconLoader.loadIcon("images/star-empty.png", 20, 20);
         
         // If loading failed, use a text fallback
         if (icon == null) {
-            icon = createTextIcon("☆", Color.GRAY);
+            icon = IconLoader.createTextIcon("☆", 20);
         }
         
         return icon;
@@ -158,53 +147,19 @@ public class StarRatingPanel extends JPanel {
     
     /**
      * Gets the icon for a filled star.
+     * Using IconLoader utility class.
      * 
      * @return The filled star icon
      */
     private ImageIcon getFilledStar() {
-        // Try to load the star-filled.png image
-        ImageIcon icon = null;
-        try {
-            java.net.URL imgURL = getClass().getClassLoader().getResource("images/star-filled.png");
-            if (imgURL != null) {
-                icon = new ImageIcon(imgURL);
-                // Scale the image if needed
-                Image img = icon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
-                icon = new ImageIcon(img);
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading filled star icon: " + e.getMessage());
-        }
+        // Try to load the star-filled.png image using IconLoader
+        ImageIcon icon = IconLoader.loadIcon("images/star-filled.png", 20, 20);
         
-        // If loading failed, use a text fallback
+        // If loading failed, use a text fallback with orange color
         if (icon == null) {
-            icon = createTextIcon("★", Color.ORANGE);
+            icon = IconLoader.createTextIcon("★", 20);
         }
         
         return icon;
-    }
-    
-    /**
-     * Creates a text-based icon as a fallback if image loading fails.
-     * 
-     * @param text The text to display
-     * @param color The color for the text
-     * @return An icon containing the specified text
-     */
-    private ImageIcon createTextIcon(String text, Color color) {
-        // Create a label with the text
-        JLabel label = new JLabel(text);
-        label.setForeground(color);
-        label.setFont(new Font("Dialog", Font.BOLD, 20));
-        label.setSize(20, 20);
-        
-        // Create an image from the label
-        BufferedImage image = new BufferedImage(
-            label.getWidth(), label.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = image.createGraphics();
-        label.paint(g2);
-        g2.dispose();
-        
-        return new ImageIcon(image);
     }
 }

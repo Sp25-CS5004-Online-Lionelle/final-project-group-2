@@ -5,14 +5,10 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
 import java.awt.Image;
+import java.util.List;
 import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.net.URL;
-import java.net.HttpURLConnection;
-import java.io.InputStream;
-import java.util.List;
-import javax.imageio.ImageIO;
 
 import skillzhunter.model.JobRecord;
 import skillzhunter.controller.IController;
@@ -26,75 +22,25 @@ public class JobDetailsDialogue {
 
     /**
      * Loads an icon from the resources folder.
-     * Simplified version similar to SavedJobsTab implementation.
+     * Now delegates to IconLoader utility class.
      *
      * @param path The path to the icon
      * @return The loaded icon, or null if it couldn't be loaded
      */
     private static ImageIcon loadIcon(String path) {
-        try {
-            URL url = JobDetailsDialogue.class.getClassLoader().getResource(path);
-            if (url != null) {
-                ImageIcon icon = new ImageIcon(url);
-                Image img = icon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
-                return new ImageIcon(img);
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading icon: " + path);
-        }
-        return null;
+        return IconLoader.loadIcon(path, 24, 24);
     }
 
     /**
      * Attempts to load a company logo from a URL.
      * If loading fails, returns the default icon.
+     * Now delegates to IconLoader utility class.
      * 
      * @param logoUrl The URL of the company logo
      * @return The loaded logo as an ImageIcon, or a default icon if loading fails
      */
     private static ImageIcon loadCompanyLogo(String logoUrl) {
-        if (logoUrl == null || logoUrl.isEmpty()) {
-            return loadIcon("images/idea.png"); // Default fallback
-        }
-        
-        try {
-            // Create URL
-            URL url = new URL(logoUrl);
-            
-            // Open connection
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
-            
-            // Set browser-like headers to avoid being blocked
-            connection.setRequestProperty("User-Agent", 
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36");
-            
-            // Connect and check response
-            int responseCode = connection.getResponseCode();
-            if (responseCode != HttpURLConnection.HTTP_OK) {
-                System.err.println("HTTP error when loading logo: " + responseCode);
-                return loadIcon("images/idea.png"); // Fallback to default
-            }
-            
-            // Read the image
-            try (InputStream in = connection.getInputStream()) {
-                Image image = ImageIO.read(in);
-                
-                if (image != null) {
-                    // Resize the image
-                    Image resized = image.getScaledInstance(LOGO_WIDTH, LOGO_HEIGHT, Image.SCALE_SMOOTH);
-                    return new ImageIcon(resized);
-                } else {
-                    System.err.println("Failed to decode logo image");
-                    return loadIcon("images/idea.png"); // Fallback to default
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading company logo from " + logoUrl + ": " + e.getMessage());
-            return loadIcon("images/idea.png"); // Fallback to default
-        }
+        return IconLoader.loadCompanyLogo(logoUrl, LOGO_WIDTH, LOGO_HEIGHT, "images/idea.png");
     }
 
     public static void showJobDetails(Component parent, JobRecord job, List<JobRecord> savedJobs, IController controller) {

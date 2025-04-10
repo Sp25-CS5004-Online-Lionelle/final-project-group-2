@@ -7,7 +7,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionListener;
-import java.net.URL;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -68,16 +67,11 @@ public class CustomMenuBar extends JPanel {
         button.setFocusPainted(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        // Set default icon
-        try {
-            URL imgURL = getClass().getClassLoader().getResource("images/SettingsIcon.png");
-            if (imgURL != null) {
-                ImageIcon icon = new ImageIcon(imgURL);
-                Image scaledImage = icon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
-                button.setIcon(new ImageIcon(scaledImage));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        // Set default icon using IconLoader
+        ImageIcon icon = IconLoader.loadIcon("images/SettingsIcon.png", 24, 24);
+        if (icon != null) {
+            button.setIcon(icon);
+        } else {
             button.setText("⚙");
             button.setFont(new java.awt.Font(button.getFont().getName(), java.awt.Font.PLAIN, 20));
         }
@@ -116,30 +110,17 @@ public class CustomMenuBar extends JPanel {
         // View mode items
         JMenu viewMenu = new JMenu("View Mode");
         
-        try {
-            URL lightModeImgURL = getClass().getClassLoader().getResource("images/LightModeIcon.png");
-            if (lightModeImgURL != null) {
-                ImageIcon lightModeIcon = new ImageIcon(lightModeImgURL);
-                Image scaledLightModeImage = lightModeIcon.getImage().getScaledInstance(12, 12, Image.SCALE_SMOOTH);
-                lightModeItem = new JMenuItem(new ImageIcon(scaledLightModeImage));
-                lightModeItem.setText("Light Mode");
-            } else {
-                lightModeItem = new JMenuItem("Light Mode");
-            }
-
-            URL darkModeImgURL = getClass().getClassLoader().getResource("images/DarkModeIcon.png");
-            if (darkModeImgURL != null) {
-                ImageIcon darkModeIcon = new ImageIcon(darkModeImgURL);
-                Image scaledDarkModeImage = darkModeIcon.getImage().getScaledInstance(12, 12, Image.SCALE_SMOOTH);
-                darkModeItem = new JMenuItem(new ImageIcon(scaledDarkModeImage));
-                darkModeItem.setText("Dark Mode");
-            } else {
-                darkModeItem = new JMenuItem("Dark Mode");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            lightModeItem = new JMenuItem("Light Mode");
-            darkModeItem = new JMenuItem("Dark Mode");
+        // Use IconLoader to load light mode and dark mode icons
+        ImageIcon lightModeIcon = IconLoader.loadIcon("images/LightModeIcon.png", 12, 12);
+        lightModeItem = new JMenuItem("Light Mode");
+        if (lightModeIcon != null) {
+            lightModeItem.setIcon(lightModeIcon);
+        }
+        
+        ImageIcon darkModeIcon = IconLoader.loadIcon("images/DarkModeIcon.png", 12, 12);
+        darkModeItem = new JMenuItem("Dark Mode");
+        if (darkModeIcon != null) {
+            darkModeItem.setIcon(darkModeIcon);
         }
         
         viewMenu.add(lightModeItem);
@@ -173,28 +154,16 @@ public class CustomMenuBar extends JPanel {
             lineColor = theme.buttonNormal;
         }
         
-        // Update settings icon based on theme
+        // Update settings icon based on theme using IconLoader
         if (theme == ColorTheme.DARK) {
-            try {
-                URL imgURL = getClass().getClassLoader().getResource("images/settingswhite.png");
-                if (imgURL != null) {
-                    ImageIcon icon = new ImageIcon(imgURL);
-                    Image scaledImage = icon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
-                    settingsButton.setIcon(new ImageIcon(scaledImage));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            ImageIcon whiteSettingsIcon = IconLoader.loadIcon("images/settingswhite.png", 24, 24);
+            if (whiteSettingsIcon != null) {
+                settingsButton.setIcon(whiteSettingsIcon);
             }
         } else {
-            try {
-                URL imgURL = getClass().getClassLoader().getResource("images/SettingsIcon.png");
-                if (imgURL != null) {
-                    ImageIcon icon = new ImageIcon(imgURL);
-                    Image scaledImage = icon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
-                    settingsButton.setIcon(new ImageIcon(scaledImage));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            ImageIcon normalSettingsIcon = IconLoader.loadIcon("images/SettingsIcon.png", 24, 24);
+            if (normalSettingsIcon != null) {
+                settingsButton.setIcon(normalSettingsIcon);
             }
         }
         
