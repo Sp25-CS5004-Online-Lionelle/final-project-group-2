@@ -175,12 +175,23 @@ public class FindJobTab extends JobView {
         searchButton.addActionListener(e -> {
             Object locationObj = locationCombo.getSelectedItem();
             Object industryObj = industryCombo.getSelectedItem();
-            Integer resultsObj = (Integer) resultsCombo.getSelectedItem();
+            Object resultsObj = resultsCombo.getSelectedItem();
+            int numberOfResults = 10;
 
             // If null, set to default values
             String location = (locationObj != null) ? locationObj.toString() : "any";
             String industry = (industryObj != null) ? industryObj.toString() : "any";
-            int numberOfResults = (resultsObj != null) ? resultsObj : 10;
+
+            // If resultsObj is null, set to default
+            if (resultsObj instanceof Integer) {
+                numberOfResults = (Integer) resultsObj;
+            } else if (resultsObj instanceof String) {
+                try {
+                    numberOfResults = Integer.parseInt((String) resultsObj);
+                } catch (NumberFormatException ex) {
+                    numberOfResults = 10;
+                }
+            }
             
             // Perform search
             searchResults = controller.getApiCall(searchField.getText(), 
