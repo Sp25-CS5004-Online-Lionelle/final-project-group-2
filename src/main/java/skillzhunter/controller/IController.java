@@ -19,7 +19,6 @@ public interface IController {
     List<String> getLocations();
     /** gets industries */
     List<String> getIndustries();
-    void setViewData();
     /** gets add job */
     void getAddJob(JobRecord job);
     /** gets remove job */

@@ -169,11 +169,6 @@ public class MainController implements IController {
         return savedJobsTab;
     }
 
-    @Override
-    public void setViewData() {
-        // Optional, depending on your logic
-    }
-
     /**
      * Updates the rating of a job record.
      * Now preserves any existing comments.
