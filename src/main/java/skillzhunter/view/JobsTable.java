@@ -9,6 +9,7 @@ import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
 
 /**
@@ -82,16 +83,23 @@ public class JobsTable extends JTable {
   private void setupHeaderRenderer() {
     JTableHeader header = getTableHeader();
     if (header != null) {
-      // Apply custom renderer without changing sort behavior
-      customHeaderRenderer = new CustomHeader(header.getDefaultRenderer());
-      
-      // Initialize with the current theme
-      customHeaderRenderer.setDarkMode(currentTheme == ColorTheme.DARK);
-      
-      header.setDefaultRenderer(customHeaderRenderer);
-      
-      // Add hand cursor to indicate clickable headers
-      header.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+      // Safely get the default renderer - IMPORTANT: handle potential null
+      TableCellRenderer defaultRenderer = header.getDefaultRenderer();
+      if (defaultRenderer != null) {
+        // Apply custom renderer without changing sort behavior
+        customHeaderRenderer = new CustomHeader(defaultRenderer);
+        
+        // Initialize with the current theme
+        customHeaderRenderer.setDarkMode(currentTheme == ColorTheme.DARK);
+        
+        header.setDefaultRenderer(customHeaderRenderer);
+        
+        // Add hand cursor to indicate clickable headers
+        header.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+      } else {
+        // Log the error
+        System.err.println("Warning: Default table header renderer is null");
+      }
     }
   }
 
@@ -136,6 +144,9 @@ public class JobsTable extends JTable {
           return Integer.compare(min1, min2);
         }
       });
+      
+      // Enable single-column sorting mode
+      sorter.setSortsOnUpdates(true);
     }
   }
   
