@@ -31,6 +31,11 @@ public class CustomHeader implements TableCellRenderer {
      * @param defaultRenderer The default renderer to use
      */
     public CustomHeader(TableCellRenderer defaultRenderer) {
+        // Check for null defaultRenderer and provide a fallback
+        if (defaultRenderer == null) {
+            throw new IllegalArgumentException("Default renderer cannot be null");
+        }
+        
         this.defaultRenderer = defaultRenderer;
         
         // Load arrow images for both light and dark modes
@@ -113,6 +118,16 @@ public class CustomHeader implements TableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value,
                                                  boolean isSelected, boolean hasFocus,
                                                  int row, int column) {
+        // Defensive check - if defaultRenderer is somehow null (should never happen)
+        if (defaultRenderer == null) {
+            // Create a simple fallback renderer
+            JLabel fallback = new JLabel(value != null ? value.toString() : "");
+            fallback.setOpaque(true);
+            fallback.setBackground(Color.WHITE);
+            fallback.setForeground(Color.BLACK);
+            return fallback;
+        }
+        
         // Get the default component (usually a JLabel)
         Component comp = defaultRenderer.getTableCellRendererComponent(
             table, value, isSelected, hasFocus, row, column);
@@ -124,22 +139,24 @@ public class CustomHeader implements TableCellRenderer {
             ImageIcon downArrow = isDarkMode ? downArrowDark : downArrowLight;
             ImageIcon upArrow = isDarkMode ? upArrowDark : upArrowLight;
             
-            // By default, show the down arrow to indicate the column is sortable
+            // Start with default down arrow for all columns
             ImageIcon icon = downArrow;
             
-            // Check if this column is the current sort column
+            // Check if there's active sorting
             RowSorter<?> sorter = table.getRowSorter();
             if (sorter != null && !sorter.getSortKeys().isEmpty()) {
-                // Get the actual model column index since view columns can be reordered
+                // Get the model column index for this view column
                 int modelColumn = table.convertColumnIndexToModel(column);
                 
-                // Find if this column is being sorted
-                for (RowSorter.SortKey sortKey : sorter.getSortKeys()) {
-                    if (sortKey.getColumn() == modelColumn) {
-                        // This column is being sorted, show the appropriate arrow
-                        icon = sortKey.getSortOrder() == SortOrder.ASCENDING ? upArrow : downArrow;
-                        break;
-                    }
+                // Check if this is the currently sorted column
+                if (!sorter.getSortKeys().isEmpty() && 
+                    sorter.getSortKeys().get(0).getColumn() == modelColumn) {
+                    // Show the appropriate arrow based on sort direction
+                    SortOrder sortOrder = sorter.getSortKeys().get(0).getSortOrder();
+                    icon = (sortOrder == SortOrder.ASCENDING) ? upArrow : downArrow;
+                } else {
+                    // Not the sorted column, always show default down arrow
+                    icon = downArrow;
                 }
             }
             
