@@ -221,7 +221,7 @@ public class Jobs implements IModel {
             System.out.println("CSV export completed successfully");
         } catch (IOException e) {
             System.err.println("Error writing to CSV file: " + e.getMessage());
-            e.printStackTrace();
+            // e.printStackTrace();
             throw new RuntimeException("Error writing to CSV file", e);
         }
     }
@@ -250,7 +250,7 @@ public class Jobs implements IModel {
             System.out.println("Export completed successfully");
         } catch (IOException e) {
             System.err.println("Failed to export jobs: " + e.getMessage());
-            e.printStackTrace();
+            // e.printStackTrace();
             throw new RuntimeException("Failed to export jobs: " + e.getMessage(), e);
         }
     }

@@ -68,7 +68,8 @@ public class JobBoardApi {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error reading CSV file: " + filePath, e);
+            // e.printStackTrace();
         }
         return myMap;
     }
