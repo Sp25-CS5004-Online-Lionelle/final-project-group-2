@@ -1,20 +1,28 @@
 package skillzhunter.view;
 
-import static skillzhunter.view.JobsLoader.getColumnNames;
-import static skillzhunter.view.JobsLoader.getData;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.util.List;
+import java.awt.Container;
+import java.awt.TextField;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import skillzhunter.controller.IController;
-import skillzhunter.model.JobRecord;
 
 public class MainView extends JFrame implements IView {
 
@@ -63,12 +71,58 @@ public class MainView extends JFrame implements IView {
         });
 
         pack();
+        setupExitKeyAction();
     }
 
+    //These next two methods are all about setting up the enter key to search
+    private void setupExitKeyAction() {
+        Action exitAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Show confirmation dialog, just like in the menu
+                int result = JOptionPane.showConfirmDialog(
+                    tabbedPane,
+                    "Are you sure you want to exit?",
+                    "Exit",
+                    JOptionPane.YES_NO_OPTION
+                );
+                if (result == JOptionPane.YES_OPTION) {
+                    System.exit(0);
+                }
+            }
+        };
+
+        JComponent rootPane = getRootPane();
+        InputMap inputMap = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Q, 0), "exit");
+        ActionMap actionMap = rootPane.getActionMap();
+        actionMap.put("exit", exitAction);
+    }
+
+    //Helper method to disable Enter key default behavior in text components
+    private void disableEnterKeyTraversalIn(Container container) {
+        for (Component comp : container.getComponents()) {
+            if (comp instanceof JTextField || comp instanceof TextField) {
+                comp.addKeyListener(new KeyAdapter() {
+                    @Override
+                    public void keyPressed(KeyEvent e) {
+                        if (e.getKeyCode() == KeyEvent.VK_Q) {
+                            System.exit(0);
+                            e.consume(); // Prevent default handling
+                        }
+                    }
+                });
+            }
+            // Recursively process nested containers
+            if (comp instanceof Container) {
+                disableEnterKeyTraversalIn((Container) comp);
+            }
+        }
+    }
+    
     /**
      * Builds the tabbed pane for the main view.
      */
-    // Update buildTabbedPane method to remove SavedJobsLists usage
     private JTabbedPane buildTabbedPane(JobView findJobTab, JobView savedJobTab) {
         // Create the tabbed pane
         tabbedPane = new JTabbedPane();
@@ -76,6 +130,8 @@ public class MainView extends JFrame implements IView {
         // Add tabs with components
         tabbedPane.addTab("Find Jobs", findJobTab);
         tabbedPane.addTab("Saved Jobs", savedJobTab);
+        
+        // Add change listener to update the selected tab
         tabbedPane.addChangeListener(e -> {
             // Get the selected tab
             int selectedIndex = tabbedPane.getSelectedIndex();
@@ -89,6 +145,7 @@ public class MainView extends JFrame implements IView {
                 }
             }
         });
+        
         return tabbedPane;
     }
 
