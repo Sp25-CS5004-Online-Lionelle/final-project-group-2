@@ -67,7 +67,7 @@ public class JobsTable extends JTable {
   }
   
   /**
-   * Sets up custom renderers for specific columns
+   * Sets up custom renderers for specific columns.
    */
   private void setupColumnRenderers() {
     // Set the logo column renderer (column 0)

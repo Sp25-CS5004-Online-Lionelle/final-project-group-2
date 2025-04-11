@@ -57,3 +57,43 @@ id,url,jobSlug,jobTitle,companyName,companyLogo,jobIndustry,jobType,jobGeo,jobLe
 <p>Vultr is committed to an inclusive workforce where diversity is celebrated and supported. All employment decisions at Vultr are based on business needs, job requirements, and individual qualifications.</p>
 <p>Vultr regards the lawful and correct use of personal information as important to the accomplishment of our objectives, to the success of our operations and to maintaining confidence between those with whom we deal and ourselves. As such the use of various key privacy controls enables Vultr’s treatment of personal information to meet current regulatory guidelines and laws.</p>
 <p>Workforce members have the right under US state law where and when applicable and certain other privacy and data protection laws, as applicable, to: fair and equal treatment, knowing what personal data we gather and retain, for what purpose, and the ability to access and/or delete such data. You also have the right to opt out of communications from Vultr and approved third- parties at any time.</p>","2025-04-11 05:02:28",150000,185000,USD,0,"No comments provided"
+106038,"https://jobicy.com/jobs/106038-senior-staff-fullstack-engineer","106038-senior-staff-fullstack-engineer","Sr. / Staff Fullstack Engineer",Linear,"https://jobicy.com/data/server-nyc0409/galaxy/mercury/2021/01/WRILS-210120060315-561576.png","Software Engineering",full-time,Europe,Senior,"Linear was set up as a fully remote company from the start. Today, our small but mighty team is distributed across North America and Europe. What unites us is relentless focus, fast execution, and our passion for software craftsmanship. We are all makers at heart and care deeply about the quality of our work. As…","<p>Linear was set up as a fully remote company from the start. Today, our small but mighty team is distributed across North America and Europe. What unites us is relentless focus, fast execution, and our passion for software craftsmanship. We are all makers at heart and care deeply about the quality of our work.</p>
+<p>As a small team, we’re all generalists and constantly picking up new challenges. When it comes to code, we’re looking to work with experienced people who can pick a problem and solve it. We use TypeScript and build scalable systems so we can continuously make progress on a solid foundation. We don’t expect you to have a background in everything we use, but we do expect strong JavaScript fundamentals and a background working with React and TypeScript.</p>
+<p><em>Please note: We are an equal opportunity employer and remote-only company. At this time, we can only hire in most European timezones for this role.</em></p>
+<h2><strong>What you’ll do:</strong></h2>
+<ul>
+<li>Build new user-facing features with everything from database models to GraphQL resolvers and UI components</li>
+<li>Optimize our data synchronization stack by applying better serialization protocols</li>
+<li>Add real-time collaborative editing to our content editor</li>
+<li>Improve performance by profiling and tweaking virtualized list rendering</li>
+<li>Add analytics, monitoring, and alerts to our service so that we can better respond to operational incidents</li>
+<li>Open-source any non-trivial innovations that come out of our work on the product</li>
+<li>Redefine best-in-class software development processes so that we can build an opinionated product</li>
+</ul>
+<h2><strong>Tech:</strong></h2>
+<ul>
+<li>React frontend with Styled Components, utilizing hooks for the composability of functionality</li>
+<li>Proprietary data synchronization library built for speed and offline support. Delta-packets are transported using WebSockets</li>
+<li>MobX for binding the data model to the UI</li>
+<li>Prosemirror-based content editor</li>
+<li>Electron desktop application</li>
+<li>Public GraphQL API that has access to all of the user’s data</li>
+<li>Node, Postgres<em>,</em> and Redis in the backend</li>
+<li>Hosted on Google Cloud with k8s</li>
+<li>GitHub, Slack, Notion</li>
+<li>Design system with React component library</li>
+</ul>
+<h2><strong>What we offer:</strong></h2>
+<ul>
+<li>Interesting and challenging work</li>
+<li>Work-life balance</li>
+<li>Competitive salary and equity</li>
+<li>Employee-friendly equity terms (extended exercise)</li>
+<li>Paid lunch and coffee during workdays</li>
+<li>Work remotely, no commuting to the office</li>
+<li>Paid co-working space/desk at an office</li>
+<li>Health, dental, and vision insurance (based on country requirements)</li>
+<li>Regular team events and off-sites</li>
+<li>5 weeks of paid vacation</li>
+<li>4 months of paid parental leave</li>
+</ul>","2025-04-11 05:00:58",0,0,,0,"No comments provided"
