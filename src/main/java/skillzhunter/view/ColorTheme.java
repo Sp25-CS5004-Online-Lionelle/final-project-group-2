@@ -1,40 +1,39 @@
 package skillzhunter.view;
 
-import java.awt.*;
+import java.awt.Color;
 
 /**
  * Manages color themes for the application with predefined schemes.
  * - Light mode uses Bootstrap 5 colors with Spotify green for success buttons
  * - Dark mode uses a teal-based color scheme with yellow success buttons
  */
-
 public class ColorTheme {
-    /** The primary button normal color */
+    /** The primary button normal color. */
     public final Color buttonNormal;
-    /** The primary button hover color */
+    /** The primary button hover color. */
     public final Color buttonHover;
-    /** The secondary button normal color */
+    /** The secondary button normal color. */
     public final Color secondaryButtonNormal;
-    /** The secondary button hover color */
+    /** The secondary button hover color. */
     public final Color secondaryButtonHover;
-    /** The success button normal color */
+    /** The success button normal color. */
     public final Color successButtonNormal;
-    /** The success button hover color */
+    /** The success button hover color. */
     public final Color successButtonHover;
-    /** The danger button normal color */
+    /** The danger button normal color. */
     public final Color dangerButtonNormal;
-    /** The danger button hover color */
+    /** The danger button hover color. */
     public final Color dangerButtonHover;
-    /** The warning button normal color */
+    /** The warning button normal color. */
     public final Color warningButtonNormal;
-    /** The warning button hover color */
+    /** The warning button hover color. */
     public final Color warningButtonHover;
-    /** The info button normal color */
+    /** The info button normal color. */
     public final Color infoButtonNormal;
-    /** The info button hover color */
+    /** The info button hover color. */
     public final Color infoButtonHover;
     
-    /** The background color */
+    /** The background color. */
     public final Color background;
     /** The foreground color. */
     public final Color foreground;
@@ -106,9 +105,8 @@ public class ColorTheme {
     
     /**
      * Constructor for ColorTheme.
-     * 
      */
-    private ColorTheme(
+    private ColorTheme (
             // Button colors
             Color buttonNormal, Color buttonHover,
             Color secondaryButtonNormal, Color secondaryButtonHover,

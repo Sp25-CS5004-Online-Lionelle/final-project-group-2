@@ -1,12 +1,22 @@
 package skillzhunter.view;
 
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 
-import java.awt.*;
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
-import skillzhunter.model.JobRecord;
 import skillzhunter.controller.IController;
 import skillzhunter.controller.MainController;
+import skillzhunter.model.JobRecord;
 
 /**
  * Dialog for displaying saved job details with Edit/Delete/Close options.
@@ -66,17 +76,17 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
 
         // Create themed buttons with different button types
         ThemedButton editButton = new ThemedButton("Edit", ThemedButton.ButtonType.INFO);
-        editButton.setIcon(editIcon);
+        editButton.setIcon(EDIT_ICON);
         editButton.setHorizontalTextPosition(SwingConstants.LEFT);
         editButton.setIconTextGap(5);
         
         ThemedButton deleteButton = new ThemedButton("Delete", ThemedButton.ButtonType.DANGER);
-        deleteButton.setIcon(deleteIcon);
+        deleteButton.setIcon(DELETE_ICON);
         deleteButton.setHorizontalTextPosition(SwingConstants.LEFT);
         deleteButton.setIconTextGap(5);
         
         ThemedButton closeButton = new ThemedButton("Close", ThemedButton.ButtonType.SECONDARY);
-        closeButton.setIcon(closeIcon);
+        closeButton.setIcon(CLOSE_ICON);
         closeButton.setHorizontalTextPosition(SwingConstants.LEFT);
         closeButton.setIconTextGap(5);
         

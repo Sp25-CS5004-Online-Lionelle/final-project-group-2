@@ -1,23 +1,25 @@
 package skillzhunter.view;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.TextField;
-import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
-import java.util.List;
-import java.util.ArrayList;
-
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.InputMap;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -26,8 +28,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
-import javax.swing.JCheckBox;
-import javax.swing.BorderFactory;
 
 import skillzhunter.controller.IController;
 import skillzhunter.controller.MainController;
@@ -69,7 +69,6 @@ public class FindJobTab extends JobView {
     /** theme button.*/
     private ThemedButton saveJob; // Now using ThemedButton instead of javax.swing.JButton
 
-
     /** 
      * Constructor for FindJobTab.
      * Initializes the controller and sets up the UI components.
@@ -95,9 +94,7 @@ public class FindJobTab extends JobView {
         modifyTablePanel();
         setupEnterKeyAction();
     }
-    /**
-     * Sets up the action for the Enter key to trigger a search.
-     */ 
+
     //These next two methods are all about setting up the enter key to search
     private void setupEnterKeyAction() {
         Action enterAction = new AbstractAction() {
@@ -114,10 +111,7 @@ public class FindJobTab extends JobView {
         disableEnterKeyTraversalIn(this);
     }
 
-    /**
-     * Disables the default Enter key traversal in text components within a container.
-     * @param container The container to process
-     */
+    //Helper method to disable Enter key default behavior in text components
     private void disableEnterKeyTraversalIn(Container container) {
         for (Component comp : container.getComponents()) {
             if (comp instanceof JTextField || comp instanceof TextField) {
@@ -132,8 +126,8 @@ public class FindJobTab extends JobView {
                 });
             }
             // Recursively process nested containers
-            if (comp instanceof Container cont) {
-                disableEnterKeyTraversalIn(cont);
+            if (comp instanceof Container) {
+                disableEnterKeyTraversalIn((Container) comp);
             }
         }
     }
@@ -142,8 +136,8 @@ public class FindJobTab extends JobView {
      * Modifies the table panel to include the visualization panel.
      */
     private void modifyTablePanel() {
-        // Find the table panel
-        for (int i = 0; i < mainPanel.getComponentCount(); i++) {
+         // Find the table panel
+         for (int i = 0; i < mainPanel.getComponentCount(); i++) {
             if (mainPanel.getComponent(i) instanceof JPanel
                 && ((JPanel) mainPanel.getComponent(i)).getLayout() instanceof BorderLayout) {
                 tablePanel = (JPanel) mainPanel.getComponent(i);
@@ -153,8 +147,7 @@ public class FindJobTab extends JobView {
         
         if (tablePanel == null) {
             return;
-        }
-        
+        }        
         // Create and set up visualization
         salaryVisualizationPanel = new SalaryVisualizationPanel(searchResults);
         salaryVisualizationPanel.setPreferredSize(new Dimension(800, 200));
@@ -338,10 +331,6 @@ public class FindJobTab extends JobView {
         }
     }
 
-    /**
-     * applies theme for view.
-     * @param theme
-     */
     @Override
     public void applyTheme(ColorTheme theme) {
         // Call parent implementation for common styling
@@ -417,8 +406,8 @@ public class FindJobTab extends JobView {
         controller.job2SavedList(selectedJob);
         
         // Set default rating and comments
-        if (controller instanceof MainController controllerObj) {
-            (controllerObj).getUpdateJob(selectedJob.id(), "No comments provided", 0);
+        if (controller instanceof MainController mainCont) {
+            (mainCont).getUpdateJob(selectedJob.id(), "No comments provided", 0);
         }
         
         // Show success message
@@ -448,7 +437,7 @@ public class FindJobTab extends JobView {
                     String title = tabbedPane.getTitleAt(i);
                     Component comp = tabbedPane.getTabComponentAt(i);
                     
-                    if ("Saved Jobs".equals(title)
+                    if ("Saved Jobs".equals(title) 
                         || (comp instanceof JLabel && "Saved Jobs".equals(((JLabel) comp).getText()))) {
                         
                         // Select the tab
@@ -487,7 +476,6 @@ public class FindJobTab extends JobView {
         return null;
     }
 
-    // In updateJobsList and setJobsList methods, maintain searchResults if needed
     /**
      * Updates the job list and visualization if needed.
      * @param jobsList The list of jobs to update

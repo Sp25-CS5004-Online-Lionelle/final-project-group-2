@@ -3,14 +3,16 @@ package skillzhunter.view;
 import java.awt.FileDialog;
 import java.awt.FlowLayout;
 import java.util.List;
+
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.JFrame;
+
 import skillzhunter.controller.IController;
 import skillzhunter.controller.MainController;
 import skillzhunter.model.JobRecord;
@@ -18,40 +20,21 @@ import skillzhunter.model.JobRecord;
 public class SavedJobsTab extends JobView {
     
     // Store buttons as fields to apply theme later
-    /** open button. */
     private ThemedButton openButton;
-    /** save button. */
     private ThemedButton saveButton;
-    /** export button. */
     private ThemedButton exportButton;
-    /** controller. */
     private ThemedButton editButton;   // New edit button
-    /** controller. */
     private ThemedButton deleteButton; // New delete button
 
     // Icons for buttons and dialogs
-    /** open icon. */
-    private final ImageIcon openIcon;
-    /** save icon. */
-    private final ImageIcon saveIcon;
-    /** export icon. */
-    private final ImageIcon exportIcon;
-    /** warning icon. */
-    private final ImageIcon warningIcon;
-    /** success icon. */
-    private final ImageIcon successIcon;
-    /** edit icon. */
-    private final ImageIcon editIcon;      // New edit icon 
-    /** delete icon. */
-    private final ImageIcon deleteIcon;    // New delete icon
+    private ImageIcon openIcon;
+    private ImageIcon saveIcon;
+    private ImageIcon exportIcon;
+    private ImageIcon warningIcon;
+    private ImageIcon successIcon;
+    private ImageIcon editIcon;      // New edit icon 
+    private ImageIcon deleteIcon;    // New delete icon
     
-    /**
-     * Constructor for SavedJobsTab.
-     * Initializes the view with the controller and saved jobs.
-     * 
-     * @param controller The controller to interact with the model
-     * @param savedJobs The list of saved jobs to display
-     */
     public SavedJobsTab(IController controller, List<JobRecord> savedJobs) {
         super();
         // set inherited field from jobview
@@ -265,7 +248,7 @@ public class SavedJobsTab extends JobView {
     }
 
     /**
-     * Opens the selected job for viewing.
+     * Opens the selected job for viewing
      */
     private void openSelectedJob() {
         int viewIdx = jobsTable.getSelectedRow();
@@ -279,7 +262,7 @@ public class SavedJobsTab extends JobView {
     }
     
     /**
-     * Edit the selected job using the controller.
+     * Edit the selected job using the controller
      */
     private void editSelectedJob() {
         int viewIdx = jobsTable.getSelectedRow();
@@ -296,7 +279,7 @@ public class SavedJobsTab extends JobView {
     
     /**
      * Shows a dialog to edit job rating and comments
-     * Uses the controller's getUpdateJob method.
+     * Uses the controller's getUpdateJob method
      * 
      * @param job The job to edit
      */
@@ -339,7 +322,8 @@ public class SavedJobsTab extends JobView {
         // Process the result
         if (result == JOptionPane.OK_OPTION) {
             // Use the controller to update the job
-            if (controller instanceof MainController mainController) {
+            if (controller instanceof MainController) {
+                MainController mainController = (MainController) controller;
                 
                 // Get the values from the UI
                 final int finalRating = starRating.getRating();
@@ -409,7 +393,7 @@ public class SavedJobsTab extends JobView {
     }
     
     /**
-     * Shows a message when no row is selected.
+     * Shows a message when no row is selected
      * 
      * @param message The message to display
      */
