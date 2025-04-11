@@ -10,12 +10,22 @@ import java.awt.event.MouseEvent;
  * Users can click on stars to set a rating from 0 to 5.
  */
 public class StarRatingPanel extends JPanel {
-    private JLabel[] stars;
+    /** star rating. */
+    private final JLabel[] stars;
+    /** default rating. */
     private int rating = 0;
+    /** rate change listener. */
     private RatingChangeListener listener;
 
     // Interface for rating change callbacks
+    /**
+     * Listener interface for rating changes.
+     */
     public interface RatingChangeListener {
+        /**
+         * Called when the rating changes.
+         * @param newRating The new rating value (0-5)
+         */
         void onRatingChanged(int newRating);
     }
 
