@@ -25,22 +25,28 @@ import skillzhunter.model.JobRecord;
 import skillzhunter.model.ResponseRecord;
 
 public class JobBoardApi {
-    /** client for making request call*/
-    private static final OkHttpClient client = new OkHttpClient();
-    /** object mapper for parsing json response*/
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-    /** map for storing industries and their slugs*/
-    private static final Map<String, String> industriesMap = JobBoardApi.loadCsvData(
+    /** client for making request call.*/
+    private static final OkHttpClient CLIENT = new OkHttpClient();
+
+    /** object mapper for parsing json response.*/
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    
+    /** map for storing industries and their slugs.*/
+    private static final Map<String, String> INDUSTRY_MAP = JobBoardApi.loadCsvData(
     Paths.get("data", "industries.csv").toString(), "industry", "slug");
-    /** map for storing locations and their slugs*/
-    private static final Map<String, String> locationsMap = JobBoardApi.loadCsvData(
+    
+    /** map for storing locations and their slugs.*/
+    private static final Map<String, String> LOCATION_MAP = JobBoardApi.loadCsvData(
     Paths.get("data", "locations.csv").toString(), "location", "slug");
 
-    /** empty contructor*/
-    public JobBoardApi() {}
+    /** empty contructor.*/
+    public JobBoardApi() {
+        // empty constructor
+    }
     
 
-    /** loads csv data into a map
+    /** 
+     * loads csv data into a map.
      * @param filePath path to the csv file
      * @param key column name for the key
      * @param value column name for the value
@@ -78,7 +84,7 @@ public class JobBoardApi {
      * - `location`: Must match an entry in `location.csv`. Defaults to "anywhere" if not found.
      * - `industry`: Must match an entry in `industry.csv`. Defaults to "any" if not found.
      * @param query
-     * @return
+     * @return List<JobRecord> list of jobs given criteria
      */
     public List<JobRecord> getJobBoard(String query) {
         return getJobBoard(query, null, null, null);
@@ -93,7 +99,7 @@ public class JobBoardApi {
      * - `industry`: Must match an entry in `industry.csv`. Defaults to "any" if not found.
      * @param query
      * @param numberOfResults
-     * @return
+     * @return List<JobRecord> list of jobs given criteria
      */
     public List<JobRecord> getJobBoard(String query, Integer numberOfResults) {
         return getJobBoard(query, numberOfResults, null, null);
@@ -109,7 +115,7 @@ public class JobBoardApi {
      * @param query
      * @param numberOfResults
      * @param location
-     * @return
+     * @return List<JobRecord> list of jobs given criteria
      */
     public List<JobRecord> getJobBoard(String query, Integer numberOfResults, String location) {
         return getJobBoard(query, numberOfResults, location, null);
@@ -133,17 +139,26 @@ public class JobBoardApi {
      */
     public List<JobRecord> getJobBoard(String query, Integer numberOfResults, String location, String industry){
         // getting slug for request, if it breaks we default
-        if(location != null) {
-            location = locationsMap.get(location.toLowerCase().trim());
+        if (location != null) {
+            location = LOCATION_MAP.get(location.toLowerCase().trim());
         }
-        if(industry != null) {
-            industry = industriesMap.get(industry.toLowerCase().trim());
+        if (industry != null) {
+            industry = INDUSTRY_MAP.get(industry.toLowerCase().trim());
         }
-        Boolean location_passed = location != null && !location.isEmpty() && !location.equalsIgnoreCase("anywhere");
-        Boolean industry_passed = industry != null && !industry.isEmpty() && !industry.equalsIgnoreCase("all")&& !industry.equalsIgnoreCase("any");
+        Boolean locationPassed = location != null && !location.isEmpty() 
+                                 && !location.equalsIgnoreCase("anywhere");
+
+
+        Boolean industryPassed = industry != null && !industry.isEmpty() 
+                                && !industry.equalsIgnoreCase("all") 
+                                && !industry.equalsIgnoreCase("any");
 
         //defualting and slugggin query
-        if (query == null || query.isEmpty() || query.equalsIgnoreCase("any") || query.equalsIgnoreCase("all") || query.equalsIgnoreCase("all jobs") || query.equalsIgnoreCase("all job")) {
+        if (query == null || query.isEmpty() 
+                          || query.equalsIgnoreCase("any")
+                          || query.equalsIgnoreCase("all")
+                          || query.equalsIgnoreCase("all jobs")
+                          || query.equalsIgnoreCase("all job")) {
             System.out.println("No query passed, using default values.");
             query = "all";
         }
@@ -154,12 +169,15 @@ public class JobBoardApi {
 
         // building url
         String url;
-        if (location_passed && industry_passed) {
-            url = String.format("https://jobicy.com/api/v2/remote-jobs?count=%s&geo=%s&industry=%s&tag=%s", numberOfResults, location, industry, query);
-        } else if (location_passed) {
-            url = String.format("https://jobicy.com/api/v2/remote-jobs?count=%s&geo=%s&tag=%s", numberOfResults, location, query);
-        } else if (industry_passed) {
-            url = String.format("https://jobicy.com/api/v2/remote-jobs?count=%s&industry=%s&tag=%s", numberOfResults, industry, query);
+        if (locationPassed && industryPassed) {
+            url = String.format("https://jobicy.com/api/v2/remote-jobs?count=%s&geo=%s&industry=%s&tag=%s",
+                                numberOfResults, location, industry, query);
+        } else if (locationPassed) {
+            url = String.format("https://jobicy.com/api/v2/remote-jobs?count=%s&geo=%s&tag=%s",
+                                numberOfResults, location, query);
+        } else if (industryPassed) {
+            url = String.format("https://jobicy.com/api/v2/remote-jobs?count=%s&industry=%s&tag=%s",
+                                    numberOfResults, industry, query);
         }  else {
             url = String.format("https://jobicy.com/api/v2/remote-jobs?count=%s&tag=%s", numberOfResults, query);
         }
@@ -170,7 +188,7 @@ public class JobBoardApi {
     }
     
     /**
-     * Process job records to replace HTML special characters with improved debugging
+     * Process job records to replace HTML special characters with improved debugging.
      * 
      * @param jobs List of job records from API
      * @return List of job records with decoded HTML special characters
@@ -189,7 +207,11 @@ public class JobBoardApi {
             String originalTitle = job.jobTitle();
             String processedTitle = replaceHtmlEntities(originalTitle);
             if (!originalTitle.equals(processedTitle)) {
-                System.out.println("Replaced HTML entities in job title: '" + originalTitle + "' -> '" + processedTitle + "'");
+                System.out.println("Replaced HTML entities in job title: '" 
+                                    + originalTitle
+                                    + "' -> '"
+                                    + processedTitle
+                                    + "'");
             }
             bean.setJobTitle(processedTitle);
             
@@ -197,7 +219,10 @@ public class JobBoardApi {
             String originalCompanyName = job.companyName();
             String processedCompanyName = replaceHtmlEntities(originalCompanyName);
             if (!originalCompanyName.equals(processedCompanyName)) {
-                System.out.println("Replaced HTML entities in company name: '" + originalCompanyName + "' -> '" + processedCompanyName + "'");
+                System.out.println("Replaced HTML entities in company name: '"
+                                    + originalCompanyName
+                                    + "' -> '" + processedCompanyName
+                                    + "'");
             }
             bean.setCompanyName(processedCompanyName);
             
@@ -209,7 +234,8 @@ public class JobBoardApi {
                     .map(industry -> {
                         String processed = replaceHtmlEntities(industry);
                         if (!industry.equals(processed)) {
-                            System.out.println("Replaced HTML entities in industry: '" + industry + "' -> '" + processed + "'");
+                            System.out.println("Replaced HTML entities in industry: '"
+                                                + industry + "' -> '" + processed + "'");
                         }
                         return processed;
                     })
@@ -225,7 +251,8 @@ public class JobBoardApi {
                     .map(type -> {
                         String processed = replaceHtmlEntities(type);
                         if (!type.equals(processed)) {
-                            System.out.println("Replaced HTML entities in job type: '" + type + "' -> '" + processed + "'");
+                            System.out.println("Replaced HTML entities in job type: '"
+                                                + type + "' -> '" + processed + "'");
                         }
                         return processed;
                     })
@@ -239,7 +266,8 @@ public class JobBoardApi {
             String originalGeo = job.jobGeo();
             String processedGeo = replaceHtmlEntities(originalGeo);
             if (originalGeo != null && !originalGeo.equals(processedGeo)) {
-                System.out.println("Replaced HTML entities in job geo: '" + originalGeo + "' -> '" + processedGeo + "'");
+                System.out.println("Replaced HTML entities in job geo: '"
+                                    + originalGeo + "' -> '" + processedGeo + "'");
             }
             bean.setJobGeo(processedGeo);
             
@@ -247,7 +275,8 @@ public class JobBoardApi {
             String originalLevel = job.jobLevel();
             String processedLevel = replaceHtmlEntities(originalLevel);
             if (originalLevel != null && !originalLevel.equals(processedLevel)) {
-                System.out.println("Replaced HTML entities in job level: '" + originalLevel + "' -> '" + processedLevel + "'");
+                System.out.println("Replaced HTML entities in job level: '"
+                                    + originalLevel + "' -> '" + processedLevel + "'");
             }
             bean.setJobLevel(processedLevel);
             
@@ -371,7 +400,8 @@ public class JobBoardApi {
         return result;
     }
     
-    /** makes a request to the api and returns the response
+    /**
+     * makes a request to the api and returns the response.
      * @param url url to make the request to
      * @return list of job records
      */
@@ -380,7 +410,7 @@ public class JobBoardApi {
             .url(url)
             .build();
 
-        try (Response response = client.newCall(request).execute()) {
+        try (Response response = CLIENT.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 System.err.println("Error: HTTP " + response.code());
                 return Collections.emptyList();
@@ -393,14 +423,17 @@ public class JobBoardApi {
             }
 
             String jsonResponse = responseBody.string();
-            ResponseRecord jobResponse = objectMapper.readValue(jsonResponse, ResponseRecord.class);
+            ResponseRecord jobResponse = OBJECT_MAPPER.readValue(jsonResponse, ResponseRecord.class);
             return jobResponse.jobs();
 
         } catch (IOException e) {
             return Collections.emptyList();
         }
     }
-
+    /**
+     * main method for testing.
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
         JobBoardApi api = new JobBoardApi();
         List<JobRecord> results = api.getJobBoard("python", 5, "austria", "devops & sysadmin");

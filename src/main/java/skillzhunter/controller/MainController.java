@@ -19,7 +19,7 @@ public class MainController implements IController {
     /** View. */
     private IView view;
     /** Saved jobs tab. */
-    private SavedJobsTab savedJobsTab;
+    private final SavedJobsTab savedJobsTab;
 
     /**
      * Constructor for MainController.
