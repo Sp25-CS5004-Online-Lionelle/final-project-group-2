@@ -1,13 +1,8 @@
 package skillzhunter.view;
 
 import javax.swing.*;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.Window;
-import java.awt.Font;
-import java.awt.GridLayout;
+import java.awt.*;
+import java.awt.event.ActionListener;
 
 import skillzhunter.model.JobRecord;
 import skillzhunter.controller.IController;
@@ -17,11 +12,7 @@ import skillzhunter.controller.MainController;
  * Dialog for displaying saved job details with Edit/Delete/Close options.
  * This is used specifically when opening a job from the Saved Jobs tab.
  */
-public class SavedJobDetailsDialogue {
-    
-    // The size for company logos
-    private static final int LOGO_WIDTH = 64;
-    private static final int LOGO_HEIGHT = 64;
+public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
     
     // Icons for buttons and dialogs
     private static ImageIcon editIcon;
@@ -57,111 +48,11 @@ public class SavedJobDetailsDialogue {
             return;
         }
         
-        // Create the dialog - properly get the parent window
-        Window parentWindow = SwingUtilities.getWindowAncestor(parent);
-        JDialog dialog;
+        // Create the dialog using the base class method
+        JDialog dialog = createBaseDialog(parent, job, "Job Details");
         
-        if (parentWindow instanceof java.awt.Frame) {
-            dialog = new JDialog((java.awt.Frame) parentWindow, "Job Details", true);
-        } else if (parentWindow instanceof java.awt.Dialog) {
-            dialog = new JDialog((java.awt.Dialog) parentWindow, "Job Details", true);
-        } else {
-            dialog = new JDialog(new JFrame(), "Job Details", true);
-        }
-        
-        dialog.setLayout(new BorderLayout(0, 10));
-        
-        // Create main panel
-        JPanel mainPanel = new JPanel(new BorderLayout(5, 5));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
-        
-        // Create simple header panel
-        JPanel headerPanel = new JPanel(new BorderLayout(5, 5));
-        
-        // Add logo at top, centered
-        ImageIcon companyLogo = IconLoader.loadCompanyLogo(job.companyLogo(), LOGO_WIDTH, LOGO_HEIGHT, "images/idea.png");
-        JLabel logoLabel = new JLabel(companyLogo);
-        logoLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        headerPanel.add(logoLabel, BorderLayout.CENTER);
-        
-        // Add header panel to main panel
-        mainPanel.add(headerPanel, BorderLayout.NORTH);
-        
-        // Create content panel
-        JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        
-        // Add company name
-        JLabel companyNameLabel = new JLabel(job.companyName(), SwingConstants.CENTER);
-        companyNameLabel.setFont(new Font("Dialog", Font.BOLD, 16));
-        companyNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        contentPanel.add(companyNameLabel);
-        contentPanel.add(Box.createVerticalStrut(10));
-        
-        // Add job title
-        JLabel titleLabel = new JLabel("<html><h2>" + job.jobTitle() + "</h2></html>", SwingConstants.CENTER);
-        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        contentPanel.add(titleLabel);
-        contentPanel.add(Box.createVerticalStrut(15));
-        
-        // Create a simple panel for job details with 2 columns
-        JPanel detailsPanel = new JPanel(new GridLayout(0, 2, 10, 5));
-        
-        // Add job details
-        if (job.jobGeo() != null && !job.jobGeo().isEmpty()) {
-            addDetailRow(detailsPanel, "Location:", job.jobGeo());
-        }
-        
-        if (job.jobIndustry() != null && !job.jobIndustry().isEmpty()) {
-            String industries = String.join(", ", job.jobIndustry());
-            addDetailRow(detailsPanel, "Industry:", industries);
-        }
-        
-        if (job.jobType() != null && !job.jobType().isEmpty()) {
-            String types = String.join(", ", job.jobType().stream()
-                .map(type -> {
-                    String[] parts = type.split("-");
-                    for (int i = 0; i < parts.length; i++) {
-                        parts[i] = parts[i].substring(0, 1).toUpperCase() + parts[i].substring(1);
-                    }
-                    return String.join("-", parts);
-                }).toList());
-            addDetailRow(detailsPanel, "Type:", types);
-        }
-        
-        if (job.jobLevel() != null && !job.jobLevel().isEmpty()) {
-            addDetailRow(detailsPanel, "Level:", job.jobLevel());
-        }
-        
-        if ((job.annualSalaryMin() != 0 || job.annualSalaryMax() != 0)) {
-            String salaryText = String.format("%s - %s",
-                job.annualSalaryMin() == 0 ? "N/A" : String.format("%,d", job.annualSalaryMin()),
-                job.annualSalaryMax() == 0 ? "N/A" : String.format("%,d", job.annualSalaryMax())
-            );
-            
-            if (job.salaryCurrency() != null && !job.salaryCurrency().isEmpty()) {
-                salaryText += " " + job.salaryCurrency();
-            }
-            
-            addDetailRow(detailsPanel, "Salary:", salaryText);
-        }
-        
-        if (job.pubDate() != null && !job.pubDate().isEmpty()) {
-            addDetailRow(detailsPanel, "Published:", job.pubDate());
-        }
-        
-        // Center the details panel
-        JPanel detailsWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        detailsWrapper.add(detailsPanel);
-        contentPanel.add(detailsWrapper);
-        
-        // Add content panel to a scroll pane
-        JScrollPane scrollPane = new JScrollPane(contentPanel);
-        scrollPane.setBorder(null);
-        mainPanel.add(scrollPane, BorderLayout.CENTER);
-        
-        // Add the main panel to the dialog
+        // Create and add the main content panel
+        JPanel mainPanel = createMainContentPanel(job);
         dialog.add(mainPanel, BorderLayout.CENTER);
         
         // Create button panel with appropriate options for saved jobs
@@ -325,17 +216,5 @@ public class SavedJobDetailsDialogue {
         dialog.setLocationRelativeTo(parent);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setVisible(true);
-    }
-    
-    /**
-     * Helper method to add detail rows to the details panel
-     */
-    private static void addDetailRow(JPanel panel, String label, String value) {
-        JLabel labelComp = new JLabel(label);
-        labelComp.setFont(labelComp.getFont().deriveFont(Font.BOLD));
-        panel.add(labelComp);
-        
-        JLabel valueComp = new JLabel(value);
-        panel.add(valueComp);
     }
 }
