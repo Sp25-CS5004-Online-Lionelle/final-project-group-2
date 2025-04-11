@@ -17,10 +17,13 @@ import javax.swing.table.DefaultTableCellRenderer;
  * A cell renderer for displaying company logos from URLs.
  */
 public class ImageCellRenderer extends DefaultTableCellRenderer {
-    
-    private final int IMAGE_WIDTH = 32;
-    private final int IMAGE_HEIGHT = 32;
+    /** Image width. */
+    private static final int IMAGE_WIDTH = 32;
+    /** Image height. */
+    private static final int IMAGE_HEIGHT = 32;
+    /** Cache for loaded images. */
     private final Map<String, ImageIcon> imageCache = new HashMap<>();
+    /** Loading status for images. */
     private final Map<String, Boolean> loadingStatus = new HashMap<>();
     
     @Override
@@ -33,18 +36,14 @@ public class ImageCellRenderer extends DefaultTableCellRenderer {
         // Center the image
         label.setHorizontalAlignment(JLabel.CENTER);
         
-        if (value instanceof String) {
-            String imageUrl = (String) value;
-            
+        if (value instanceof String imageUrl) {   
             if (imageUrl != null && !imageUrl.isEmpty()) {
                 // Check if we have this image in cache
                 if (imageCache.containsKey(imageUrl)) {
                     ImageIcon icon = imageCache.get(imageUrl);
                     label.setIcon(icon);
                     label.setText(icon == null ? "X" : "");
-                } 
-                // Check if we're already loading this image
-                else if (!loadingStatus.containsKey(imageUrl)) {
+                } else if (!loadingStatus.containsKey(imageUrl)) {
                     // Start loading the image
                     loadingStatus.put(imageUrl, true);
                     label.setText("...");
@@ -74,7 +73,10 @@ public class ImageCellRenderer extends DefaultTableCellRenderer {
     }
     
     /**
-     * Load an image asynchronously to avoid blocking the UI
+     * Load an image asynchronously to avoid blocking the UI.
+     * @param imageUrl The URL of the image to load
+     * @param label The label to update with the image
+     * @param table The table to repaint after loading
      */
     private void loadImageAsync(String imageUrl, JLabel label, JTable table) {
         new Thread(() -> {
@@ -90,7 +92,8 @@ public class ImageCellRenderer extends DefaultTableCellRenderer {
                 
                 // Set browser-like headers
                 connection.setRequestProperty("User-Agent", 
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36");
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+                    + " AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36");
                 
                 // Connect and check response
                 int responseCode = connection.getResponseCode();
@@ -136,7 +139,7 @@ public class ImageCellRenderer extends DefaultTableCellRenderer {
     }
     
     /**
-     * Clear the image cache when no longer needed
+     * Clear the image cache when no longer needed.
      */
     public void clearCache() {
         imageCache.clear();
