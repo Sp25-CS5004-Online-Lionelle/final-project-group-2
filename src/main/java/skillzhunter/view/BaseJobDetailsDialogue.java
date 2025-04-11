@@ -2,8 +2,6 @@ package skillzhunter.view;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.Font;
-import java.util.List;
 
 import skillzhunter.model.JobRecord;
 import skillzhunter.controller.IController;
@@ -14,8 +12,9 @@ import skillzhunter.controller.IController;
  */
 public abstract class BaseJobDetailsDialogue {
     
-    // The size for company logos
+    /** Width of the logo.*/
     protected static final int LOGO_WIDTH = 64;
+    /** Height of the logo.*/
     protected static final int LOGO_HEIGHT = 64;
 
     /**
@@ -31,10 +30,10 @@ public abstract class BaseJobDetailsDialogue {
         Window parentWindow = SwingUtilities.getWindowAncestor(parent);
         JDialog dialog;
         
-        if (parentWindow instanceof java.awt.Frame) {
-            dialog = new JDialog((java.awt.Frame) parentWindow, title, true);
-        } else if (parentWindow instanceof java.awt.Dialog) {
-            dialog = new JDialog((java.awt.Dialog) parentWindow, title, true);
+        if (parentWindow instanceof java.awt.Frame frame) {
+            dialog = new JDialog(frame, title, true);
+        } else if (parentWindow instanceof java.awt.Dialog dialogParent) {
+            dialog = new JDialog(dialogParent, title, true);
         } else {
             dialog = new JDialog(new JFrame(), title, true);
         }
@@ -58,7 +57,8 @@ public abstract class BaseJobDetailsDialogue {
         JPanel headerPanel = new JPanel(new BorderLayout(5, 5));
         
         // Add logo at top, centered
-        ImageIcon companyLogo = IconLoader.loadCompanyLogo(job.companyLogo(), LOGO_WIDTH, LOGO_HEIGHT, "images/idea.png");
+        ImageIcon companyLogo = IconLoader.loadCompanyLogo(job.companyLogo(),
+        LOGO_WIDTH, LOGO_HEIGHT, "images/idea.png");
         JLabel logoLabel = new JLabel(companyLogo);
         logoLabel.setHorizontalAlignment(SwingConstants.CENTER);
         headerPanel.add(logoLabel, BorderLayout.CENTER);
@@ -144,7 +144,10 @@ public abstract class BaseJobDetailsDialogue {
     }
     
     /**
-     * Helper method to add detail rows to the details panel
+     * Helper method to add detail rows to the details panel.
+     * @param panel The panel to add the detail row to
+     * @param label The label for the detail
+     * @param value The value for the detail
      */
     protected static void addDetailRow(JPanel panel, String label, String value) {
         JLabel labelComp = new JLabel(label);
@@ -156,13 +159,14 @@ public abstract class BaseJobDetailsDialogue {
     }
     
     /**
-     * Recursively searches for a JTabbedPane in the component hierarchy
+     * Recursively searches for a JTabbedPane in the component hierarchy.
+     * @param component The component to search in
+     * @return The found JTabbedPane, or null if not found
      */
     protected static JTabbedPane findTabbedPane(Component component) {
-        if (component instanceof JTabbedPane) {
-            return (JTabbedPane) component;
-        } else if (component instanceof Container) {
-            Container container = (Container) component;
+        if (component instanceof JTabbedPane tab) {
+            return tab;
+        } else if (component instanceof Container container) {
             for (int i = 0; i < container.getComponentCount(); i++) {
                 JTabbedPane found = findTabbedPane(container.getComponent(i));
                 if (found != null) {
@@ -175,7 +179,9 @@ public abstract class BaseJobDetailsDialogue {
     
     /**
      * Switches to the Saved Jobs tab and refreshes its content
-     * Gets the updated job list from the controller
+     * Gets the updated job list from the controller.
+     * @param component The component to find the tabbed pane in
+     * @param controller The controller to get the job list from
      */
     protected static void switchToSavedJobsTab(Component component, IController controller) {
         // Find the main window containing the tabs
@@ -189,16 +195,16 @@ public abstract class BaseJobDetailsDialogue {
                     String title = tabbedPane.getTitleAt(i);
                     Component comp = tabbedPane.getTabComponentAt(i);
                     
-                    if ("Saved Jobs".equals(title) || 
-                        (comp instanceof JLabel && "Saved Jobs".equals(((JLabel)comp).getText()))) {
+                    if ("Saved Jobs".equals(title)
+                        || (comp instanceof JLabel && "Saved Jobs".equals(((JLabel) comp).getText()))) {
                         
                         // Select the tab
                         tabbedPane.setSelectedIndex(i);
                         
                         // Update the tab content if it's a SavedJobsTab
                         Component tabComponent = tabbedPane.getComponentAt(i);
-                        if (tabComponent instanceof SavedJobsTab) {
-                            SavedJobsTab savedJobsTab = (SavedJobsTab) tabComponent;
+                        if (tabComponent instanceof SavedJobsTab tabComp) {
+                            SavedJobsTab savedJobsTab = tabComp;
                             // Get the updated job list from the controller
                             savedJobsTab.updateJobsList(controller.getSavedJobs());
                         }
