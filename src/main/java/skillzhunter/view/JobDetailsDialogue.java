@@ -130,9 +130,7 @@ public class JobDetailsDialogue {
         }
         
         if (job.jobIndustry() != null && !job.jobIndustry().isEmpty()) {
-            String industries = String.join(", ", job.jobIndustry().stream()
-                .map(industry -> industry.replace("&amp;", ",").replace("&", ",").trim())
-                .toList());
+            String industries = String.join(", ", job.jobIndustry());
             addDetailRow(detailsPanel, "Industry:", industries);
         }
         
