@@ -33,7 +33,7 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
             SavedJobDetailsDialogue.show(parent, job, controller);
         } else {
             // Keep the original implementation for Find Jobs tab
-            showFindJobDetails(parent, job, savedJobs, controller);
+            showFindJobDetails(parent, job, controller);
         }
     }
     
@@ -41,7 +41,7 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
      * Shows job details when accessed from Find Jobs tab
      * with "Save this Job?" option and fields for user input
      */
-    private static void showFindJobDetails(Component parent, JobRecord job, List<JobRecord> savedJobs, IController controller) {
+    private static void showFindJobDetails(Component parent, JobRecord job, IController controller) {
         // Create the dialog using the base class method
         JDialog dialog = createBaseDialog(parent, job, "Job Details");
         
@@ -56,7 +56,7 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
         JPanel ratingPanel = new JPanel(new BorderLayout(5, 5));
         ratingPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
         
-        // Create star rating panel
+        // Create star rating panel - use existing rating from job 
         StarRatingPanel starRating = new StarRatingPanel(job.rating() > 0 ? job.rating() : 0);
         JPanel starPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JLabel ratingLabel = new JLabel("Your Rating:");
@@ -65,16 +65,16 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
         ratingPanel.add(starPanel, BorderLayout.NORTH);
         
         // Create comments text area
-        JTextArea comments = new JTextArea(3, 20);
-        comments.setLineWrap(true);
-        comments.setWrapStyleWord(true);
+        JTextArea commentsArea = new JTextArea(3, 20);
+        commentsArea.setLineWrap(true);
+        commentsArea.setWrapStyleWord(true);
         
         // Set existing comments if available
         if (job.comments() != null && !job.comments().isEmpty() && !job.comments().equals("No comments provided")) {
-            comments.setText(job.comments());
+            commentsArea.setText(job.comments());
         }
         
-        JScrollPane commentScrollPane = new JScrollPane(comments);
+        JScrollPane commentScrollPane = new JScrollPane(commentsArea);
         commentScrollPane.setBorder(BorderFactory.createTitledBorder("Your Comments"));
         ratingPanel.add(commentScrollPane, BorderLayout.CENTER);
         
@@ -111,15 +111,15 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
         // Handle the button clicks
         yesButton.addActionListener(e -> {
             // Get the rating and comments from UI
-            int rating = starRating.getRating();
-            String commentText = comments.getText().isEmpty() ? "No comments provided" : comments.getText();
+            int newRating = starRating.getRating();
+            String commentText = commentsArea.getText().isEmpty() ? "No comments provided" : commentsArea.getText();
             
             // First, add the job to the model through the controller
             controller.getAddJob(job);
             
-            // Then update the job with the rating and comments
+            // Then update the job with the rating and comments through the controller
             if (controller instanceof MainController) {
-                ((MainController) controller).getUpdateJob(job.id(), commentText, rating);
+                ((MainController) controller).getUpdateJob(job.id(), commentText, newRating);
             }
             
             // Switch to "Saved Jobs" tab after adding a job

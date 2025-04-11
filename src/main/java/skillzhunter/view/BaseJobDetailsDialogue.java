@@ -19,22 +19,10 @@ public abstract class BaseJobDetailsDialogue {
     protected static final int LOGO_HEIGHT = 64;
 
     /**
-     * Shows a dialog with job details.
-     * This is the main entry point for displaying job information.
-     * 
-     * @param parent The parent component
-     * @param job The job to display
-     * @param controller The controller
-     */
-    public static void show(Component parent, JobRecord job, IController controller) {
-        // This should be overridden by child classes
-    }
-    
-    /**
      * Creates a dialog with job details.
      * 
      * @param parent The parent component
-     * @param job The job to display
+     * @param job The job record from the controller
      * @param title The dialog title
      * @return The created dialog
      */
@@ -58,7 +46,7 @@ public abstract class BaseJobDetailsDialogue {
     /**
      * Creates the main content panel for job details.
      * 
-     * @param job The job to display
+     * @param job The job to display, retrieved from the controller
      * @return The created panel
      */
     protected static JPanel createMainContentPanel(JobRecord job) {
@@ -187,6 +175,7 @@ public abstract class BaseJobDetailsDialogue {
     
     /**
      * Switches to the Saved Jobs tab and refreshes its content
+     * Gets the updated job list from the controller
      */
     protected static void switchToSavedJobsTab(Component component, IController controller) {
         // Find the main window containing the tabs
@@ -210,6 +199,7 @@ public abstract class BaseJobDetailsDialogue {
                         Component tabComponent = tabbedPane.getComponentAt(i);
                         if (tabComponent instanceof SavedJobsTab) {
                             SavedJobsTab savedJobsTab = (SavedJobsTab) tabComponent;
+                            // Get the updated job list from the controller
                             savedJobsTab.updateJobsList(controller.getSavedJobs());
                         }
                         
