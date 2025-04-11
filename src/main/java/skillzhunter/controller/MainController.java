@@ -185,11 +185,11 @@ public class MainController implements IController {
      * @param index The index of the job to remove
      */
     @Override
-    public void getRemoveJob(int index) {
+    public void removeJobFromList(int index) {
         model.removeJob(index);
     }
 
-
+    
     /**
      * Saves the job records to a CSV file.
      */

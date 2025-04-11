@@ -156,7 +156,7 @@ public abstract class JobView extends JPanel {
 
     // Remove a job record via controller (delegates to controller)
     public void removeJobRecord(int index) {
-        controller.getRemoveJob(index); // Delegate to controller
+        controller.removeJobFromList(index); // Delegate to controller
     }
 
     // Update the job list after an operation (like add or remove)

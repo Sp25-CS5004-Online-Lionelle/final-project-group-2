@@ -22,7 +22,7 @@ public interface IController {
     /** gets add job model*/
     void job2SavedList(JobRecord job);
     /** gets remove job */
-    void getRemoveJob(int id);
+    void removeJobFromList(int id);
     /** gets saved jobs that need to be made into a csv */
     void getSavedJobsToCsv(String filePath);
     /** exports saved jobs into selected format */

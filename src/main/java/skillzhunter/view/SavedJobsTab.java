@@ -372,7 +372,7 @@ public class SavedJobsTab extends JobView {
             
             if (result == JOptionPane.YES_OPTION) {
                 // Use the controller to remove the job
-                controller.getRemoveJob(selectedJob.id());
+                controller.removeJobFromList(selectedJob.id());
                 
                 // Update the jobs list in the view to reflect changes
                 updateJobsList(controller.getSavedJobs());

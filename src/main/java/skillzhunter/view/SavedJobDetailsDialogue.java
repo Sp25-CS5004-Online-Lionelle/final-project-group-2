@@ -193,7 +193,7 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
             
             if (result == JOptionPane.YES_OPTION) {
                 // Use the controller to remove the job
-                controller.getRemoveJob(job.id());
+                controller.removeJobFromList(job.id());
                 
                 // Get the SavedJobsTab to update its list
                 if (parent instanceof JTable) {
