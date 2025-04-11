@@ -1,41 +1,36 @@
 id,url,jobSlug,jobTitle,companyName,companyLogo,jobIndustry,jobType,jobGeo,jobLevel,jobExcerpt,jobDescription,pubDate,annualSalaryMin,annualSalaryMax,salaryCurrency,rating,comments
-106038,"https://jobicy.com/jobs/106038-senior-staff-fullstack-engineer","106038-senior-staff-fullstack-engineer","Sr. / Staff Fullstack Engineer",Linear,"https://jobicy.com/data/server-nyc0409/galaxy/mercury/2021/01/WRILS-210120060315-561576.png","Software Engineering",full-time,Europe,Senior,"Linear was set up as a fully remote company from the start. Today, our small but mighty team is distributed across North America and Europe. What unites us is relentless focus, fast execution, and our passion for software craftsmanship. We are all makers at heart and care deeply about the quality of our work. As…","<p>Linear was set up as a fully remote company from the start. Today, our small but mighty team is distributed across North America and Europe. What unites us is relentless focus, fast execution, and our passion for software craftsmanship. We are all makers at heart and care deeply about the quality of our work.</p>
-<p>As a small team, we’re all generalists and constantly picking up new challenges. When it comes to code, we’re looking to work with experienced people who can pick a problem and solve it. We use TypeScript and build scalable systems so we can continuously make progress on a solid foundation. We don’t expect you to have a background in everything we use, but we do expect strong JavaScript fundamentals and a background working with React and TypeScript.</p>
-<p><em>Please note: We are an equal opportunity employer and remote-only company. At this time, we can only hire in most European timezones for this role.</em></p>
-<h2><strong>What you’ll do:</strong></h2>
+116837,"https://jobicy.com/jobs/116837-professional-services-consultant","116837-professional-services-consultant","Professional Services Consultant",Alteryx,"https://jobicy.com/data/server-nyc0409/galaxy/mercury/2021/08/f322ccfc59309e42104171ce4d7fc580.png","Technical Support",full-time,UK,Any,"We’re looking for problem solvers, innovators, and dreamers who are searching for anything but business as usual. Like us, you’re a high performer who’s an expert at your craft, constantly challenging the status quo. You value inclusivity and want to join a culture that empowers you to show up as your authentic self. You know…","<p>We’re looking for problem solvers, innovators, and dreamers who are searching for anything but business as usual. Like us, you’re a high performer who’s an expert at your craft, constantly challenging the status quo. You value inclusivity and want to join a culture that empowers you to show up as your authentic self. You know that success hinges on commitment, that our differences make us stronger, and that the finish line is always sweeter when the whole team crosses together.</p>
+<p>Alteryx Professional Services Consultants drive value throughout Alteryx and with our customers by effectively consulting and guiding using knowledge of software deployment and integration processes and technical skills.</p>
+<p>As part of the Professional Services Consulting EMEA team you will be responsible for delivering services for Alteryx products, including installations, configurations, assisting with migrations from on-premises to cloud, sizing and workflow optimizations. You will be making our customers successful when they purchase professional services. With your expertise and knowledge, you will be a trusted technical advisor to our customers!</p>
+<h2><b>Primary Responsibilities:</b></h2>
 <ul>
-<li>Build new user-facing features with everything from database models to GraphQL resolvers and UI components</li>
-<li>Optimize our data synchronization stack by applying better serialization protocols</li>
-<li>Add real-time collaborative editing to our content editor</li>
-<li>Improve performance by profiling and tweaking virtualized list rendering</li>
-<li>Add analytics, monitoring, and alerts to our service so that we can better respond to operational incidents</li>
-<li>Open-source any non-trivial innovations that come out of our work on the product</li>
-<li>Redefine best-in-class software development processes so that we can build an opinionated product</li>
+<li>Support and architect enterprise-scale solutions utilizing emerging platforms and technologies.</li>
+<li>Design, guide and implement the optimal state for data and analytical architectures for customer scenarios, including Cloud and server sizing support, strategies for achieving high availability, resiliency, and disaster recovery.</li>
+<li>Provide recommended best practices on architecture, deployment, and tech stack integration.</li>
+<li>Works proactively with Technical Consultants, Analytics Consultants, and Resident Consultants to strategize on projects, cross-training and knowledge transfer.</li>
+<li>Engage with Alteryx customers as a knowledgeable Consultant.</li>
+<li>Advise customers with integration of Alteryx in their Cloud, On Prem or Hybrid ecosystems</li>
+<li>Travel requirements up to 30%.</li>
 </ul>
-<h2><strong>Tech:</strong></h2>
+<h2><b>Preferred Qualifications:</b></h2>
 <ul>
-<li>React frontend with Styled Components, utilizing hooks for the composability of functionality</li>
-<li>Proprietary data synchronization library built for speed and offline support. Delta-packets are transported using WebSockets</li>
-<li>MobX for binding the data model to the UI</li>
-<li>Prosemirror-based content editor</li>
-<li>Electron desktop application</li>
-<li>Public GraphQL API that has access to all of the user’s data</li>
-<li>Node, Postgres<em>,</em> and Redis in the backend</li>
-<li>Hosted on Google Cloud with k8s</li>
-<li>GitHub, Slack, Notion</li>
-<li>Design system with React component library</li>
+<li>4+ years of experience in a customer facing role, such as consulting or technical support.</li>
+<li>Proficient in Cloud resources and platforms, such as AWS, Azure, Google and VMware.</li>
+<li>Strong knowledge of Windows Server or Linux.</li>
+<li>Knowledge of data & analytic technologies and software architecture.</li>
+<li>Ability to have deep conversations with the customer Enterprise Architect to define solutions in their enterprise.</li>
+<li>Experience with software and hardware installation and configuration.</li>
+<li>Superior problem solving, organizational, decision-making written, oral, and interpersonal skills.</li>
+<li>Exceptional ability to listen, assess and document information from client.</li>
+<li>Troubleshooting techniques for parsing and dissecting log files.</li>
+<li>Experience with traditional RDBMS databases, NoSQL databases, and Hadoop</li>
+<li>Experience with System Security, including Networking, LDAP and Active Directory.</li>
 </ul>
-<h2><strong>What we offer:</strong></h2>
+<h2><b>Nice To Have Qualifications:</b></h2>
 <ul>
-<li>Interesting and challenging work</li>
-<li>Work-life balance</li>
-<li>Competitive salary and equity</li>
-<li>Employee-friendly equity terms (extended exercise)</li>
-<li>Paid lunch and coffee during workdays</li>
-<li>Work remotely, no commuting to the office</li>
-<li>Paid co-working space/desk at an office</li>
-<li>Health, dental, and vision insurance (based on country requirements)</li>
-<li>Regular team events and off-sites</li>
-<li>5 weeks of paid vacation</li>
-<li>4 months of paid parental leave</li>
-</ul>","2025-04-11 05:00:58",0,0,,0,"No comments provided"
+<li>Knowledgeable of machine learning techniques and environments, including industry leaders such as Python, R, and Spark.</li>
+<li>Prior experience with procedural languages, including Unix scripting, Java, C++, Python.</li>
+<li>Knowledge of statistical analysis, data structures, model training, scoring.</li>
+<li>Knowledgeable of emerging technology architectures built on containers and microservices and orchestrated by Kubernetes and Virtualization, such as VMWare.</li>
+</ul>
+<p>Find yourself checking a lot of these boxes but doubting whether you should apply? At Alteryx, we support a growth mindset for our associates through all stages of their careers. If you meet some of the requirements and you share our values, we encourage you to apply. As part of our ongoing commitment to a diverse, equitable, and inclusive workplace, we’re invested in building teams with a wide variety of backgrounds, identities, and experiences.</p>","2025-04-11 04:57:50",0,0,,0,"No comments provided"
