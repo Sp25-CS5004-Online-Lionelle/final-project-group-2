@@ -2,11 +2,7 @@ package skillzhunter.view;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.util.List;
-import java.awt.Container;
-import java.awt.TextField;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
@@ -18,23 +14,34 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import skillzhunter.controller.IController;
 
 public class MainView extends JFrame implements IView {
-
-    private JPanel mainPane = new JPanel();
-    final private JobView findJobTab;
-    final private JobView savedJobTab;
+    /** Mian Pane. */
+    private final JPanel mainPane = new JPanel();
+    /** Find Job Tab. */
+    private final JobView findJobTab;
+    /** Saved Job Tab. */
+    private final JobView savedJobTab;
+    /** Tabbed Pane. */
     private JTabbedPane tabbedPane;
-    private TabStyleManager tabStyleManager;
-    final private IController controller;
+    /** Tab Style Manager. */
+    private final TabStyleManager tabStyleManager;
+    /** Controller. */
+    private final IController controller;
+    /** Custom Menu Bar. */
     private CustomMenuBar customMenuBar;
+    /** Theme. */
     private ColorTheme theme;
 
+    /**
+     * Creates main view and pane for model.
+     * 
+     * @param controller The controller instance
+     */
     public MainView(IController controller) {
         super("Jobz Hunter App");
         this.controller = controller;
@@ -75,6 +82,9 @@ public class MainView extends JFrame implements IView {
     }
 
     //These next two methods are all about setting up the enter key to search
+    /**
+     * Sets up the exit key (Ctrl+Q).
+     */
     private void setupExitKeyAction() {
         Action exitAction = new AbstractAction() {
             @Override
@@ -99,29 +109,32 @@ public class MainView extends JFrame implements IView {
         actionMap.put("exit", exitAction);
     }
 
-    //Helper method to disable Enter key default behavior in text components
-    private void disableEnterKeyTraversalIn(Container container) {
-        for (Component comp : container.getComponents()) {
-            if (comp instanceof JTextField || comp instanceof TextField) {
-                comp.addKeyListener(new KeyAdapter() {
-                    @Override
-                    public void keyPressed(KeyEvent e) {
-                        if (e.getKeyCode() == KeyEvent.VK_Q) {
-                            System.exit(0);
-                            e.consume(); // Prevent default handling
-                        }
-                    }
-                });
-            }
-            // Recursively process nested containers
-            if (comp instanceof Container) {
-                disableEnterKeyTraversalIn((Container) comp);
-            }
-        }
-    }
+    // //Helper method to disable Enter key default behavior in text components
+    // private void disableEnterKeyTraversalIn(Container container) {
+    //     for (Component comp : container.getComponents()) {
+    //         if (comp instanceof JTextField || comp instanceof TextField) {
+    //             comp.addKeyListener(new KeyAdapter() {
+    //                 @Override
+    //                 public void keyPressed(KeyEvent e) {
+    //                     if (e.getKeyCode() == KeyEvent.VK_Q) {
+    //                         System.exit(0);
+    //                         e.consume(); // Prevent default handling
+    //                     }
+    //                 }
+    //             });
+    //         }
+    //         // Recursively process nested containers
+    //         if (comp instanceof Container) {
+    //             disableEnterKeyTraversalIn((Container) comp);
+    //         }
+    //     }
+    // }
     
     /**
      * Builds the tabbed pane for the main view.
+     * @param findJobTab The tab for finding jobs
+     * @param savedJobTab The tab for saved jobs
+     * @return The created tabbed pane
      */
     private JTabbedPane buildTabbedPane(JobView findJobTab, JobView savedJobTab) {
         // Create the tabbed pane
@@ -150,7 +163,7 @@ public class MainView extends JFrame implements IView {
     }
 
     /**
-     * Creates and adds the custom menu bar to the frame
+     * Creates and adds the custom menu bar to the frame.
      */
     private void createCustomMenu() {
         // Create our custom menu bar
@@ -164,12 +177,13 @@ public class MainView extends JFrame implements IView {
     }
 
     /**
-     * Maps action listeners to menu items
+     * Maps action listeners to menu items.
      */
     private void mapMenuEvents() {
         // Exit Functionality
         customMenuBar.getExitItem().addActionListener(exitEvent -> {
-            int result = JOptionPane.showConfirmDialog(tabbedPane, "Are you sure you want to exit?", "Exit", JOptionPane.YES_NO_OPTION);
+            int result = JOptionPane.showConfirmDialog(tabbedPane, "Are you sure you want to exit?", 
+            "Exit", JOptionPane.YES_NO_OPTION);
             if (result == JOptionPane.YES_OPTION) {
                 System.exit(0);
             }
@@ -203,6 +217,7 @@ public class MainView extends JFrame implements IView {
     
     /**
      * Applies the specified color theme to all components in the view hierarchy.
+     * @param theme The color theme to apply
      */
     private void applyTheme(ColorTheme theme) {
         // Apply theme to main frame components

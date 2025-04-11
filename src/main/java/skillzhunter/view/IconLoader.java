@@ -2,6 +2,7 @@ package skillzhunter.view;
 
 import java.awt.Image;
 import java.net.URL;
+
 import javax.swing.ImageIcon;
 
 /**
@@ -15,7 +16,14 @@ import javax.swing.ImageIcon;
  * - Star rating icons: 20x20
  * - Light/Dark mode menu icons: 12x12
  */
-public class IconLoader {
+public final class IconLoader {
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private IconLoader() {
+        throw new UnsupportedOperationException("Utility class cannot be instantiated");
+    }
     
     /**
      * Loads an icon from the resources folder with default size (24x24).
@@ -45,8 +53,7 @@ public class IconLoader {
                 return new ImageIcon(img);
             }
         } catch (Exception e) {
-            System.err.println("Error loading icon: " + path);
-            e.printStackTrace();
+            System.err.println("Error loading icon: " + path + " - " + e.getMessage());
         }
         return null;
     }
@@ -99,7 +106,8 @@ public class IconLoader {
             
             // Set browser-like headers to avoid being blocked
             connection.setRequestProperty("User-Agent", 
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36");
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit"
+                + "/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36");
             
             // Connect and check response
             int responseCode = connection.getResponseCode();

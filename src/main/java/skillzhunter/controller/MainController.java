@@ -1,8 +1,5 @@
 package skillzhunter.controller;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -11,20 +8,18 @@ import java.util.Map;
 import skillzhunter.model.IModel;
 import skillzhunter.model.JobRecord;
 import skillzhunter.model.Jobs;
-import skillzhunter.model.formatters.DataFormatter;
-import skillzhunter.model.formatters.Formats;
 import skillzhunter.view.IView;
 import skillzhunter.view.MainView;
 import skillzhunter.view.SavedJobsTab;
 
 public class MainController implements IController {
 
-    /** Model */
+    /** Model. */
     private IModel model;
-    /** View */
+    /** View. */
     private IView view;
-    /** Saved jobs tab */
-    private SavedJobsTab savedJobsTab;
+    /** Saved jobs tab. */
+    private final SavedJobsTab savedJobsTab;
 
     /**
      * Constructor for MainController.
@@ -62,6 +57,7 @@ public class MainController implements IController {
 
     /**
      * Returns the model.
+     * @return IModel
      */
     @Override
     public IModel getModel() {
@@ -81,6 +77,7 @@ public class MainController implements IController {
 
     /**
      * Gets the locations from the API and capitalizes them appropriately.
+     * @return List<String> of locations
      */
     @Override
     public List<String> getLocations() {
@@ -89,6 +86,7 @@ public class MainController implements IController {
 
     /**
      * Gets the industries from the API and capitalizes them appropriately.
+     * @return List<String> of industries
      */
     @Override
     public List<String> getIndustries() {
@@ -136,12 +134,12 @@ public class MainController implements IController {
     }
 
     /**
-     * Gets the API call for job search.
+     * Gets the API call for jobicy api search.
      * 
      * @param query The search query
-     * @param numberOfResults The number of results to return
-     * @param location The location to filter by
-     * @param industry The industry to filter by
+     * @param numberOfResults The number of results to return (Nullable)
+     * @param location The location to filter by (Nullable)
+     * @param industry The industry to filter by (Nullable)
      * @return List of JobRecord objects
      */
     @Override
@@ -180,7 +178,7 @@ public class MainController implements IController {
      * @param jobRecord The JobRecord object to add
      */
     @Override
-    public void getAddJob(JobRecord jobRecord) {
+    public void job2SavedList(JobRecord jobRecord) {
         model.addJob(jobRecord);
     }
 
@@ -190,30 +188,33 @@ public class MainController implements IController {
      * @param index The index of the job to remove
      */
     @Override
-    public void getRemoveJob(int index) {
+    public void removeJobFromList(int index) {
         model.removeJob(index);
     }
 
-
+    
     /**
      * Saves the job records to a CSV file.
+     * @param filePath The file path to save the CSV file
      */
     @Override
-    public void getSavedJobsToCsv(String filePath) {
+    public void path2CSV(String filePath) {
         model.saveJobsToCsv(filePath);
     }
-
+    
     /**
      * Exports the saved jobs to a specified format and file path.
+     * @param jobs The list of JobRecord objects to export
+     * @param formatStr The format string (e.g., "csv", "json")
+     * @param filePath The file path to save the exported file
      */
     @Override
-    public void getExportSavedJobs(List<JobRecord> jobs, String formatStr, String filePath) {
+    public void export2FileType(List<JobRecord> jobs, String formatStr, String filePath) {
         model.exportSavedJobs(jobs, formatStr, filePath);
     }
 
     /**
      * Gets the saved jobs tab.
-     * 
      * @return The saved jobs tab
      */
     public SavedJobsTab getSavedJobsTab() {
@@ -222,7 +223,7 @@ public class MainController implements IController {
     
 
     /**
-     * Updates a job with new comments and rating
+     * Updates a job with new comments and rating.
      * 
      * @param id The ID of the job to update
      * @param comments The comments to set
@@ -230,7 +231,8 @@ public class MainController implements IController {
      * @return The updated JobRecord
      */
     public JobRecord getUpdateJob(int id, String comments, int rating) {
-        model.updateJob(id, comments, rating); //IDEA: if model.updateJob returns a record then you can delete the loop at the end
+        //IDEA: if model.updateJob returns a record then you can delete the loop at the end
+        model.updateJob(id, comments, rating);
         savedJobsTab.updateJobsList(model.getJobRecords());
         
         // Return the updated job record so the view can use it
@@ -241,8 +243,11 @@ public class MainController implements IController {
         }
         return null;
     }
-
+    /**
+     * Main method for testing purposes.
+     * @param args
+     */
     public static void main(String[] args) {
-        MainController mainController = new MainController();
+        // MainController mainController = new MainController();
     }
 }

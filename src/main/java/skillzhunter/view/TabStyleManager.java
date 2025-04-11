@@ -12,9 +12,13 @@ import javax.swing.event.ChangeListener;
  * Handles the creation and styling of tabs based on the current theme.
  */
 public class TabStyleManager {
-    private JTabbedPane tabbedPane;
-    private JLabel[] tabLabels;
+    /** pane for tabs. */
+    private final JTabbedPane tabbedPane;
+    /** labels for tabs. */
+    private final JLabel[] tabLabels;
+    /** theme for tabs. */
     private ColorTheme theme;
+    /** macOS flag. */
     private final boolean isMacOS;
     
     /**
@@ -85,11 +89,12 @@ public class TabStyleManager {
         Color tabPaneBackground;
         
         if (isMacOS) {
-            tabPaneBackground = (theme == ColorTheme.DARK) ? 
-                                theme.macTabPaneBgDark : theme.macTabPaneBgLight;
+            tabPaneBackground = (theme == ColorTheme.DARK)
+                                ? theme.macTabPaneBgDark : theme.macTabPaneBgLight;
         } else {
-            tabPaneBackground = (theme == ColorTheme.DARK) ? 
-                                theme.winTabPaneBgDark : theme.winTabPaneBgLight;
+            tabPaneBackground = (theme == ColorTheme.DARK)
+                                ? theme.winTabPaneBgDark 
+                                : theme.winTabPaneBgLight;
         }
         
         // Apply background color to tabbedPane
@@ -101,13 +106,14 @@ public class TabStyleManager {
     }
     
     /**
-     * Gets the appropriate tab colors based on platform and theme
+     * Gets the appropriate tab colors based on platform and theme.
      * 
      * @param isSelected Whether this is for a selected tab
      * @return Array containing [background color, foreground color]
      */
     private Color[] getTabColors(boolean isSelected) {
-        Color bg, fg;
+        Color bg; 
+        Color fg;
         
         if (isMacOS) {
             // macOS coloring
@@ -149,14 +155,16 @@ public class TabStyleManager {
             }
         }
         
-        return new Color[] { bg, fg };
+        return new Color[] {bg, fg};
     }
     
     /**
      * Updates the appearance of all tabs based on selection state and theme.
      */
     private void updateTabStyles() {
-        if (theme == null) return;
+        if (theme == null) {
+            return;
+        }
         
         int selectedIndex = tabbedPane.getSelectedIndex();
         

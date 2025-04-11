@@ -1,13 +1,10 @@
 package skillzhunter.view;
 
 import java.awt.Dimension;
-import java.awt.Component;
 import java.util.Comparator;
 
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.RowSorter;
-import javax.swing.SortOrder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
@@ -18,19 +15,44 @@ import javax.swing.table.TableRowSorter;
  * A table for displaying job listings with basic sorting functionality.
  */
 public class JobsTable extends JTable {
-
+  /** 
+   * Table model for the job listings.
+   */
   private DefaultTableModel tableModel;
+  /** 
+   * Row sorter for sorting the table rows.
+   */
   private TableRowSorter<DefaultTableModel> sorter;
-  private String[] columnNames = { "Logo", "Job Title", "Company", "Level", "Salary Range", "Currency" };
+  /** 
+   * Column names for the table.
+   */
+  private String[] columnNames = {"Logo", "Job Title", "Company", "Level", "Salary Range", "Currency" };
+  /** 
+   * Custom header renderer for sortable columns.
+   */
   private CustomHeader customHeaderRenderer;
+  /**
+   * Current color theme for the table.
+   */
   private ColorTheme currentTheme = ColorTheme.LIGHT; // Default theme
+  /**
+   * Image cell renderer for displaying logos.
+   */
   private ImageCellRenderer imageCellRenderer = new ImageCellRenderer();
 
+  /**
+   * Default constructor that initializes the table with no data.
+   */
   public JobsTable() {
     this(new String[] {}, new Object[0][0]);
     setPreferredScrollableViewportSize(new Dimension(1000, 500));
   }
-
+  /**
+   * Constructor that initializes the table with specified column names and data.
+   * This constructor is used to create the table with data from the controller.
+   * @param columnNames
+   * @param data
+   */
   public JobsTable(String[] columnNames, Object[][] data) {
     // Create a non-editable table model
     tableModel = new DefaultTableModel(data, columnNames) {
@@ -67,7 +89,7 @@ public class JobsTable extends JTable {
   }
   
   /**
-   * Sets up custom renderers for specific columns
+   * Sets up custom renderers for specific columns.
    */
   private void setupColumnRenderers() {
     // Set the logo column renderer (column 0)
@@ -103,7 +125,7 @@ public class JobsTable extends JTable {
   }
   
   /**
-   * Sets up the custom header renderer for visual indication of sortable columns
+   * Sets up the custom header renderer for visual indication of sortable columns.
    */
   private void setupHeaderRenderer() {
     JTableHeader header = getTableHeader();
@@ -127,7 +149,10 @@ public class JobsTable extends JTable {
       }
     }
   }
-
+  /**
+   * sets the data for the table model and reconfigures the sorter.
+   * @param data
+   */
   public void setData(Object[][] data) {
     tableModel.setDataVector(data, getColumnNames());
     
@@ -152,8 +177,9 @@ public class JobsTable extends JTable {
   }
 
   /**
-   * Configure any special column comparators for the sorter
+   * Configure any special column comparators for the sorter.
    */
+  @SuppressWarnings("Convert2Lambda")
   private void configureColumnSorters() {
     if (sorter != null) {
       // Add special comparator for the Salary Range column (index 4)
@@ -185,7 +211,9 @@ public class JobsTable extends JTable {
   }
   
   /**
-   * Helper method to extract minimum salary from range string
+   * Helper method to extract minimum salary from range string.
+   * @param salaryRange The salary range string (e.g., "120,000 - 150,000")
+   * @return The minimum salary as an integer, or 0 if parsing fails
    */
   private int extractMinSalary(String salaryRange) {
     try {
@@ -199,6 +227,10 @@ public class JobsTable extends JTable {
     }
   }
 
+  /**
+   * Sets the column names for the table model and reconfigures the header renderer.
+   * @param columnNames The new column names to set
+   */
   public void setColumnNames(String[] columnNames) {
     tableModel.setColumnIdentifiers(columnNames);
     setupHeaderRenderer(); // Reapply the custom header
@@ -207,21 +239,35 @@ public class JobsTable extends JTable {
     // Re-apply theme to ensure consistent styling
     applyTheme(currentTheme);
   }
-
+  /**
+   * Adds a new row to the table model with the specified data.
+   * @param rowData The data for the new row
+   */
   public void addRow(Object[] rowData) {
     tableModel.addRow(rowData);
   }
-
+  /**
+   * Removes a row from the table model at the specified index.
+   * @param row The index of the row to remove
+   */
   public void removeRow(int row) {
     int modelRow = convertRowIndexToModel(row);
     tableModel.removeRow(modelRow);
   }
-
+  /**
+   * Updates a cell in the table model at the specified row and column with the given value.
+   * @param row The row index of the cell to update
+   * @param column The column index of the cell to update
+   * @param value The new value to set in the cell
+   */
   public void updateCell(int row, int column, Object value) {
     int modelRow = convertRowIndexToModel(row);
     tableModel.setValueAt(value, modelRow, column);
   }
-
+  /**
+   * Returns the value at the specified row and column in the table model.
+   * @return The value at the specified row and column
+   */
   @Override
   public int getRowCount() {
     return tableModel.getRowCount();
@@ -231,13 +277,16 @@ public class JobsTable extends JTable {
   public int getColumnCount() {
     return tableModel.getColumnCount();
   }
-
+  /**
+   * Returns the column names of the table model.
+   * @return The column names of the table model
+   */
   public String[] getColumnNames() {
     return this.columnNames;
   }
   
   /**
-   * Clean up resources when the table is no longer needed
+   * Clean up resources when the table is no longer needed.
    */
   public void cleanup() {
     if (imageCellRenderer != null) {

@@ -1,9 +1,6 @@
 package skillzhunter.view;
 
-import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JButton;
@@ -14,7 +11,9 @@ import javax.swing.JButton;
  * Supports multiple button types based on Bootstrap styling (primary, secondary, success, etc.)
  */
 public class ThemedButton extends JButton {
+    /** Button Theme. */
     private ColorTheme theme;
+    /** Hover state. */
     private boolean isHovering = false;
     private ButtonType buttonType = ButtonType.PRIMARY; // Default to primary
     
@@ -118,7 +117,9 @@ public class ThemedButton extends JButton {
      * Updates button colors based on current theme, button type, and hover state.
      */
     private void updateButtonColors() {
-        if (theme == null) return;
+        if (theme == null) {
+            return;
+        }
         
         Color normalColor;
         Color hoverColor;
@@ -178,4 +179,6 @@ public class ThemedButton extends JButton {
     public ColorTheme getTheme() {
         return theme;
     }
+
+
 }

@@ -12,9 +12,14 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
 
     /**
      * Shows job details when accessed from the Find Jobs tab
-     * with "Save this Job?" option and fields for user input
+     * with "Save this Job?" option and fields for user input.
+     * @param parent The parent component
+     * @param job The job record from the controller
+     * @param savedJobs List of saved jobs
+     * @param controller The controller instance
      */
-    public static void showJobDetails(Component parent, JobRecord job, List<JobRecord> savedJobs, IController controller) {
+    public static void showJobDetails(Component parent, JobRecord job,
+                                    List<JobRecord> savedJobs, IController controller) {
         if (job == null || controller == null) {
             ImageIcon errorIcon = IconLoader.loadIcon("images/warning.png");
             JOptionPane.showMessageDialog(parent,
@@ -39,7 +44,10 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
     
     /**
      * Shows job details when accessed from Find Jobs tab
-     * with "Save this Job?" option and fields for user input
+     * with "Save this Job?" option and fields for user input.
+     * @param parent The parent component
+     * @param job The job record from the controller
+     * @param controller The controller instance
      */
     private static void showFindJobDetails(Component parent, JobRecord job, IController controller) {
         // Create the dialog using the base class method
@@ -115,11 +123,11 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
             String commentText = commentsArea.getText().isEmpty() ? "No comments provided" : commentsArea.getText();
             
             // First, add the job to the model through the controller
-            controller.getAddJob(job);
+            controller.job2SavedList(job);
             
             // Then update the job with the rating and comments through the controller
-            if (controller instanceof MainController) {
-                ((MainController) controller).getUpdateJob(job.id(), commentText, newRating);
+            if (controller instanceof MainController cont) {
+                (cont).getUpdateJob(job.id(), commentText, newRating);
             }
             
             // Switch to "Saved Jobs" tab after adding a job

@@ -6,7 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonPropertyOrder({"apiVersion", "documentationUrl", "friendlyNotice", "jobCount", "xRayHash", "clientKey", "lastUpdate", "jobs"})
+@JsonPropertyOrder({"apiVersion", "documentationUrl", "friendlyNotice",
+                    "jobCount", "xRayHash", "clientKey", "lastUpdate", "jobs"})
 public record ResponseRecord(
     String apiVersion,
     String documentationUrl,
@@ -16,4 +17,4 @@ public record ResponseRecord(
     String clientKey,
     String lastUpdate,
     List<JobRecord> jobs
-) {}
+) { }
