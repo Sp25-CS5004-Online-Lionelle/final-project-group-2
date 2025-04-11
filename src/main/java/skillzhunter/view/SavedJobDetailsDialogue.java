@@ -1,6 +1,7 @@
 package skillzhunter.view;
 
 import javax.swing.*;
+
 import java.awt.*;
 
 import skillzhunter.model.JobRecord;
@@ -14,19 +15,24 @@ import skillzhunter.controller.MainController;
 public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
     
     // Icons for buttons and dialogs
-    private static ImageIcon editIcon;
-    private static ImageIcon deleteIcon;
-    private static ImageIcon closeIcon;
-    private static ImageIcon warningIcon;
-    private static ImageIcon successIcon;
+    /** edit icon. */
+    private static final ImageIcon EDIT_ICON;
+    /** delete icon. */
+    private static final ImageIcon DELETE_ICON;
+    /** close icon. */
+    private static final ImageIcon CLOSE_ICON;
+    /** warning icon. */
+    private static final ImageIcon WARNING_ICON;
+    /** success icon. */
+    private static final ImageIcon SUCCESS_ICON;
     
     // Initialize icons
     static {
-        editIcon = IconLoader.loadIcon("images/edit.png", 24, 24);
-        deleteIcon = IconLoader.loadIcon("images/delete.png", 24, 24);
-        closeIcon = IconLoader.loadIcon("images/close.png", 24, 24);
-        warningIcon = IconLoader.loadIcon("images/warning.png", 24, 24);
-        successIcon = IconLoader.loadIcon("images/success.png", 24, 24);
+        EDIT_ICON = IconLoader.loadIcon("images/edit.png", 24, 24);
+        DELETE_ICON = IconLoader.loadIcon("images/delete.png", 24, 24);
+        CLOSE_ICON = IconLoader.loadIcon("images/close.png", 24, 24);
+        WARNING_ICON = IconLoader.loadIcon("images/warning.png", 24, 24);
+        SUCCESS_ICON = IconLoader.loadIcon("images/success.png", 24, 24);
     }
     
     /**
@@ -43,7 +49,7 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
                 "Job or controller not provided.",
                 "Error",
                 JOptionPane.INFORMATION_MESSAGE,
-                warningIcon);
+                WARNING_ICON);
             return;
         }
         
@@ -59,17 +65,17 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
         
         // Create themed buttons
         ThemedButton editButton = new ThemedButton("Edit");
-        editButton.setIcon(editIcon);
+        editButton.setIcon(EDIT_ICON);
         editButton.setHorizontalTextPosition(SwingConstants.LEFT);
         editButton.setIconTextGap(5);
         
         ThemedButton deleteButton = new ThemedButton("Delete");
-        deleteButton.setIcon(deleteIcon);
+        deleteButton.setIcon(DELETE_ICON);
         deleteButton.setHorizontalTextPosition(SwingConstants.LEFT);
         deleteButton.setIconTextGap(5);
         
         ThemedButton closeButton = new ThemedButton("Close");
-        closeButton.setIcon(closeIcon);
+        closeButton.setIcon(CLOSE_ICON);
         closeButton.setHorizontalTextPosition(SwingConstants.LEFT);
         closeButton.setIconTextGap(5);
         
@@ -131,7 +137,7 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
                 "Edit Job: " + job.jobTitle(),
                 JOptionPane.OK_CANCEL_OPTION,
                 JOptionPane.PLAIN_MESSAGE,
-                editIcon
+                EDIT_ICON
             );
             
             // Process the result
@@ -154,7 +160,7 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
                             "Job updated successfully!",
                             "Update Complete",
                             JOptionPane.INFORMATION_MESSAGE,
-                            successIcon
+                            SUCCESS_ICON
                         );
                         
                         // Update SavedJobsTab if needed
@@ -186,7 +192,7 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
                 "Confirm Delete",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE,
-                deleteIcon,
+                DELETE_ICON,
                 options,
                 options[1]  // Default is Cancel
             );
@@ -214,7 +220,7 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
                     "Job deleted successfully!",
                     "Delete Complete",
                     JOptionPane.INFORMATION_MESSAGE,
-                    successIcon
+                    SUCCESS_ICON
                 );
                 dialog.dispose();
             }
@@ -228,4 +234,5 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setVisible(true);
     }
+
 }
