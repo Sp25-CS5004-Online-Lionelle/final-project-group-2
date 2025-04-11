@@ -14,11 +14,11 @@ import skillzhunter.view.SavedJobsTab;
 
 public class MainController implements IController {
 
-    /** Model */
+    /** Model. */
     private IModel model;
-    /** View */
+    /** View. */
     private IView view;
-    /** Saved jobs tab */
+    /** Saved jobs tab. */
     private SavedJobsTab savedJobsTab;
 
     /**
@@ -57,6 +57,7 @@ public class MainController implements IController {
 
     /**
      * Returns the model.
+     * @return IModel
      */
     @Override
     public IModel getModel() {
@@ -76,6 +77,7 @@ public class MainController implements IController {
 
     /**
      * Gets the locations from the API and capitalizes them appropriately.
+     * @return List<String> of locations
      */
     @Override
     public List<String> getLocations() {
@@ -84,6 +86,7 @@ public class MainController implements IController {
 
     /**
      * Gets the industries from the API and capitalizes them appropriately.
+     * @return List<String> of industries
      */
     @Override
     public List<String> getIndustries() {
@@ -131,12 +134,12 @@ public class MainController implements IController {
     }
 
     /**
-     * Gets the API call for job search.
+     * Gets the API call for jobicy api search.
      * 
      * @param query The search query
-     * @param numberOfResults The number of results to return
-     * @param location The location to filter by
-     * @param industry The industry to filter by
+     * @param numberOfResults The number of results to return (Nullable)
+     * @param location The location to filter by (Nullable)
+     * @param industry The industry to filter by (Nullable)
      * @return List of JobRecord objects
      */
     @Override
@@ -192,6 +195,7 @@ public class MainController implements IController {
     
     /**
      * Saves the job records to a CSV file.
+     * @param filePath The file path to save the CSV file
      */
     @Override
     public void path2CSV(String filePath) {
@@ -200,6 +204,9 @@ public class MainController implements IController {
     
     /**
      * Exports the saved jobs to a specified format and file path.
+     * @param jobs The list of JobRecord objects to export
+     * @param formatStr The format string (e.g., "csv", "json")
+     * @param filePath The file path to save the exported file
      */
     @Override
     public void export2FileType(List<JobRecord> jobs, String formatStr, String filePath) {
@@ -208,7 +215,6 @@ public class MainController implements IController {
 
     /**
      * Gets the saved jobs tab.
-     * 
      * @return The saved jobs tab
      */
     public SavedJobsTab getSavedJobsTab() {
@@ -237,8 +243,11 @@ public class MainController implements IController {
         }
         return null;
     }
-
+    /**
+     * Main method for testing purposes.
+     * @param args
+     */
     public static void main(String[] args) {
-        MainController mainController = new MainController();
+        // MainController mainController = new MainController();
     }
 }
