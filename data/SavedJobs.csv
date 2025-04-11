@@ -1,2 +1,80 @@
 id,url,jobSlug,jobTitle,companyName,companyLogo,jobIndustry,jobType,jobGeo,jobLevel,jobExcerpt,jobDescription,pubDate,annualSalaryMin,annualSalaryMax,salaryCurrency,rating,comments
-116798,,,"Data Engineer",Pagos,,"Data Science &amp; Analytics",full-time,Europe,Any,,,"2025-04-09 18:59:15",0,0,,0,"No comments provided"
+116838,"https://jobicy.com/jobs/116838-product-manager-ai-services","116838-product-manager-ai-services","Product Manager,  AI Services",Vultr,"https://jobicy.com/data/server-nyc0409/galaxy/mercury/2024/04/4089507a-221.jpeg","Product & Operations",full-time,Anywhere,Any,"Vultr was an early entrant in cloud GPU infrastructure and the first to offer on-demand, fractionalized GPU cards. We have built on this success to offer an extensive list of GPU products that service different parts of the market across multiple manufacturers. GPU infrastructure continues to be one of the company’s top priorities as we increase…","<p>Vultr was an early entrant in cloud GPU infrastructure and the first to offer on-demand, fractionalized GPU cards. We have built on this success to offer an extensive list of GPU products that service different parts of the market across multiple manufacturers. GPU infrastructure continues to be one of the company’s top priorities as we increase the number of ways we can deliver AI / ML service and infrastructure to our customers. We are looking for a <strong>Product Manager, AI Services</strong> to help us shape, define, and develop the future of our GPU-based infrastructure offerings.</p>
+<h2>As a Product Manager at Vultr you will be in the middle of it all, helping to shape and drive innovation. You would be:</h2>
+<ul>
+<li>Working directly with executives on core company strategy</li>
+<li>Collaborating with technical leads and architects on product roadmaps</li>
+<li>Planning and validating required functionality with solution engineering</li>
+<li>Work directly with sales and marketing on go-to-market strategies</li>
+<li>Perform market assessment and competitive analysis</li>
+<li>Work directly with customers to understand their business and technical needs</li>
+</ul>
+<h2>This person will be:</h2>
+<ul>
+<li>Supporting engineering efforts and strategies around GPU delivery</li>
+<li>Supproting strategy to make our fleet of GPUs super easy for our customers to consume, leverage, and grow with</li>
+<li>Define the supporting software ecosystem needed to quickly deliver, setup, and configure GPU infrastructure to minimize the ‘time to value’ for our customers</li>
+<li>Help drive network architecture and GPU direct technologies, including both InfiniBand as well as RoCe implementations</li>
+<li>Define and iterate ongoing methods for bespoke customer hardware</li>
+</ul>
+<p>You should have relevant experience with AI / ML, GPU implementations, data-center infrastructure, and cloud compute, as well as experience with the many ways GPUs are used within startups, SMBs, and enterprise development teams. Experience in product management best practices around the process and execution of the product development lifecycle is a must. You should be competent and excited to drive a vision, strategy, and roadmap.</p>
+<h2><strong>What to expect: </strong></h2>
+<p>As we continue to invest in our ever-growing data center locations, we need to define our next-generation strategies for highly composable infrastructure that will maximize those investments.Our product offerings will each need its own analysis, opportunity assessment, execution strategy, and roadmap that fits into a larger plan:</p>
+<ul>
+<li>Consolidate, synthesize, and communicate market assessment and opportunities for serverless products</li>
+<li>Apply and show data-driven decision-making</li>
+<li>Leverage a design thinking-based approach to identify user needs</li>
+<li>Work across silos with ‘event storming’ collaboration strategies to ensure the roadmap is accretive and effective across multiple product categories and teams</li>
+<li>Evaluate and assess current product capabilities</li>
+<li>Propose product roadmaps to maximize business value through strategic technical investments</li>
+<li>Create product roadmaps that outline a product’s evolution over time-based on market conditions and customer feedback</li>
+<li>Work with leadership to define and target market opportunities</li>
+<li>Work with engineering to define and sequence development efforts</li>
+<li>Research new technologies and identify opportunities for improvement or change</li>
+<li>Communicate with clients, including conducting workshops and seminars to educate them on new products or services</li>
+<li>Analyze customer needs and provide guidance on how to meet those needs by suggesting solutions and recommending products</li>
+<li>Identify potential challenges or problems with existing products or services and propose solutions</li>
+<li>Develop business cases for new products or services based on market research</li>
+<li>Work with engineering teams to develop new cloud computing products or services</li>
+<li>Manage the product life cycle from conception through retirement to ensure that all products meet the company’s standards for quality and performance</li>
+<li>Develop strategies to increase market share and improve customer satisfaction with existing products</li>
+<li>Evaluate existing and new cloud technologies, advance storage features, and new operational methodology to drive efficiency, availability, and effectiveness of our services</li>
+</ul>
+<h2><strong>Our ideal candidate will have: </strong></h2>
+<ul>
+<li>6+ years and extensive experience configuring, deploying, and managing GPU deployment</li>
+<li>5+ years of product management, technical program management, or related work experiences</li>
+<li>Solid experience with AI / ML orchestration</li>
+<li>History of driving product management requirements analysis and definition</li>
+<li>Solid understanding of common enterprise and SMB technical and business requirements</li>
+<li>Experience in a dynamic, fast-paced environment that requires independent time management, task prioritization, flexibility, and keen experience to identify problems and proactively work toward solutions</li>
+<li>Experience with effectively working with cross-functional teams including, but not limited to, executives, engineering, marketing, operations, and finance</li>
+<li>Track record of operating independently and taking initiative, embracing ambiguity, demonstrating creativity, being detail-oriented, and delivering results in a highly organized manner</li>
+<li>Ability to effectively communicate complex technical concepts to a broad range of audiences.</li>
+</ul>
+<h2>Compensation</h2>
+<p>$150,000 – $185,000 + Bonus</p>
+<p>Vultr is committed to an inclusive workforce where diversity is celebrated and supported. All employment decisions at Vultr are based on business needs, job requirements, and individual qualifications.</p>
+<p>Vultr regards the lawful and correct use of personal information as important to the accomplishment of our objectives, to the success of our operations and to maintaining confidence between those with whom we deal and ourselves. As such the use of various key privacy controls enables Vultr’s treatment of personal information to meet current regulatory guidelines and laws.</p>
+<p>Workforce members have the right under US state law where and when applicable and certain other privacy and data protection laws, as applicable, to: fair and equal treatment, knowing what personal data we gather and retain, for what purpose, and the ability to access and/or delete such data. You also have the right to opt out of communications from Vultr and approved third- parties at any time.</p>","2025-04-11 05:02:28",150000,185000,USD,0,"No comments provided"
+106043,"https://jobicy.com/jobs/106043-large-language-model-llm-ai-research-engineer","106043-large-language-model-llm-ai-research-engineer","Large Language Model (LLM) AI Research Engineer",upfeat,"https://jobicy.com/data/server-nyc0409/galaxy/mercury/2021/10/22b8d94f669de7f756f7dec30801fe32.png","Software Engineering",full-time,Anywhere,Any,"We’re on the lookout for a Large Language Model (LLM) AI Research Engineer who loves getting their hands dirty in the world of NLP. If you’re the kind of person who enjoys diving into complex problems, playing around with massive data sets and turning big ideas into real-world solutions, then you’ll fit right in! This…","<p>We’re on the lookout for a Large Language Model (LLM) AI Research Engineer who loves getting their hands dirty in the world of NLP. If you’re the kind of person who enjoys diving into complex problems, playing around with massive data sets and turning big ideas into real-world solutions, then you’ll fit right in!</p>
+<p>This role is perfect for someone who likes to work both in a team and independently, bringing innovative ideas to life, especially in the area of LLMs. We’re a rapidly growing company with a mission and we want someone who’s as excited as we are to make a big impact. We are also looking for people that are passionate about empowering the financial success of our customers.<strong><br />
+</strong></p>
+<h2>Job requirements:</h2>
+<p><strong>Responsibilities:</strong></p>
+<ul>
+<li>Lead the development and management of datasets specifically tailored for fine-tuning LLMs, aimed at maximizing model efficiency and effectiveness.</li>
+<li>A/B test different open-source LLMs to enhance performance and applicability.</li>
+<li>Develop cool applications using LLMs and if you’ve worked with Huggingface that’s a plus.</li>
+<li>Engage in pioneering projects with langchain and related LLM applications, pushing technology boundaries and trying new things.</li>
+</ul>
+<p><strong>Qualifications:</strong></p>
+<ul>
+<li>A Bachelor’s degree in Computer Science or Machine Learning.</li>
+<li>Experience with Langchain and RAG</li>
+<li>Experience training / fine tuning and deploying open source LLM’s</li>
+<li>Proficient in Python with extensive experience in ML libraries like TensorFlow and PyTorch.</li>
+<li>Exceptional problem solving abilities, meticulous attention to detail and a talent for logical reasoning</li>
+</ul>
+<p><strong>Notice for Job Applicants:</strong></p>
+<p>We are living and thriving on diversity at Upfeat! We thank all applicants, however only those selected for an interview will be contacted.</p>","2025-04-11 04:47:48",0,0,,0,"No comments provided"
