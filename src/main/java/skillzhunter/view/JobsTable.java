@@ -179,6 +179,7 @@ public class JobsTable extends JTable {
   /**
    * Configure any special column comparators for the sorter.
    */
+  @SuppressWarnings("Convert2Lambda")
   private void configureColumnSorters() {
     if (sorter != null) {
       // Add special comparator for the Salary Range column (index 4)
@@ -240,6 +241,7 @@ public class JobsTable extends JTable {
   }
   /**
    * Adds a new row to the table model with the specified data.
+   * @param rowData The data for the new row
    */
   public void addRow(Object[] rowData) {
     tableModel.addRow(rowData);
@@ -255,6 +257,8 @@ public class JobsTable extends JTable {
   /**
    * Updates a cell in the table model at the specified row and column with the given value.
    * @param row The row index of the cell to update
+   * @param column The column index of the cell to update
+   * @param value The new value to set in the cell
    */
   public void updateCell(int row, int column, Object value) {
     int modelRow = convertRowIndexToModel(row);
