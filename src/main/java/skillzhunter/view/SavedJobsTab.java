@@ -171,7 +171,7 @@ public class SavedJobsTab extends JobView {
                 if (result == JOptionPane.YES_OPTION) {
                     // Save to data/SavedJobs.csv in a fixed location (overwrite each time)
                     String filePath = "data/SavedJobs.csv";
-                    controller.getSavedJobsToCsv(filePath);
+                    controller.path2CSV(filePath);
                     
                     // Use save icon for success message
                     JOptionPane.showMessageDialog(parentFrame,

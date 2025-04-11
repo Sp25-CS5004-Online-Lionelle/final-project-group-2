@@ -194,10 +194,10 @@ public class MainController implements IController {
      * Saves the job records to a CSV file.
      */
     @Override
-    public void getSavedJobsToCsv(String filePath) {
+    public void path2CSV(String filePath) {
         model.saveJobsToCsv(filePath);
     }
-
+    
     /**
      * Exports the saved jobs to a specified format and file path.
      */
