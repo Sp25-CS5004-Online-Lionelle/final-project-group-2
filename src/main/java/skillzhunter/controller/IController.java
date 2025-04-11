@@ -26,7 +26,7 @@ public interface IController {
     /** gets saved jobs that need to be made into a csv */
     void path2CSV(String filePath);
     /** exports saved jobs into selected format */
-    void getExportSavedJobs(List<JobRecord> jobs, String formatStr, String filePath);
+    void export2FileType(List<JobRecord> jobs, String formatStr, String filePath);
     /** gets saved jobs */
     List<JobRecord> getSavedJobs();
     

@@ -230,7 +230,7 @@ public class SavedJobsTab extends JobView {
                     // Get the selected file path
                     if (fd.getFile() != null) {
                         String filePath = fd.getDirectory() + fd.getFile();
-                        controller.getExportSavedJobs(savedJobs, selectedFormat, filePath);
+                        controller.export2FileType(savedJobs, selectedFormat, filePath);
 
                         // Show success message with export icon
                         JOptionPane.showMessageDialog(parentFrame,

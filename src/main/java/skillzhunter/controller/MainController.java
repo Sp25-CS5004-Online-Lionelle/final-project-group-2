@@ -202,7 +202,7 @@ public class MainController implements IController {
      * Exports the saved jobs to a specified format and file path.
      */
     @Override
-    public void getExportSavedJobs(List<JobRecord> jobs, String formatStr, String filePath) {
+    public void export2FileType(List<JobRecord> jobs, String formatStr, String filePath) {
         model.exportSavedJobs(jobs, formatStr, filePath);
     }
 
@@ -217,7 +217,7 @@ public class MainController implements IController {
     
 
     /**
-     * Updates a job with new comments and rating
+     * Updates a job with new comments and rating.
      * 
      * @param id The ID of the job to update
      * @param comments The comments to set
@@ -225,7 +225,8 @@ public class MainController implements IController {
      * @return The updated JobRecord
      */
     public JobRecord getUpdateJob(int id, String comments, int rating) {
-        model.updateJob(id, comments, rating); //IDEA: if model.updateJob returns a record then you can delete the loop at the end
+        //IDEA: if model.updateJob returns a record then you can delete the loop at the end
+        model.updateJob(id, comments, rating);
         savedJobsTab.updateJobsList(model.getJobRecords());
         
         // Return the updated job record so the view can use it
