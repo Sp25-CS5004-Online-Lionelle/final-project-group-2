@@ -1,21 +1,32 @@
 package skillzhunter.view;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.TextField;
 import java.awt.Image;
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.net.URL;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import java.util.List;
 import java.util.ArrayList;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.InputMap;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.JCheckBox;
 import javax.swing.BorderFactory;
@@ -55,6 +66,44 @@ public class FindJobTab extends JobView {
         setJobsList(searchResults);
         
         modifyTablePanel();
+        setupEnterKeyAction();
+    }
+
+    //These next two methods are all about setting up the enter key to search
+    private void setupEnterKeyAction() {
+        Action enterAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (searchButton != null && searchButton.isEnabled()) {
+                    searchButton.doClick();
+                }
+            }
+        };
+        InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "performSearch");
+        getActionMap().put("performSearch", enterAction);
+        disableEnterKeyTraversalIn(this);
+    }
+
+    //Helper method to disable Enter key default behavior in text components
+    private void disableEnterKeyTraversalIn(Container container) {
+        for (Component comp : container.getComponents()) {
+            if (comp instanceof JTextField || comp instanceof TextField) {
+                comp.addKeyListener(new KeyAdapter() {
+                    @Override
+                    public void keyPressed(KeyEvent e) {
+                        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                            searchButton.doClick();
+                            e.consume(); // Prevent default handling
+                        }
+                    }
+                });
+            }
+            // Recursively process nested containers
+            if (comp instanceof Container) {
+                disableEnterKeyTraversalIn((Container) comp);
+            }
+        }
     }
 
     /**
