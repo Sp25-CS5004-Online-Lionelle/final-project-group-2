@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import skillzhunter.model.formatters.DataFormatter;
 import skillzhunter.model.formatters.Formats;
@@ -181,37 +180,6 @@ public class Jobs implements IModel {
     }
 
     /**
-     * Creates a version of the job list with empty URLs and HTML content for export.
-     * 
-     * @param jobs The original job records
-     * @return A new list with URLs and HTML content removed
-     */
-    private List<JobRecord> createExportableJobs(List<JobRecord> jobs) {
-        return jobs.stream()
-            .map(job -> new JobRecord(
-                job.id(),
-                "", // Empty URL
-                job.jobSlug(),
-                job.jobTitle(),
-                job.companyName(),
-                "", // Empty company logo URL
-                job.jobIndustry(),
-                job.jobType(),
-                job.jobGeo(),
-                job.jobLevel(),
-                "", // Empty jobExcerpt
-                "", // Empty jobDescription
-                job.pubDate(),
-                job.annualSalaryMin(),
-                job.annualSalaryMax(),
-                job.salaryCurrency(),
-                job.rating(),
-                job.comments()
-            ))
-            .collect(Collectors.toList());
-    }
-
-    /**
      * Saves the job records (saved jobs) in the jobList to a CSV file.
      * @param fileName Name of the CSV file to save to
      */
@@ -226,19 +194,8 @@ public class Jobs implements IModel {
         }
         
         try (OutputStream out = new FileOutputStream(fileName)) {
-            // Create exportable jobs that have cleaned data and empty URLs
-            List<JobRecord> exportableJobs = createExportableJobs(jobList);
-            
-            // Debug information after transformation
-            System.out.println("Transformed jobs for export:");
-            for (JobRecord job : exportableJobs) {
-                System.out.println("Transformed job: " + job.jobTitle() + 
-                                   ", Rating: " + job.rating() + 
-                                   ", Comments: " + job.comments());
-            }
-            
-            // Write to file
-            DataFormatter.write(exportableJobs, Formats.CSV, out);
+            // Write to file - DataFormatter now handles escaping correctly
+            DataFormatter.write(jobList, Formats.CSV, out);
             System.out.println("CSV export completed successfully");
         } catch (IOException e) {
             System.err.println("Error writing to CSV file: " + e.getMessage());
@@ -264,13 +221,10 @@ public class Jobs implements IModel {
         // Debug information before export
         System.out.println("Exporting " + jobs.size() + " jobs to " + formatStr + ": " + filePath);
         
-        // Export the jobs to the specified file with URLs cleared
+        // Export the jobs to the specified file
         try (OutputStream out = new FileOutputStream(filePath)) {
-            // Create exportable jobs
-            List<JobRecord> exportableJobs = createExportableJobs(jobs);
-            
-            // Write to file
-            DataFormatter.write(exportableJobs, format, out);
+            // DataFormatter now handles escaping correctly for each format
+            DataFormatter.write(jobs, format, out);
             System.out.println("Export completed successfully");
         } catch (IOException e) {
             System.err.println("Failed to export jobs: " + e.getMessage());
@@ -286,7 +240,7 @@ public class Jobs implements IModel {
     public static void main(String[] args) {
         Jobs jobs = new Jobs();
         // Test adding, updating, removing jobs
-        JobRecord job = new JobRecord(1, "url", "slug", "Python Developer", "Company A", "logo", Arrays.asList("Tech"), Arrays.asList("Full-time"), "NYC", "Senior", "Job excerpt", "Job description", "2025-03-30", 60000, 80000, "USD", 4, "Great job");
+        JobRecord job = new JobRecord(1, "https://example.com/job", "slug", "Python Developer & Data Scientist", "Company A", "logo", Arrays.asList("Tech"), Arrays.asList("Full-time"), "NYC", "Senior", "Job excerpt", "Job description", "2025-03-30", 60000, 80000, "USD", 4, "Great job");
         System.out.println("Adding job" + job);
         jobs.addJob(job);
 
@@ -294,6 +248,11 @@ public class Jobs implements IModel {
         JobRecord searchedJob = jobs.getJobRecord("Python Developer");
         System.out.println("Searched job: " + searchedJob);
         System.out.println(searchedJob);
+
+        // Export test
+        jobs.exportSavedJobs(jobs.getJobRecords(), "CSV", "test_jobs.csv");
+        jobs.exportSavedJobs(jobs.getJobRecords(), "JSON", "test_jobs.json");
+        jobs.exportSavedJobs(jobs.getJobRecords(), "XML", "test_jobs.xml");
 
         // Remove job
         System.out.println("Removing job with ID 1");
