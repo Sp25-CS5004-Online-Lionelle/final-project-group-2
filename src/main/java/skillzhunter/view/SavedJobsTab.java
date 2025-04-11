@@ -254,7 +254,7 @@ public class SavedJobsTab extends JobView {
         if (viewIdx >= 0) {
             int modelIdx = jobsTable.convertRowIndexToModel(viewIdx);
             JobRecord selectedJob = jobsList.get(modelIdx);
-            JobDetailsDialogue.showJobDetails(jobsTable, selectedJob, SavedJobsLists.getSavedJobs(), controller);
+            SavedJobDetailsDialogue.show(jobsTable, selectedJob, controller);
         } else {
             showNoSelectionMessage("Please select a job to open");
         }
