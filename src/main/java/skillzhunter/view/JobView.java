@@ -12,7 +12,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
-import javax.swing.table.DefaultTableModel;
 
 import skillzhunter.controller.IController;
 import skillzhunter.model.JobRecord;
@@ -152,7 +151,7 @@ public abstract class JobView extends JPanel {
 
     // Add a new job record via controller (delegates to controller)
     public void addJobRecord(JobRecord record) {
-        controller.getAddJob(record); // Delegate to controller
+        controller.job2SavedList(record); // Delegate to controller
     }
 
     // Remove a job record via controller (delegates to controller)

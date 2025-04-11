@@ -12,18 +12,23 @@ classDiagram
 Main *.. IController
 Main *.. IView: uses
 Main *.. Jobs: uses
+
 IController *.. IView: uses
 IController *.. Jobs: uses
 IController <-- MainController: Inheritance
 IController <-- SavedJobController: Inheritance
 IController <-- FindJobController: Inheritance
+
 MainController *.. SavedJobController: uses
 MainController *.. FindJobController: uses
+
 IView <-- MainView: Inheritance
 IView <-- FindJobView: Inheritance
 IView <-- SavedJobsView: Inheritance
+
 MainView *.. FindJobView: use
 MainView *.. SavedJobsView: use
+
 Jobs *.. JobFilters: uses
 Jobs *.. JobSorts: uses
 Jobs *.. DataFormatters: uses

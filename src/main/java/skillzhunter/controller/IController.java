@@ -19,8 +19,8 @@ public interface IController {
     List<String> getLocations();
     /** gets industries */
     List<String> getIndustries();
-    /** gets add job */
-    void getAddJob(JobRecord job);
+    /** gets add job model*/
+    void job2SavedList(JobRecord job);
     /** gets remove job */
     void getRemoveJob(int id);
     /** gets saved jobs that need to be made into a csv */
