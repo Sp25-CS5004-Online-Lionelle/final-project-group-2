@@ -66,8 +66,8 @@ public class FindJobTab extends JobView {
     private JCheckBox showVisualizationCheckbox;
     /** table panel. */
     private JPanel tablePanel;
-    /** save job button. */
-    private javax.swing.JButton saveJob; // New save job button
+    /** theme button.*/
+    private ThemedButton saveJob; // Now using ThemedButton instead of javax.swing.JButton
 
 
     /** 
@@ -206,8 +206,8 @@ public class FindJobTab extends JobView {
         searchRow.setLayout(new BoxLayout(searchRow, BoxLayout.LINE_AXIS));
 
         // Create UI components
-        TextField searchField = new TextField("", 20);
-        searchButton = createThemedButton("Find Jobs \t🔎");
+        TextField searchField = new TextField("", 20);    
+        searchButton = createThemedButton("Find Jobs \t🔎", ThemedButton.ButtonType.PRIMARY);
         Integer[] results = {5, 10, 20, 50};
         JComboBox<String> industryCombo = new JComboBox<>(industries);
         industryCombo.setEditable(true);
@@ -294,15 +294,15 @@ public class FindJobTab extends JobView {
     public JPanel makeBottomButtonPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
 
-        // Create and configure Open button
-        openJob = createThemedButton("Open");
+        // Create and configure Open button with PRIMARY type
+        openJob = createThemedButton("Open", ThemedButton.ButtonType.PRIMARY);
         openJob.setIcon(openIcon);
         openJob.setHorizontalTextPosition(SwingConstants.LEFT);
         openJob.setIconTextGap(5);
         openJob.addActionListener(e -> openSelectedJob());
 
-        // Create and configure Save button
-        saveJob = createThemedButton("Save");
+        // Create and configure Save button with SUCCESS type
+        saveJob = createThemedButton("Save", ThemedButton.ButtonType.SUCCESS);
         saveJob.setIcon(saveIcon);
         saveJob.setHorizontalTextPosition(SwingConstants.LEFT);
         saveJob.setIconTextGap(5);
@@ -349,6 +349,11 @@ public class FindJobTab extends JobView {
         
         // Apply theme to visualization components
         applyThemeToVisualization(theme);
+        
+        // Apply theme to saveJob button (which might not be handled by parent)
+        if (saveJob != null) {
+            saveJob.applyTheme(theme);
+        }
         
         // Use correct theme foreground color for labels
         java.awt.Color color = (theme == ColorTheme.DARK)

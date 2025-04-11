@@ -256,7 +256,12 @@ public abstract class JobView extends JPanel {
      * @return The created themed button
      */
     protected ThemedButton createThemedButton(String text) {
-        ThemedButton button = new ThemedButton(text);
+        return createThemedButton(text, ThemedButton.ButtonType.PRIMARY);
+    }
+    
+    // New method to create a themed button with a specific type
+    protected ThemedButton createThemedButton(String text, ThemedButton.ButtonType buttonType) {
+        ThemedButton button = new ThemedButton(text, buttonType);
         if (theme != null) {
             button.applyTheme(theme);
         }

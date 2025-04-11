@@ -63,19 +63,20 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
         // Create button panel with appropriate options for saved jobs
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         
-        // Create themed buttons
-        ThemedButton editButton = new ThemedButton("Edit");
-        editButton.setIcon(EDIT_ICON);
+
+        // Create themed buttons with different button types
+        ThemedButton editButton = new ThemedButton("Edit", ThemedButton.ButtonType.INFO);
+        editButton.setIcon(editIcon);
         editButton.setHorizontalTextPosition(SwingConstants.LEFT);
         editButton.setIconTextGap(5);
         
-        ThemedButton deleteButton = new ThemedButton("Delete");
-        deleteButton.setIcon(DELETE_ICON);
+        ThemedButton deleteButton = new ThemedButton("Delete", ThemedButton.ButtonType.DANGER);
+        deleteButton.setIcon(deleteIcon);
         deleteButton.setHorizontalTextPosition(SwingConstants.LEFT);
         deleteButton.setIconTextGap(5);
         
-        ThemedButton closeButton = new ThemedButton("Close");
-        closeButton.setIcon(CLOSE_ICON);
+        ThemedButton closeButton = new ThemedButton("Close", ThemedButton.ButtonType.SECONDARY);
+        closeButton.setIcon(closeIcon);
         closeButton.setHorizontalTextPosition(SwingConstants.LEFT);
         closeButton.setIconTextGap(5);
         

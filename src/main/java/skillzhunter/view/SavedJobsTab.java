@@ -82,29 +82,31 @@ public class SavedJobsTab extends JobView {
         JPanel bottomRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
         // Create buttons and store them as fields with consistent sizing
-        openButton = createThemedButton("Open");
+        openButton = createThemedButton("Open", ThemedButton.ButtonType.PRIMARY);
         openButton.setIcon(openIcon);
         openButton.setHorizontalTextPosition(SwingConstants.LEFT);
         openButton.setIconTextGap(5);
         
-        // New Edit button
-        editButton = createThemedButton("Edit");
+        // New Edit button - using PRIMARY type
+        editButton = createThemedButton("Edit", ThemedButton.ButtonType.INFO);
         editButton.setIcon(editIcon);
         editButton.setHorizontalTextPosition(SwingConstants.LEFT);
         editButton.setIconTextGap(5);
         
-        // New Delete button
-        deleteButton = createThemedButton("Delete");
+        // New Delete button - using DANGER type for destructive actions
+        deleteButton = createThemedButton("Delete", ThemedButton.ButtonType.DANGER);
         deleteButton.setIcon(deleteIcon);
         deleteButton.setHorizontalTextPosition(SwingConstants.LEFT);
         deleteButton.setIconTextGap(5);
         
-        saveButton = createThemedButton("Save");  // Use createThemedButton for consistency
+        // Save button - using SUCCESS type
+        saveButton = createThemedButton("Save", ThemedButton.ButtonType.SUCCESS);
         saveButton.setIcon(saveIcon);
         saveButton.setHorizontalTextPosition(SwingConstants.LEFT);
         saveButton.setIconTextGap(5);
         
-        exportButton = createThemedButton("Export");  // Use createThemedButton for consistency
+        // Export button - using SECONDARY type
+        exportButton = createThemedButton("Export", ThemedButton.ButtonType.SECONDARY);
         exportButton.setIcon(exportIcon);
         exportButton.setHorizontalTextPosition(SwingConstants.LEFT);
         exportButton.setIconTextGap(5);
