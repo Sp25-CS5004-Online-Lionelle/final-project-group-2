@@ -1,7 +1,6 @@
 package skillzhunter.view;
 
 import java.awt.Component;
-import java.awt.Image;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -17,11 +16,17 @@ import javax.swing.table.TableCellRenderer;
  * without changing the sorting behavior.
  */
 public class CustomHeader implements TableCellRenderer {
+    /** Rendering for cell. */
     private final TableCellRenderer defaultRenderer;
+    /** Up Arrow icons for sorting light. */
     private ImageIcon upArrowLight;
+    /** Down arrow icons for sorting light. */
     private ImageIcon downArrowLight;
+    /** Up Arrow icons for sorting dark. */
     private ImageIcon upArrowDark;
+    /** Down arrow icons for sorting dark. */
     private ImageIcon downArrowDark;
+    /** Dark mode flag. */
     private boolean isDarkMode = false;
     
     /**
@@ -63,7 +68,9 @@ public class CustomHeader implements TableCellRenderer {
      * @return A new icon with the specified color
      */
     private ImageIcon createColoredArrow(ImageIcon originalIcon, Color color) {
-        if (originalIcon == null) return null;
+        if (originalIcon == null) {
+            return null;
+        }
         
         int width = originalIcon.getIconWidth();
         int height = originalIcon.getIconHeight();
@@ -81,8 +88,8 @@ public class CustomHeader implements TableCellRenderer {
                 int alpha = (rgba >> 24) & 0xff;
                 if (alpha > 0) {
                     // Keep the alpha but use the new color
-                    image.setRGB(x, y, (alpha << 24) | (color.getRed() << 16) | 
-                                      (color.getGreen() << 8) | color.getBlue());
+                    image.setRGB(x, y, (alpha << 24) | (color.getRed() << 16)
+                                | (color.getGreen() << 8) | color.getBlue());
                 }
             }
         }
@@ -90,7 +97,16 @@ public class CustomHeader implements TableCellRenderer {
         g2d.dispose();
         return new ImageIcon(image);
     }
-    
+    /**
+     * Renders the table cell with sorting icons.
+     * @param table The table
+     * @param value The value to render
+     * @param isSelected Whether the cell is selected
+     * @param hasFocus Whether the cell has focus
+     * @param row The row index
+     * @param column The column index
+     * @return The rendered component
+     */
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value,
                                                  boolean isSelected, boolean hasFocus,
@@ -109,8 +125,8 @@ public class CustomHeader implements TableCellRenderer {
         Component comp = defaultRenderer.getTableCellRendererComponent(
             table, value, isSelected, hasFocus, row, column);
         
-        if (comp instanceof JLabel) {
-            JLabel label = (JLabel) comp;
+        if (comp instanceof JLabel label) {
+            // JLabel label = (JLabel) comp;
             
             // Special case for Logo column - don't show any sort icon
             if (column == 0 && "Logo".equals(value)) {
@@ -133,8 +149,8 @@ public class CustomHeader implements TableCellRenderer {
                 int modelColumn = table.convertColumnIndexToModel(column);
                 
                 // Check if this is the currently sorted column
-                if (!sorter.getSortKeys().isEmpty() && 
-                    sorter.getSortKeys().get(0).getColumn() == modelColumn) {
+                if (!sorter.getSortKeys().isEmpty()
+                    && sorter.getSortKeys().get(0).getColumn() == modelColumn) {
                     // Show the appropriate arrow based on sort direction
                     SortOrder sortOrder = sorter.getSortKeys().get(0).getSortOrder();
                     icon = (sortOrder == SortOrder.ASCENDING) ? upArrow : downArrow;

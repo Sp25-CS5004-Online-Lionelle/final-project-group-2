@@ -5,83 +5,84 @@ import java.awt.*;
 /**
  * Manages color themes for the application with predefined schemes.
  */
-public class ColorTheme {
-    /** The button normal color */
+public final class ColorTheme {
+    /** The button normal color. */
     public final Color buttonNormal;
-    /** The button hover color */
+    /** The button hover color. */
     public final Color buttonHover;
-    /** The background color */
+    /** The background color. */
     public final Color background;
-    /** The foreground color */
+    /** The foreground color. */
     public final Color foreground;
-    /** The field background color */
+    /** The field background color. */
     public final Color fieldBackground;
-    /** The field foreground color */
+    /** The field foreground color. */
     public final Color fieldForeground;
-    /** The button foreground color */
+    /** The button foreground color. */
     public final Color buttonForeground;
-    /** The label color */
+    /** The label color. */
     public final Color labelForeground;
     
     // Menu bar colors
-    /** The menu bar background for light theme */
+    /** The menu bar background for light theme. */
     public final Color menuBarBackgroundLight;
-    /** The menu bar foreground for light theme */
+    /** The menu bar foreground for light theme. */
     public final Color menuBarForegroundLight;
-    /** The menu bar background for dark theme */
+    /** The menu bar background for dark theme. */
     public final Color menuBarBackgroundDark;
-    /** The menu bar foreground for dark theme */
+    /** The menu bar foreground for dark theme. */
     public final Color menuBarForegroundDark;
     
     // Platform-specific tab colors for Windows/Linux
-    /** Selected tab background color for Windows/Linux in Light theme */
+    /** Selected tab background color for Windows/Linux in Light theme. */
     public final Color winSelectedBgLight;
-    /** Selected tab foreground color for Windows/Linux in Light theme */
+    /** Selected tab foreground color for Windows/Linux in Light theme. */
     public final Color winSelectedFgLight;
-    /** Unselected tab background color for Windows/Linux in Light theme */
+    /** Unselected tab background color for Windows/Linux in Light theme. */
     public final Color winUnselectedBgLight;
-    /** Unselected tab foreground color for Windows/Linux in Light theme */
+    /** Unselected tab foreground color for Windows/Linux in Light theme. */
     public final Color winUnselectedFgLight;
     
-    /** Selected tab background color for Windows/Linux in Dark theme */
+    /** Selected tab background color for Windows/Linux in Dark theme. */
     public final Color winSelectedBgDark;
-    /** Selected tab foreground color for Windows/Linux in Dark theme */
+    /** Selected tab foreground color for Windows/Linux in Dark theme. */
     public final Color winSelectedFgDark;
-    /** Unselected tab background color for Windows/Linux in Dark theme */
+    /** Unselected tab background color for Windows/Linux in Dark theme. */
     public final Color winUnselectedBgDark;
-    /** Unselected tab foreground color for Windows/Linux in Dark theme */
+    /** Unselected tab foreground color for Windows/Linux in Dark theme. */
     public final Color winUnselectedFgDark;
     
     // Platform-specific tab colors for macOS
-    /** Selected tab background color for macOS in Light theme */
+    /** Selected tab background color for macOS in Light theme. */
     public final Color macSelectedBgLight;
-    /** Selected tab foreground color for macOS in Light theme */
+    /** Selected tab foreground color for macOS in Light theme. */
     public final Color macSelectedFgLight;
-    /** Unselected tab background color for macOS in Light theme */
+    /** Unselected tab background color for macOS in Light theme. */
     public final Color macUnselectedBgLight;
-    /** Unselected tab foreground color for macOS in Light theme */
+    /** Unselected tab foreground color for macOS in Light theme. */
     public final Color macUnselectedFgLight;
     
-    /** Selected tab background color for macOS in Dark theme */
+    /** Selected tab background color for macOS in Dark theme. */
     public final Color macSelectedBgDark;
-    /** Selected tab foreground color for macOS in Dark theme */
+    /** Selected tab foreground color for macOS in Dark theme. */
     public final Color macSelectedFgDark;
-    /** Unselected tab background color for macOS in Dark theme */
+    /** Unselected tab background color for macOS in Dark theme. */
     public final Color macUnselectedBgDark;
-    /** Unselected tab foreground color for macOS in Dark theme */
+    /** Unselected tab foreground color for macOS in Dark theme. */
     public final Color macUnselectedFgDark;
     
-    /** Tab pane background color for Windows/Linux in Light theme */
+    /** Tab pane background color for Windows/Linux in Light theme. */
     public final Color winTabPaneBgLight;
-    /** Tab pane background color for Windows/Linux in Dark theme */
+    /** Tab pane background color for Windows/Linux in Dark theme. */
     public final Color winTabPaneBgDark;
-    /** Tab pane background color for macOS in Light theme */
+    /** Tab pane background color for macOS in Light theme. */
     public final Color macTabPaneBgLight;
-    /** Tab pane background color for macOS in Dark theme */
+    /** Tab pane background color for macOS in Dark theme. */
     public final Color macTabPaneBgDark;
     
     /**
-     * Constructor for ColorTheme
+     * Constructor for ColorTheme.
+     * 
      */
     private ColorTheme(Color buttonNormal, Color buttonHover, Color background,
                        Color foreground, Color fieldBackground, Color fieldForeground,
