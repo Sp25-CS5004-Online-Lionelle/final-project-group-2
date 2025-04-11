@@ -2,7 +2,6 @@ package skillzhunter.view;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
 
 import skillzhunter.model.JobRecord;
 import skillzhunter.controller.IController;
@@ -107,21 +106,21 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
             JPanel editPanel = new JPanel();
             editPanel.setLayout(new java.awt.BorderLayout(10, 10));
             
-            // Create star rating panel
+            // Create star rating panel with rating from job object
             StarRatingPanel starRating = new StarRatingPanel(job.rating() > 0 ? job.rating() : 0);
             editPanel.add(starRating, java.awt.BorderLayout.NORTH);
             
             // Create comments text area
-            javax.swing.JTextArea comments = new javax.swing.JTextArea(5, 20);
-            comments.setLineWrap(true);
-            comments.setWrapStyleWord(true);
+            javax.swing.JTextArea commentsArea = new javax.swing.JTextArea(5, 20);
+            commentsArea.setLineWrap(true);
+            commentsArea.setWrapStyleWord(true);
             
             // Set existing comments if available
             if (job.comments() != null && !job.comments().isEmpty() && !job.comments().equals("No comments provided")) {
-                comments.setText(job.comments());
+                commentsArea.setText(job.comments());
             }
             
-            javax.swing.JScrollPane commentScrollPane = new javax.swing.JScrollPane(comments);
+            javax.swing.JScrollPane commentScrollPane = new javax.swing.JScrollPane(commentsArea);
             commentScrollPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Your Comments"));
             editPanel.add(commentScrollPane, java.awt.BorderLayout.CENTER);
             
@@ -143,7 +142,7 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
                     
                     // Get the values from the UI
                     final int finalRating = starRating.getRating();
-                    final String finalComments = comments.getText();
+                    final String finalComments = commentsArea.getText();
                     
                     // Update through the controller
                     JobRecord updatedJob = mainController.getUpdateJob(job.id(), finalComments, finalRating);
@@ -157,6 +156,19 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
                             JOptionPane.INFORMATION_MESSAGE,
                             successIcon
                         );
+                        
+                        // Update SavedJobsTab if needed
+                        if (parent instanceof JTable) {
+                            Component comp = parent;
+                            while (comp != null && !(comp instanceof SavedJobsTab)) {
+                                comp = comp.getParent();
+                            }
+                            
+                            if (comp instanceof SavedJobsTab) {
+                                // Update the jobs list in the view to reflect changes
+                                ((SavedJobsTab) comp).updateJobsList(controller.getSavedJobs());
+                            }
+                        }
                     }
                 }
             }
@@ -204,7 +216,6 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
                     JOptionPane.INFORMATION_MESSAGE,
                     successIcon
                 );
-                
                 dialog.dispose();
             }
         });
