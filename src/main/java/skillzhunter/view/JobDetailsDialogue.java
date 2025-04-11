@@ -5,8 +5,10 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
 import java.awt.Image;
-import java.net.URL;
 import java.util.List;
+import java.awt.Dimension;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 
 import skillzhunter.model.JobRecord;
 import skillzhunter.controller.IController;
@@ -14,25 +16,31 @@ import skillzhunter.controller.MainController;
 
 public class JobDetailsDialogue {
 
+    // The size for company logos
+    private static final int LOGO_WIDTH = 64;
+    private static final int LOGO_HEIGHT = 64;
+
     /**
      * Loads an icon from the resources folder.
-     * Simplified version similar to SavedJobsTab implementation.
+     * Now delegates to IconLoader utility class.
      *
      * @param path The path to the icon
      * @return The loaded icon, or null if it couldn't be loaded
      */
     private static ImageIcon loadIcon(String path) {
-        try {
-            URL url = JobDetailsDialogue.class.getClassLoader().getResource(path);
-            if (url != null) {
-                ImageIcon icon = new ImageIcon(url);
-                Image img = icon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
-                return new ImageIcon(img);
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading icon: " + path);
-        }
-        return null;
+        return IconLoader.loadIcon(path, 24, 24);
+    }
+
+    /**
+     * Attempts to load a company logo from a URL.
+     * If loading fails, returns the default icon.
+     * Now delegates to IconLoader utility class.
+     * 
+     * @param logoUrl The URL of the company logo
+     * @return The loaded logo as an ImageIcon, or a default icon if loading fails
+     */
+    private static ImageIcon loadCompanyLogo(String logoUrl) {
+        return IconLoader.loadCompanyLogo(logoUrl, LOGO_WIDTH, LOGO_HEIGHT, "images/idea.png");
     }
 
     public static void showJobDetails(Component parent, JobRecord job, List<JobRecord> savedJobs, IController controller) {
@@ -49,9 +57,34 @@ public class JobDetailsDialogue {
         boolean jobPresent = savedJobs != null && savedJobs.contains(job);
         String dialogMsg = jobPresent ? "Remove this Job?" : "Save this Job?";
 
+        // Load company logo (or default icon if no logo available)
+        ImageIcon companyLogo = loadCompanyLogo(job.companyLogo());
+        JLabel logoLabel = new JLabel(companyLogo);
+        logoLabel.setHorizontalAlignment(JLabel.CENTER);
+        logoLabel.setPreferredSize(new Dimension(LOGO_WIDTH + 10, LOGO_HEIGHT + 10));
+        
+        // Create company header panel with logo and name - using vertical BoxLayout to maintain centering
+        JPanel companyPanel = new JPanel();
+        companyPanel.setLayout(new BoxLayout(companyPanel, BoxLayout.Y_AXIS));
+        
+        // Create a panel just for the logo to control its alignment
+        JPanel logoPanel = new JPanel();
+        logoPanel.add(logoLabel);
+        
+        // Company name with larger font
+        JLabel companyNameLabel = new JLabel(job.companyName());
+        companyNameLabel.setFont(new Font("Dialog", Font.BOLD, 16));
+        companyNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        // Add components to company panel with proper alignment
+        companyPanel.add(logoPanel);
+        companyPanel.add(Box.createVerticalStrut(5)); // Add spacing
+        companyPanel.add(companyNameLabel);
+
         // Use helper method to make non-editable JTextAreas
         JTextArea jobTitle = readOnlyArea(job.jobTitle());
-        JTextArea jobCompany = readOnlyArea(job.companyName());
+        jobTitle.setFont(new Font("Dialog", Font.BOLD, 14));
+        
         JTextArea jobIndustry = readOnlyArea(
             job.jobIndustry() != null ? 
                 String.join(", ", job.jobIndustry().stream()
@@ -100,47 +133,33 @@ public class JobDetailsDialogue {
             comments.setText(job.comments());
         }
 
-        // Create a panel with icon for the confirmation message
+        // Create a panel for the confirmation message using just text (no icon)
         JPanel confirmPanel = new JPanel();
         confirmPanel.setLayout(new BoxLayout(confirmPanel, BoxLayout.X_AXIS));
-        
-        // Load appropriate icon based on whether job is being saved or removed
-        ImageIcon actionIcon = jobPresent ? 
-            loadIcon("images/idea.png") : loadIcon("images/saveIcon.png");
-        
-        if (actionIcon != null) {
-            JLabel iconLabel = new JLabel(actionIcon);
-            confirmPanel.add(iconLabel);
-            confirmPanel.add(Box.createHorizontalStrut(10)); // Add some spacing
-        }
         
         JLabel confirmLabel = new JLabel(dialogMsg);
         confirmLabel.setFont(confirmLabel.getFont().deriveFont(Font.BOLD));
         confirmPanel.add(confirmLabel);
 
         Object[] obj = {
-            "Job Title: ", jobTitle, "Company: ", jobCompany, "Industry: ", jobIndustry,
+            companyPanel,
+            "Job Title: ", jobTitle, "Industry: ", jobIndustry,
             "Type: ", jobType, "Location: ", jobGeo, "Level: ", jobLevel, "Salary: ", jobSalaryRange,
             "Currency: ", jobCurrency, "Published: ", jobPubDate, starRating,
-            new JScrollPane(comments), confirmPanel  // Use the custom panel with icon instead of just text
+            new JScrollPane(comments), confirmPanel
         };
 
-        // Create a JOptionPane with custom icon for the dialog itself
+        // Create a JOptionPane without a custom icon for the dialog itself
         JOptionPane optionPane = new JOptionPane(
             obj,
-            JOptionPane.QUESTION_MESSAGE,
+            JOptionPane.PLAIN_MESSAGE,  // Changed to PLAIN_MESSAGE to remove default icon
             JOptionPane.YES_NO_OPTION
         );
-        
-        // Set a custom icon for the entire dialog
-        ImageIcon dialogIcon = loadIcon("images/idea.png");
-        if (dialogIcon != null) {
-            optionPane.setIcon(dialogIcon);
-        }
         
         // Create and display the dialog
         JDialog dialog = optionPane.createDialog(parent, "Job Details: ");
         dialog.setResizable(true);
+        dialog.setLocationRelativeTo(parent); // Explicitly center the dialog on the parent
         dialog.setVisible(true);
         
         // Get the result (return value is an Integer or null if closed)

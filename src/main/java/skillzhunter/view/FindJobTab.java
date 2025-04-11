@@ -5,7 +5,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.TextField;
-import java.awt.Image;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
@@ -57,7 +56,9 @@ public class FindJobTab extends JobView {
         this.controller = controller;
         this.locations = controller.getLocations().toArray(new String[0]);
         this.industries = controller.getIndustries().toArray(new String[0]);
-        this.openIcon = loadIcon("images/open.png");
+
+        // Use IconLoader to load icons
+        this.openIcon = IconLoader.loadIcon("images/open.png");
         
         super.initView();
 
@@ -166,23 +167,6 @@ public class FindJobTab extends JobView {
         tablePanel.repaint();
     }
 
-    /**
-     * Loads an icon from the resources folder.
-     */
-    private ImageIcon loadIcon(String path) {
-        try {
-            URL url = getClass().getClassLoader().getResource(path);
-            if (url != null) {
-                ImageIcon icon = new ImageIcon(url);
-                Image img = icon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
-                return new ImageIcon(img);
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading icon: " + path);
-        }
-        return null;
-    }
-
     @Override
     public JPanel makeTopButtonPanel() {
         JPanel searchRow = new JPanel();
@@ -252,7 +236,7 @@ public class FindJobTab extends JobView {
             } else {
                 // Check if the number of results requested is too large
                 if (numberOfResults > 50) {
-                    ImageIcon warningIcon = loadIcon("images/warning.png");
+                    ImageIcon warningIcon = IconLoader.loadIcon("images/warning.png");
                     JOptionPane.showMessageDialog(this,
                             "The number of results requested is too large.\nPlease try a smaller number.",
                             "Too Many Results Requested",
@@ -260,7 +244,7 @@ public class FindJobTab extends JobView {
                             warningIcon);
                 } else {
                     // Show custom popup if no results found for the query
-                    ImageIcon errorIcon = loadIcon("images/warning.png");
+                    ImageIcon errorIcon = IconLoader.loadIcon("images/warning.png");
                     JOptionPane.showMessageDialog(this,
                             "No jobs found for the given query.\nTry different keywords or filters.",
                             "No Results Found",

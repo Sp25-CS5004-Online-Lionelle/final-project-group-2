@@ -5,7 +5,6 @@ import java.awt.Image;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.net.URL;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -38,9 +37,9 @@ public class CustomHeader implements TableCellRenderer {
         
         this.defaultRenderer = defaultRenderer;
         
-        // Load arrow images for both light and dark modes
-        this.upArrowLight = loadIcon("images/arrow-up.png");
-        this.downArrowLight = loadIcon("images/arrow-down.png");
+        // Load arrow images for both light and dark modes using IconLoader
+        this.upArrowLight = IconLoader.loadIcon("images/arrow-up.png", 12, 12);
+        this.downArrowLight = IconLoader.loadIcon("images/arrow-down.png", 12, 12);
         
         // Create white versions for dark mode
         this.upArrowDark = createColoredArrow(upArrowLight, Color.WHITE);
@@ -90,28 +89,6 @@ public class CustomHeader implements TableCellRenderer {
         
         g2d.dispose();
         return new ImageIcon(image);
-    }
-    
-    /**
-     * Loads an icon from the resources folder.
-     * 
-     * @param path The path to the icon
-     * @return The loaded icon, or null if it couldn't be loaded
-     */
-    private ImageIcon loadIcon(String path) {
-        try {
-            URL url = getClass().getClassLoader().getResource(path);
-            if (url != null) {
-                ImageIcon icon = new ImageIcon(url);
-                // Scale the image to an appropriate size for the header
-                Image img = icon.getImage().getScaledInstance(12, 12, Image.SCALE_SMOOTH);
-                return new ImageIcon(img);
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading icon: " + path);
-        }
-        
-        return null;
     }
     
     @Override
