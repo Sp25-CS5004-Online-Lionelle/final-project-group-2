@@ -5,8 +5,7 @@ import skillzhunter.model.IModel;
 import skillzhunter.view.IView;
 
 
-public class SkillsHunterApp {
-    static final String DEFAULT_DATA_FILE = "data\\temp_data.xml";
+public final class SkillsHunterApp {
 
     private SkillsHunterApp() {
         // empty

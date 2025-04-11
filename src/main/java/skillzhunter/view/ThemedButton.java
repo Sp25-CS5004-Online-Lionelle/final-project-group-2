@@ -1,9 +1,6 @@
 package skillzhunter.view;
 
-import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JButton;
@@ -13,7 +10,9 @@ import javax.swing.JButton;
  * This centralizes button styling logic across the application.
  */
 public class ThemedButton extends JButton {
+    /** Button Theme. */
     private ColorTheme theme;
+    /** Hover state. */
     private boolean isHovering = false;
     
     /**
@@ -73,7 +72,9 @@ public class ThemedButton extends JButton {
      * Updates button colors based on current theme and hover state.
      */
     private void updateButtonColors() {
-        if (theme == null) return;
+        if (theme == null) {
+            return;
+        }
         
         if (isHovering) {
             setBackground(theme.buttonHover);
