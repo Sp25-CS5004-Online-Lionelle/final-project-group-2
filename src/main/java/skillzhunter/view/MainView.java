@@ -4,6 +4,7 @@ import static skillzhunter.view.JobsLoader.getColumnNames;
 import static skillzhunter.view.JobsLoader.getData;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -67,21 +68,27 @@ public class MainView extends JFrame implements IView {
     /**
      * Builds the tabbed pane for the main view.
      */
+    // Update buildTabbedPane method to remove SavedJobsLists usage
     private JTabbedPane buildTabbedPane(JobView findJobTab, JobView savedJobTab) {
         // Create the tabbed pane
         tabbedPane = new JTabbedPane();
-    
-        // Use the existing tabs instead of creating new ones
-        SavedJobsLists.addObserver(savedJobTab);
-        SavedJobsLists.addObserver(findJobTab);
 
-        // Set controller
-        SavedJobsLists.setController(controller);
-        
         // Add tabs with components
-        tabbedPane.add(findJobTab);
-        tabbedPane.add(savedJobTab);
-        
+        tabbedPane.addTab("Find Jobs", findJobTab);
+        tabbedPane.addTab("Saved Jobs", savedJobTab);
+        tabbedPane.addChangeListener(e -> {
+            // Get the selected tab
+            int selectedIndex = tabbedPane.getSelectedIndex();
+            if (selectedIndex >= 0) {
+                Component selectedComponent = tabbedPane.getComponentAt(selectedIndex);
+                
+                // If it's a JobView, update its job list
+                if (selectedComponent instanceof JobView) {
+                    JobView jobView = (JobView) selectedComponent;
+                    jobView.updateJobsList(controller.getSavedJobs());
+                }
+            }
+        });
         return tabbedPane;
     }
 
