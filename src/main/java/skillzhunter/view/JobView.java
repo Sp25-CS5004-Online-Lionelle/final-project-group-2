@@ -169,10 +169,6 @@ public abstract class JobView extends JPanel {
     // Add listeners and features (e.g., search button functionality)
     public void addFeatures(IController controller) {
         this.controller = controller; // Set controller
-        // if (searchButton != null) {
-        //     searchButton.addActionListener(e -> controller.setViewData());  // Delegate logic to controller for search
-        // }
-        // You can add other action listeners for other buttons (like add, remove job)
     }
 
     // Get the current theme - useful for subclasses
@@ -180,9 +176,14 @@ public abstract class JobView extends JPanel {
         return theme;
     }
 
-    // Create a new themed button with the specified text
+    // Create a new themed button with the specified text - Original method
     protected ThemedButton createThemedButton(String text) {
-        ThemedButton button = new ThemedButton(text);
+        return createThemedButton(text, ThemedButton.ButtonType.PRIMARY);
+    }
+    
+    // New method to create a themed button with a specific type
+    protected ThemedButton createThemedButton(String text, ThemedButton.ButtonType buttonType) {
+        ThemedButton button = new ThemedButton(text, buttonType);
         if (theme != null) {
             button.applyTheme(theme);
         }
