@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.checkerframework.common.returnsreceiver.qual.This;
-
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
@@ -137,7 +135,7 @@ public class JobBoardApi {
      * @param industry Industry to filter jobs (e.g., IT, healthcare).
      * @return List of job records matching the criteria.
      */
-    public List<JobRecord> getJobBoard(String query, Integer numberOfResults, String location, String industry){
+    public List<JobRecord> getJobBoard(String query, Integer numberOfResults, String location, String industry) {
         // getting slug for request, if it breaks we default
         if (location != null) {
             location = LOCATION_MAP.get(location.toLowerCase().trim());
