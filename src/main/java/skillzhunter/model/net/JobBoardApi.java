@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.checkerframework.common.returnsreceiver.qual.This;
 
@@ -19,6 +20,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import skillzhunter.model.JobBean;
 import skillzhunter.model.JobRecord;
 import skillzhunter.model.ResponseRecord;
 
@@ -164,7 +166,95 @@ public class JobBoardApi {
         System.err.println("URL: " + url);
     
         List<JobRecord> jobs = this.searchApi(url);
-        return jobs;
+        return processJobRecords(jobs);
+    }
+    
+    /**
+     * Process job records to replace HTML special characters
+     * 
+     * @param jobs List of job records from API
+     * @return List of job records with decoded HTML special characters
+     */
+    private List<JobRecord> processJobRecords(List<JobRecord> jobs) {
+        System.out.println("Processing " + jobs.size() + " job records to replace HTML entities");
+        
+        List<JobRecord> processedJobs = jobs.stream().map(job -> {
+            // Create a new JobBean and copy all values
+            JobBean bean = new JobBean();
+            bean.setId(job.id());
+            bean.setUrl(job.url());
+            bean.setJobSlug(job.jobSlug());
+            
+            // Process and log the job title
+            String originalTitle = job.jobTitle();
+            String processedTitle = replaceHtmlEntities(originalTitle);
+            if (!originalTitle.equals(processedTitle)) {
+                System.out.println("Replaced HTML special characters in job title: '" + originalTitle + "' -> '" + processedTitle + "'");
+            }
+            bean.setJobTitle(processedTitle);
+            
+            bean.setCompanyName(replaceHtmlEntities(job.companyName()));
+            bean.setCompanyLogo(job.companyLogo());
+            
+            // Replace HTML special characters in industry list
+            if (job.jobIndustry() != null) {
+                List<String> cleanedIndustries = job.jobIndustry().stream()
+                    .map(JobBoardApi::replaceHtmlEntities)
+                    .collect(Collectors.toList());
+                bean.setJobIndustry(cleanedIndustries);
+            } else {
+                bean.setJobIndustry(job.jobIndustry());
+            }
+            
+            // Replace HTML special characters in job type list
+            if (job.jobType() != null) {
+                List<String> cleanedTypes = job.jobType().stream()
+                    .map(JobBoardApi::replaceHtmlEntities)
+                    .collect(Collectors.toList());
+                bean.setJobType(cleanedTypes);
+            } else {
+                bean.setJobType(job.jobType());
+            }
+            
+            bean.setJobGeo(replaceHtmlEntities(job.jobGeo()));
+            bean.setJobLevel(replaceHtmlEntities(job.jobLevel()));
+            bean.setJobExcerpt(replaceHtmlEntities(job.jobExcerpt()));
+            bean.setJobDescription(replaceHtmlEntities(job.jobDescription()));
+            bean.setPubDate(job.pubDate());
+            bean.setAnnualSalaryMin(job.annualSalaryMin());
+            bean.setAnnualSalaryMax(job.annualSalaryMax());
+            bean.setSalaryCurrency(job.salaryCurrency());
+            bean.setRating(job.rating());
+            bean.setComments(job.comments());
+            
+            return bean.toRecord();
+        }).collect(Collectors.toList());
+        
+        System.out.println("Processed " + processedJobs.size() + " job records");
+        return processedJobs;
+    }
+    
+    /**
+     * Replaces common HTML special characters in a string
+     * 
+     * @param text Text with potential HTML special characters
+     * @return Text with replaced HTML special characters
+     */
+    public static String replaceHtmlEntities(String text) {
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
+        
+        // Replace common HTML special characters
+        String result = text;
+        result = result.replace("&amp;", "&");
+        result = result.replace("&lt;", "<");
+        result = result.replace("&gt;", ">");
+        result = result.replace("&quot;", "\"");
+        result = result.replace("&#39;", "'");
+        result = result.replace("&nbsp;", " ");
+        
+        return result;
     }
     
     /** makes a request to the api and returns the response
@@ -198,7 +288,6 @@ public class JobBoardApi {
     }
 
     public static void main(String[] args) {
-
         JobBoardApi api = new JobBoardApi();
         List<JobRecord> results = api.getJobBoard("python", 5, "austria", "devops & sysadmin");
         System.out.println("Job Records: " + results.size());
@@ -208,8 +297,5 @@ public class JobBoardApi {
             System.out.println("Location: " + job.jobGeo());
             System.out.println("-----------------------------");
         }
-        
-        
     }
-
 }
