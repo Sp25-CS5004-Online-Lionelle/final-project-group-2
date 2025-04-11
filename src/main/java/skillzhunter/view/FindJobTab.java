@@ -263,20 +263,27 @@ public class FindJobTab extends JobView {
         titleLabel.setForeground(color);
     }
 
+    // In the openSelectedJob method
+    /**
+     * Opens the selected job in a new dialog
+     * Displays job details in a new dialog when a job is selected from the table.
+     */
     private void openSelectedJob() {
         int viewIdx = jobsTable.getSelectedRow();
         if (viewIdx >= 0) {
             int modelIdx = jobsTable.convertRowIndexToModel(viewIdx);
             JobRecord selectedJob = jobsList.get(modelIdx);
+            // Use controller directly instead of SavedJobsLists
             JobDetailsDialogue.showJobDetails(jobsTable, selectedJob, 
-                    SavedJobsLists.getSavedJobs(), controller);
+                    controller.getSavedJobs(), controller);
         }
     }
-    
-    /**
-     * Override to maintain search results when updating jobs list
-     */
+
+    // In updateJobsList and setJobsList methods, maintain searchResults if needed
     @Override
+    /**
+     * Updates the job list and visualization if needed
+     */
     public void updateJobsList(List<JobRecord> jobsList) {
         if (searchResults != null && !searchResults.isEmpty()) {
             super.setJobsList(searchResults);
