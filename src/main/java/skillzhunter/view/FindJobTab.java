@@ -221,6 +221,15 @@ public class FindJobTab extends JobView {
                 try {
                     numberOfResults = Integer.parseInt((String) resultsObj);
                 } catch (NumberFormatException ex) {
+                    //add non-numeric dialogue
+                    ImageIcon warningIcon = IconLoader.loadIcon("images/warning.png");
+                    JOptionPane.showMessageDialog(this,
+                        "Couldn't parse the number of results requested."
+                            + "\nPlease ensure you enter a numeric value."
+                            + "\nReturned 10 results.",
+                        "Null or Non-Numeric Value",
+                        JOptionPane.WARNING_MESSAGE,
+                        warningIcon);
                     numberOfResults = 10;
                 }
             }

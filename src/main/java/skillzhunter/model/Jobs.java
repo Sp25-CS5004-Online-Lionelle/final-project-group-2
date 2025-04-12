@@ -25,6 +25,9 @@ public class Jobs implements IModel {
     /** Job List */
     private final List<JobRecord> jobList;
 
+    /** used to track number of times the joblist is accessed*/
+    private int runs = 0;
+
     /** Jobs Api */
     private final JobBoardApi api = new JobBoardApi();
 
@@ -96,9 +99,11 @@ public class Jobs implements IModel {
      * @return List of JobRecords
      */
     public List<JobRecord> getJobRecords() {
-        if (jobList.isEmpty()) {
+        if (jobList.isEmpty() && runs > 0) {
             System.out.println("Job List is empty. Ensure jobs are added before retrieving.");
+            runs++;
         }
+
         return new ArrayList<>(jobList);
     }
 

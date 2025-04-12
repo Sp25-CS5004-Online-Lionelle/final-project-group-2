@@ -140,7 +140,7 @@ public class JobBoardApi {
         Boolean location_passed = location != null && !location.isEmpty() && !location.equalsIgnoreCase("anywhere");
         Boolean industry_passed = industry != null && !industry.isEmpty() && !industry.equalsIgnoreCase("all")&& !industry.equalsIgnoreCase("any");
 
-        //defualting and slugggin query
+        //defaulting and slugggin query
         if (query == null || query.isEmpty() || query.equalsIgnoreCase("any") || query.equalsIgnoreCase("all") || query.equalsIgnoreCase("all jobs") || query.equalsIgnoreCase("all job")) {
             System.out.println("No query passed, using default values.");
             query = "all";
