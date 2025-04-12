@@ -2,6 +2,7 @@ package skillzhunter.view;
 
 import java.awt.FileDialog;
 import java.awt.FlowLayout;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -15,10 +16,10 @@ import javax.swing.SwingUtilities;
 
 import skillzhunter.controller.IController;
 import skillzhunter.controller.MainController;
+import skillzhunter.model.JobBean;
 import skillzhunter.model.JobRecord;
 
 public class SavedJobsTab extends JobView {
-    
     
     // Store buttons as fields to apply theme later
     /** open button. */
@@ -192,7 +193,12 @@ public class SavedJobsTab extends JobView {
                 if (result == JOptionPane.YES_OPTION) {
                     // Save to data/SavedJobs.csv in a fixed location (overwrite each time)
                     String filePath = "data/SavedJobs.csv";
-                    controller.path2CSV(filePath);
+                    
+                    // Create a cleaned version of the jobs for export
+                    List<JobRecord> cleanedJobs = cleanJobRecordsForExport(savedJobs);
+                    
+                    // Pass the cleaned jobs to the controller
+                    controller.export2FileType(cleanedJobs, "CSV", filePath);
                     
                     // Use save icon for success message
                     JOptionPane.showMessageDialog(parentFrame,
@@ -251,7 +257,12 @@ public class SavedJobsTab extends JobView {
                     // Get the selected file path
                     if (fd.getFile() != null) {
                         String filePath = fd.getDirectory() + fd.getFile();
-                        controller.export2FileType(savedJobs, selectedFormat, filePath);
+                        
+                        // Create clean version of jobs for export
+                        List<JobRecord> cleanedJobs = cleanJobRecordsForExport(savedJobs);
+                        
+                        // Pass the cleaned jobs to the controller
+                        controller.export2FileType(cleanedJobs, selectedFormat, filePath);
 
                         // Show success message with export icon
                         JOptionPane.showMessageDialog(parentFrame,
@@ -265,6 +276,109 @@ public class SavedJobsTab extends JobView {
         });
 
         return bottomRow;
+    }
+
+    /**
+     * Creates a cleaned copy of job records for export.
+     * Removes HTML content and simplifies descriptions.
+     * 
+     * @param jobs The original job records
+     * @return A new list of cleaned job records
+     */
+    private List<JobRecord> cleanJobRecordsForExport(List<JobRecord> jobs) {
+        List<JobRecord> cleanedRecords = new ArrayList<>();
+        
+        for (JobRecord job : jobs) {
+            // Create a new JobBean with cleaned data
+            JobBean cleanedJob = new JobBean();
+            
+            // Copy basic fields directly
+            cleanedJob.setId(job.id());
+            cleanedJob.setUrl(job.url());
+            cleanedJob.setJobSlug(job.jobSlug());
+            cleanedJob.setJobTitle(job.jobTitle());
+            cleanedJob.setCompanyName(job.companyName());
+            cleanedJob.setCompanyLogo(job.companyLogo());
+            cleanedJob.setJobGeo(job.jobGeo());
+            cleanedJob.setJobLevel(job.jobLevel());
+            cleanedJob.setPubDate(job.pubDate());
+            cleanedJob.setAnnualSalaryMin(job.annualSalaryMin());
+            cleanedJob.setAnnualSalaryMax(job.annualSalaryMax());
+            cleanedJob.setSalaryCurrency(job.salaryCurrency());
+            cleanedJob.setRating(job.rating());
+            cleanedJob.setComments(job.comments());
+            
+            // Handle collection fields
+            if (job.jobIndustry() != null) {
+                cleanedJob.setJobIndustry(new ArrayList<>(job.jobIndustry()));
+            } else {
+                cleanedJob.setJobIndustry(new ArrayList<>());
+            }
+            
+            if (job.jobType() != null) {
+                cleanedJob.setJobType(new ArrayList<>(job.jobType()));
+            } else {
+                cleanedJob.setJobType(new ArrayList<>());
+            }
+            
+            // Clean excerpt - extract first sentence without HTML
+            String excerpt = "";
+            if (job.jobExcerpt() != null) {
+                excerpt = extractFirstSentence(stripHTML(job.jobExcerpt()));
+            }
+            cleanedJob.setJobExcerpt(excerpt);
+            
+            // Simplify job description
+            String description = "Position at " + job.companyName() + " - " + job.jobTitle();
+            cleanedJob.setJobDescription(description);
+            
+            // Add to the list of cleaned records
+            cleanedRecords.add(cleanedJob.toRecord());
+        }
+        
+        return cleanedRecords;
+    }
+    
+    /**
+     * Strips HTML tags from a string.
+     * 
+     * @param html The string possibly containing HTML tags
+     * @return The string with HTML tags removed
+     */
+    private String stripHTML(String html) {
+        if (html == null) return "";
+        return html.replaceAll("<[^>]*>", "").replaceAll("\\s+", " ").trim();
+    }
+    
+    /**
+     * Extracts the first sentence from a text string.
+     * 
+     * @param text The text to extract from
+     * @return The first sentence or a truncated version if no end marker found
+     */
+    private String extractFirstSentence(String text) {
+        if (text == null || text.isEmpty()) return "";
+        
+        // Find the end of the first sentence
+        int endPos = -1;
+        for (String endMark : new String[]{".", "!", "?"}) {
+            int pos = text.indexOf(endMark);
+            if (pos >= 0 && (endPos == -1 || pos < endPos)) {
+                endPos = pos + 1;
+            }
+        }
+        
+        // If a sentence end was found, return just that sentence
+        if (endPos > 0) {
+            return text.substring(0, endPos);
+        }
+        
+        // Otherwise truncate to a reasonable length
+        if (text.length() > 100) {
+            return text.substring(0, 97) + "...";
+        }
+        
+        return text;
     }
 
     /**
