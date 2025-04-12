@@ -30,7 +30,6 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
 import skillzhunter.controller.IController;
-import skillzhunter.controller.MainController;
 import skillzhunter.model.JobRecord;
 
 /**
@@ -372,7 +371,7 @@ public class FindJobTab extends JobView {
 
     /**
      * Saves the selected job directly without opening the dialog
-     * Adds the job to saved jobs and switches to the Saved Jobs tab.
+     * Uses helper class to save the job.
      */
     private void saveSelectedJob() {
         int viewIdx = jobsTable.getSelectedRow();
@@ -402,78 +401,8 @@ public class FindJobTab extends JobView {
             return;
         }
         
-        // Add the job to saved jobs
-        controller.job2SavedList(selectedJob);
-        
-        // Set default rating and comments
-        if (controller instanceof MainController mainCont) {
-            (mainCont).getUpdateJob(selectedJob.id(), "No comments provided", 0);
-        }
-        
-        // Show success message
-        ImageIcon successIcon = IconLoader.loadIcon("images/success.png");
-        JOptionPane.showMessageDialog(this,
-                "Job saved successfully!",
-                "Job Saved",
-                JOptionPane.INFORMATION_MESSAGE,
-                successIcon);
-        
-        // Switch to Saved Jobs tab
-        switchToSavedJobsTab();
-    }
-    
-    /**
-     * Switches to the Saved Jobs tab and refreshes it.
-     */
-    private void switchToSavedJobsTab() {
-        // Method adapted from JobDetailsDialogue.switchToSavedJobsTab
-        javax.swing.JFrame frame = (javax.swing.JFrame) javax.swing.SwingUtilities.getWindowAncestor(this);
-        if (frame != null) {
-            // Look for the tabbed pane
-            javax.swing.JTabbedPane tabbedPane = findTabbedPane(frame.getContentPane());
-            if (tabbedPane != null) {
-                // Find and select the "Saved Jobs" tab
-                for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-                    String title = tabbedPane.getTitleAt(i);
-                    Component comp = tabbedPane.getTabComponentAt(i);
-                    
-                    if ("Saved Jobs".equals(title) 
-                        || (comp instanceof JLabel && "Saved Jobs".equals(((JLabel) comp).getText()))) {
-                        
-                        // Select the tab
-                        tabbedPane.setSelectedIndex(i);
-                        
-                        // Update the tab content if it's a SavedJobsTab
-                        Component tabComponent = tabbedPane.getComponentAt(i);
-                        if (tabComponent instanceof SavedJobsTab savedJobsTab) {
-                            savedJobsTab.updateJobsList(controller.getSavedJobs());
-                        }
-                        
-                        break;
-                    }
-                }
-            }
-        }
-    }
-    
-    /**
-     * Recursively searches for a JTabbedPane in the component hierarchy
-     * Method copied from JobDetailsDialogue.
-     * @param component The component to search in
-     * @return The found JTabbedPane, or null if not found
-     */
-    private javax.swing.JTabbedPane findTabbedPane(Component component) {
-        if (component instanceof javax.swing.JTabbedPane comp) {
-            return comp;
-        } else if (component instanceof Container container) {
-            for (int i = 0; i < container.getComponentCount(); i++) {
-                javax.swing.JTabbedPane found = findTabbedPane(container.getComponent(i));
-                if (found != null) {
-                    return found;
-                }
-            }
-        }
-        return null;
+        // Use helper method to save the job with default values
+        JobActionHelper.saveJob(selectedJob, "No comments provided", 0, controller, this);
     }
 
     /**

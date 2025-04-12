@@ -7,7 +7,6 @@ import java.awt.FlowLayout;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -15,7 +14,6 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import skillzhunter.controller.IController;
-import skillzhunter.controller.MainController;
 import skillzhunter.model.JobRecord;
 
 /**
@@ -33,8 +31,6 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
     private static final ImageIcon CLOSE_ICON;
     /** warning icon. */
     private static final ImageIcon WARNING_ICON;
-    /** success icon. */
-    private static final ImageIcon SUCCESS_ICON;
     
     // Initialize icons
     static {
@@ -42,7 +38,6 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
         DELETE_ICON = IconLoader.loadIcon("images/delete.png", 24, 24);
         CLOSE_ICON = IconLoader.loadIcon("images/close.png", 24, 24);
         WARNING_ICON = IconLoader.loadIcon("images/warning.png", 24, 24);
-        SUCCESS_ICON = IconLoader.loadIcon("images/success.png", 24, 24);
     }
     
     /**
@@ -73,7 +68,6 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
         // Create button panel with appropriate options for saved jobs
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         
-
         // Create themed buttons with different button types
         ThemedButton editButton = new ThemedButton("Edit", ThemedButton.ButtonType.INFO);
         editButton.setIcon(EDIT_ICON);
@@ -112,128 +106,15 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
         // Add button panel to dialog
         dialog.add(buttonPanel, BorderLayout.SOUTH);
         
-        // Set button actions
+        // Set button actions using helper methods
         editButton.addActionListener(e -> {
-            dialog.dispose();
-            
-            // Use the same edit dialog as SavedJobsTab
-            JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(parent);
-            
-            // Create a panel for editing
-            JPanel editPanel = new JPanel();
-            editPanel.setLayout(new java.awt.BorderLayout(10, 10));
-            
-            // Create star rating panel with rating from job object
-            StarRatingPanel starRating = new StarRatingPanel(job.rating() > 0 ? job.rating() : 0);
-            editPanel.add(starRating, java.awt.BorderLayout.NORTH);
-            
-            // Create comments text area
-            javax.swing.JTextArea commentsArea = new javax.swing.JTextArea(5, 20);
-            commentsArea.setLineWrap(true);
-            commentsArea.setWrapStyleWord(true);
-            
-            // Set existing comments if available
-            if (job.comments() != null && !job.comments().isEmpty() && !job.comments().equals("No comments provided")) {
-                commentsArea.setText(job.comments());
-            }
-            
-            javax.swing.JScrollPane commentScrollPane = new javax.swing.JScrollPane(commentsArea);
-            commentScrollPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Your Comments"));
-            editPanel.add(commentScrollPane, java.awt.BorderLayout.CENTER);
-            
-            // Show the edit dialog
-            int result = JOptionPane.showConfirmDialog(
-                parentFrame,
-                editPanel,
-                "Edit Job: " + job.jobTitle(),
-                JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.PLAIN_MESSAGE,
-                EDIT_ICON
-            );
-            
-            // Process the result
-            if (result == JOptionPane.OK_OPTION) {
-                // Use the controller to update the job
-                if (controller instanceof MainController) {
-                    MainController mainController = (MainController) controller;
-                    
-                    // Get the values from the UI
-                    final int finalRating = starRating.getRating();
-                    final String finalComments = commentsArea.getText();
-                    
-                    // Update through the controller
-                    JobRecord updatedJob = mainController.getUpdateJob(job.id(), finalComments, finalRating);
-                    
-                    if (updatedJob != null) {
-                        // Show confirmation
-                        JOptionPane.showMessageDialog(
-                            parentFrame,
-                            "Job updated successfully!",
-                            "Update Complete",
-                            JOptionPane.INFORMATION_MESSAGE,
-                            SUCCESS_ICON
-                        );
-                        
-                        // Update SavedJobsTab if needed
-                        if (parent instanceof JTable) {
-                            Component comp = parent;
-                            while (comp != null && !(comp instanceof SavedJobsTab)) {
-                                comp = comp.getParent();
-                            }
-                            
-                            if (comp instanceof SavedJobsTab) {
-                                // Update the jobs list in the view to reflect changes
-                                ((SavedJobsTab) comp).updateJobsList(controller.getSavedJobs());
-                            }
-                        }
-                    }
-                }
-            }
+            dialog.dispose(); // Close dialog first
+            JobActionHelper.editJob(job, controller, parent); // Use helper method to edit
         });
         
         deleteButton.addActionListener(e -> {
-            // Find the parent frame for centering dialogs
-            JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(parent);
-            
-            // Create a confirm dialog
-            Object[] options = {"Delete", "Cancel"};
-            int result = JOptionPane.showOptionDialog(
-                parentFrame,
-                "Are you sure you want to delete the job: " + job.jobTitle() + "?",
-                "Confirm Delete",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE,
-                DELETE_ICON,
-                options,
-                options[1]  // Default is Cancel
-            );
-            
-            if (result == JOptionPane.YES_OPTION) {
-                // Use the controller to remove the job
-                controller.removeJobFromList(job.id());
-                
-                // Get the SavedJobsTab to update its list
-                if (parent instanceof JTable) {
-                    Component comp = parent;
-                    while (comp != null && !(comp instanceof SavedJobsTab)) {
-                        comp = comp.getParent();
-                    }
-                    
-                    if (comp instanceof SavedJobsTab) {
-                        // Update the jobs list in the view to reflect changes
-                        ((SavedJobsTab) comp).updateJobsList(controller.getSavedJobs());
-                    }
-                }
-                
-                // Show confirmation
-                JOptionPane.showMessageDialog(
-                    parentFrame,
-                    "Job deleted successfully!",
-                    "Delete Complete",
-                    JOptionPane.INFORMATION_MESSAGE,
-                    SUCCESS_ICON
-                );
-                dialog.dispose();
+            if (JobActionHelper.deleteJob(job, controller, parent)) {
+                dialog.dispose(); // Only close the dialog if delete was confirmed
             }
         });
         
@@ -245,5 +126,4 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setVisible(true);
     }
-
 }

@@ -6,7 +6,6 @@ import java.util.List;
 
 import skillzhunter.model.JobRecord;
 import skillzhunter.controller.IController;
-import skillzhunter.controller.MainController;
 
 public class JobDetailsDialogue extends BaseJobDetailsDialogue {
 
@@ -116,22 +115,14 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
         
         dialog.add(buttonPanel, BorderLayout.SOUTH);
         
-        // Handle the button clicks
+        // Handle the button clicks using the helper class
         yesButton.addActionListener(e -> {
             // Get the rating and comments from UI
             int newRating = starRating.getRating();
             String commentText = commentsArea.getText().isEmpty() ? "No comments provided" : commentsArea.getText();
             
-            // First, add the job to the model through the controller
-            controller.job2SavedList(job);
-            
-            // Then update the job with the rating and comments through the controller
-            if (controller instanceof MainController cont) {
-                (cont).getUpdateJob(job.id(), commentText, newRating);
-            }
-            
-            // Switch to "Saved Jobs" tab after adding a job
-            switchToSavedJobsTab(parent, controller);
+            // Use helper to save the job
+            JobActionHelper.saveJob(job, commentText, newRating, controller, parent);
             
             dialog.dispose();
         });
