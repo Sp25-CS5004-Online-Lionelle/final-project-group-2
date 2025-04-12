@@ -15,7 +15,6 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import skillzhunter.controller.IController;
-import skillzhunter.controller.MainController;
 import skillzhunter.model.JobBean;
 import skillzhunter.model.JobRecord;
 
@@ -91,7 +90,7 @@ public class SavedJobsTab extends JobView {
         openButton.setHorizontalTextPosition(SwingConstants.LEFT);
         openButton.setIconTextGap(5);
         
-        // New Edit button - using PRIMARY type
+        // New Edit button - using INFO type
         editButton = createThemedButton("Edit", ThemedButton.ButtonType.INFO);
         editButton.setIcon(editIcon);
         editButton.setHorizontalTextPosition(SwingConstants.LEFT);
@@ -149,13 +148,9 @@ public class SavedJobsTab extends JobView {
         bottomRow.add(exportButton);
         bottomRow.add(formatDropdown);
 
-        // Set listeners - using controller methods directly
+        // Set listeners - using helper methods for common actions
         openButton.addActionListener(e -> openSelectedJob());
-        
-        // Edit button listener using controller
         editButton.addActionListener(e -> editSelectedJob());
-        
-        // Delete button listener using controller
         deleteButton.addActionListener(e -> deleteSelectedJob());
         
         saveButton.addActionListener(e -> {
@@ -391,12 +386,12 @@ public class SavedJobsTab extends JobView {
             JobRecord selectedJob = jobsList.get(modelIdx);
             SavedJobDetailsDialogue.show(jobsTable, selectedJob, controller);
         } else {
-            showNoSelectionMessage("Please select a job to open");
+            JobActionHelper.showNoSelectionMessage("Please select a job to open", this);
         }
     }
     
     /**
-     * Edit the selected job using the controller.
+     * Edit the selected job using the helper class.
      */
     private void editSelectedJob() {
         int viewIdx = jobsTable.getSelectedRow();
@@ -404,84 +399,15 @@ public class SavedJobsTab extends JobView {
             int modelIdx = jobsTable.convertRowIndexToModel(viewIdx);
             JobRecord selectedJob = jobsList.get(modelIdx);
             
-            // Open the job details dialog in edit mode
-            showEditDialog(selectedJob);
+            // Use JobActionHelper to edit the job
+            JobActionHelper.editJob(selectedJob, controller, this);
         } else {
-            showNoSelectionMessage("Please select a job to edit");
+            JobActionHelper.showNoSelectionMessage("Please select a job to edit", this);
         }
     }
     
     /**
-     * Shows a dialog to edit job rating and comments
-     * Uses the controller's getUpdateJob method.
-     * 
-     * @param job The job to edit
-     */
-    private void showEditDialog(JobRecord job) {
-        // Find the parent frame for centering dialogs
-        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        
-        // Create a panel for editing
-        JPanel editPanel = new JPanel();
-        editPanel.setLayout(new java.awt.BorderLayout(10, 10));
-        
-        // Create star rating panel
-        StarRatingPanel starRating = new StarRatingPanel(job.rating() > 0 ? job.rating() : 0);
-        editPanel.add(starRating, java.awt.BorderLayout.NORTH);
-        
-        // Create comments text area
-        javax.swing.JTextArea comments = new javax.swing.JTextArea(5, 20);
-        comments.setLineWrap(true);
-        comments.setWrapStyleWord(true);
-        
-        // Set existing comments if available
-        if (job.comments() != null && !job.comments().isEmpty() && !job.comments().equals("No comments provided")) {
-            comments.setText(job.comments());
-        }
-        
-        javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(comments);
-        scrollPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Your Comments"));
-        editPanel.add(scrollPane, java.awt.BorderLayout.CENTER);
-        
-        // Show the edit dialog
-        int result = JOptionPane.showConfirmDialog(
-            parentFrame,
-            editPanel,
-            "Edit Job: " + job.jobTitle(),
-            JOptionPane.OK_CANCEL_OPTION,
-            JOptionPane.PLAIN_MESSAGE,
-            editIcon
-        );
-        
-        // Process the result
-        if (result == JOptionPane.OK_OPTION) {
-            // Use the controller to update the job
-            if (controller instanceof MainController) {
-                MainController mainController = (MainController) controller;
-                
-                // Get the values from the UI
-                final int finalRating = starRating.getRating();
-                final String finalComments = comments.getText();
-                
-                // Update through the controller
-                JobRecord updatedJob = mainController.getUpdateJob(job.id(), finalComments, finalRating);
-                
-                if (updatedJob != null) {
-                    // Show confirmation
-                    JOptionPane.showMessageDialog(
-                        parentFrame,
-                        "Job updated successfully!",
-                        "Update Complete",
-                        JOptionPane.INFORMATION_MESSAGE,
-                        successIcon
-                    );
-                }
-            }
-        }
-    }
-    
-    /**
-     * Delete the selected job using the controller.
+     * Delete the selected job using the helper class.
      */
     private void deleteSelectedJob() {
         int viewIdx = jobsTable.getSelectedRow();
@@ -489,60 +415,14 @@ public class SavedJobsTab extends JobView {
             int modelIdx = jobsTable.convertRowIndexToModel(viewIdx);
             JobRecord selectedJob = jobsList.get(modelIdx);
             
-            // Find the parent frame for centering dialogs
-            JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-            
-            // Create a confirm dialog
-            Object[] options = {"Delete", "Cancel"};
-            int result = JOptionPane.showOptionDialog(
-                parentFrame,
-                "Are you sure you want to delete the job: " + selectedJob.jobTitle() + "?",
-                "Confirm Delete",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE,
-                deleteIcon,
-                options,
-                options[1]  // Default is Cancel
-            );
-            
-            if (result == JOptionPane.YES_OPTION) {
-                // Use the controller to remove the job
-                controller.removeJobFromList(selectedJob.id());
-                
-                // Update the jobs list in the view to reflect changes
+            // Use JobActionHelper to delete the job
+            if (JobActionHelper.deleteJob(selectedJob, controller, this)) {
+                // Job was deleted successfully
                 updateJobsList(controller.getSavedJobs());
-                
-                // Show confirmation
-                JOptionPane.showMessageDialog(
-                    parentFrame,
-                    "Job deleted successfully!",
-                    "Delete Complete",
-                    JOptionPane.INFORMATION_MESSAGE,
-                    successIcon
-                );
             }
         } else {
-            showNoSelectionMessage("Please select a job to delete");
+            JobActionHelper.showNoSelectionMessage("Please select a job to delete", this);
         }
-    }
-    
-    /**
-     * Shows a message when no row is selected.
-     * 
-     * @param message The message to display
-     */
-    private void showNoSelectionMessage(String message) {
-        // Find the parent frame for centering dialogs
-        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        
-        // Show warning message
-        JOptionPane.showMessageDialog(
-            parentFrame,
-            message,
-            "No Selection",
-            JOptionPane.WARNING_MESSAGE,
-            warningIcon
-        );
     }
 
     @Override
