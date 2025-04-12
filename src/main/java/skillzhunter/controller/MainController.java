@@ -1,9 +1,14 @@
 package skillzhunter.controller;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import skillzhunter.model.IModel;
 import skillzhunter.model.JobRecord;
@@ -194,12 +199,167 @@ public class MainController implements IController {
 
     
     /**
-     * Saves the job records to a CSV file.
+     * Saves the job records to a CSV file using a custom CSV writer
+     * that properly handles collections and HTML content.
+     * 
      * @param filePath The file path to save the CSV file
      */
     @Override
     public void path2CSV(String filePath) {
-        model.saveJobsToCsv(filePath);
+        // Get all job records
+        List<JobRecord> jobs = model.getJobRecords();
+        
+        // Use our custom CSV export method that properly handles HTML content
+        exportToCSV(jobs, filePath);
+    }
+    
+    /**
+     * Custom method to export jobs to CSV format with proper handling of HTML and collections.
+     * 
+     * @param jobs The job records to export
+     * @param filePath The file path to save the CSV file
+     */
+    private void exportToCSV(List<JobRecord> jobs, String filePath) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            // Write header
+            writer.write("id,url,jobSlug,jobTitle,companyName,companyLogo,jobIndustry,jobType,jobGeo,jobLevel,jobExcerpt,jobDescription,pubDate,annualSalaryMin,annualSalaryMax,salaryCurrency,rating,comments");
+            writer.newLine();
+            
+            // Write each job record
+            for (JobRecord job : jobs) {
+                StringBuilder line = new StringBuilder();
+                
+                // ID
+                line.append(job.id()).append(",");
+                
+                // URL
+                line.append(escapeCSV(job.url())).append(",");
+                
+                // jobSlug
+                line.append(escapeCSV(job.jobSlug())).append(",");
+                
+                // jobTitle
+                line.append(escapeCSV(job.jobTitle())).append(",");
+                
+                // companyName
+                line.append(escapeCSV(job.companyName())).append(",");
+                
+                // companyLogo
+                line.append(escapeCSV(job.companyLogo())).append(",");
+                
+                // jobIndustry - join with commas and handle null/empty
+                if (job.jobIndustry() != null && !job.jobIndustry().isEmpty()) {
+                    String industries = job.jobIndustry().stream().collect(Collectors.joining(", "));
+                    line.append(escapeCSV(industries));
+                }
+                line.append(",");
+                
+                // jobType - join with commas and handle null/empty
+                if (job.jobType() != null && !job.jobType().isEmpty()) {
+                    String types = job.jobType().stream().collect(Collectors.joining(", "));
+                    line.append(escapeCSV(types));
+                }
+                line.append(",");
+                
+                // jobGeo
+                line.append(escapeCSV(job.jobGeo())).append(",");
+                
+                // jobLevel
+                line.append(escapeCSV(job.jobLevel())).append(",");
+                
+                // jobExcerpt - extract first sentence without HTML
+                String excerpt = "";
+                if (job.jobExcerpt() != null && !job.jobExcerpt().isEmpty()) {
+                    excerpt = extractFirstSentence(stripHTML(job.jobExcerpt()));
+                }
+                line.append(escapeCSV(excerpt)).append(",");
+                
+                // jobDescription - simplified version without HTML
+                String description = "Position at " + job.companyName() + " - " + job.jobTitle();
+                line.append(escapeCSV(description)).append(",");
+                
+                // pubDate
+                line.append(escapeCSV(job.pubDate())).append(",");
+                
+                // annualSalaryMin
+                line.append(job.annualSalaryMin()).append(",");
+                
+                // annualSalaryMax
+                line.append(job.annualSalaryMax()).append(",");
+                
+                // salaryCurrency
+                line.append(escapeCSV(job.salaryCurrency())).append(",");
+                
+                // rating
+                line.append(job.rating()).append(",");
+                
+                // comments
+                line.append(escapeCSV(job.comments()));
+                
+                // Write the line
+                writer.write(line.toString());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error writing CSV file: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Strips HTML tags from a string.
+     * 
+     * @param html The string with HTML tags
+     * @return The string without HTML tags
+     */
+    private String stripHTML(String html) {
+        if (html == null) return "";
+        return html.replaceAll("<[^>]*>", "").replaceAll("\\s+", " ").trim();
+    }
+    
+    /**
+     * Extracts the first sentence from a text.
+     * 
+     * @param text The text to extract from
+     * @return The first sentence, or the whole text if no sentence end is found
+     */
+    private String extractFirstSentence(String text) {
+        if (text == null || text.isEmpty()) return "";
+        
+        // Find first sentence end
+        int endPos = -1;
+        for (String endMark : new String[]{".", "!", "?"}) {
+            int pos = text.indexOf(endMark);
+            if (pos >= 0 && (endPos == -1 || pos < endPos)) {
+                endPos = pos + 1;
+            }
+        }
+        
+        // If found, return just the first sentence
+        if (endPos > 0) {
+            return text.substring(0, endPos).trim();
+        }
+        
+        // If no sentence end, limit length
+        if (text.length() > 100) {
+            return text.substring(0, 97) + "...";
+        }
+        
+        return text;
+    }
+    
+    /**
+     * Properly escapes a string for CSV format.
+     * 
+     * @param value The string to escape
+     * @return The escaped string
+     */
+    private String escapeCSV(String value) {
+        if (value == null) return "\"\"";
+        
+        // Replace any double quotes with two double quotes and wrap in quotes
+        String escaped = value.replace("\"", "\"\"");
+        return "\"" + escaped + "\"";
     }
     
     /**
@@ -210,7 +370,13 @@ public class MainController implements IController {
      */
     @Override
     public void export2FileType(List<JobRecord> jobs, String formatStr, String filePath) {
-        model.exportSavedJobs(jobs, formatStr, filePath);
+        if ("CSV".equalsIgnoreCase(formatStr)) {
+            // Use our custom CSV export for better control
+            exportToCSV(jobs, filePath);
+        } else {
+            // Use the model's export for other formats
+            model.exportSavedJobs(jobs, formatStr, filePath);
+        }
     }
 
     /**
@@ -242,12 +408,5 @@ public class MainController implements IController {
             }
         }
         return null;
-    }
-    /**
-     * Main method for testing purposes.
-     * @param args
-     */
-    public static void main(String[] args) {
-        // MainController mainController = new MainController();
     }
 }
