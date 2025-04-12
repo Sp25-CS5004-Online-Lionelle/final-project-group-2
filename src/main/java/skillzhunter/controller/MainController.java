@@ -178,6 +178,21 @@ public class MainController implements IController {
     }
 
     /**
+     * Checks if a job is already in the saved jobs list.
+     * 
+     * @param jobRecord The job record to check
+     * @return true if the job is already saved, false otherwise
+     */
+    @Override
+    public boolean isJobAlreadySaved(JobRecord jobRecord) {
+        List<JobRecord> savedJobs = getSavedJobs();
+        
+        // Check if the job is already in the list
+        return savedJobs.stream()
+                .anyMatch(job -> job.id() == jobRecord.id());
+    }
+
+    /**
      * Adds a job to the saved jobs list.
      * 
      * @param jobRecord The JobRecord object to add
@@ -185,6 +200,23 @@ public class MainController implements IController {
     @Override
     public void job2SavedList(JobRecord jobRecord) {
         model.addJob(jobRecord);
+    }
+    
+    /**
+     * Try to add a job to the saved jobs list, checking for duplicates.
+     * 
+     * @param jobRecord The JobRecord object to add
+     * @return true if the job was added successfully, false if it was already in the list
+     */
+    public boolean tryAddJobToSavedList(JobRecord jobRecord) {
+        // Check if the job is already in the list
+        if (isJobAlreadySaved(jobRecord)) {
+            return false;
+        }
+        
+        // Add the job to the list
+        model.addJob(jobRecord);
+        return true;
     }
 
     /**
@@ -403,7 +435,7 @@ public class MainController implements IController {
         
         // Return the updated job record so the view can use it
         for (JobRecord job : model.getJobRecords()) {
-            if (job.id() == id) {
+            if (job.id() == job.id()) {
                 return job;
             }
         }

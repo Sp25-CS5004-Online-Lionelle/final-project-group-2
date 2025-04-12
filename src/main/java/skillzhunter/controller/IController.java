@@ -1,6 +1,5 @@
 package skillzhunter.controller;
 
-
 import java.util.List;
 
 import skillzhunter.model.IModel;
@@ -9,73 +8,76 @@ import skillzhunter.view.IView;
 
 public interface IController {
     /**
-     * Returns the view.
-     * 
-     * @return The view
+     * Get a reference to the view.
+     * @return the view
      */
     IView getView();
 
     /**
-     * Returns the model.
-     * @return IModel
+     * Get a reference to the model.
+     * @return the model
      */
     IModel getModel();
 
     /**
-     * Gets the API call for jobicy api search.
-     * 
+     * Get all locations from the API.
+     * @return List of locations
+     */
+    List<String> getLocations();
+
+    /**
+     * Get all industries from the API.
+     * @return List of industries
+     */
+    List<String> getIndustries();
+
+    /**
+     * Make an API call to get jobs
      * @param query The search query
-     * @param numberOfResults The number of results to return (Nullable)
-     * @param location The location to filter by (Nullable)
-     * @param industry The industry to filter by (Nullable)
+     * @param numberOfResults The number of results to return
+     * @param location The location to filter by
+     * @param industry The industry to filter by
      * @return List of JobRecord objects
      */
     List<JobRecord> getApiCall(String query, Integer numberOfResults, String location, String industry);
-    
+
     /**
-     * Gets the locations from the API and capitalizes them appropriately.
-     * @return List<String> of locations
+     * Get the list of saved jobs.
+     * @return List of JobRecord objects
      */
-    List<String> getLocations();
-    
+    List<JobRecord> getSavedJobs();
+
     /**
-     * Gets the industries from the API and capitalizes them appropriately.
-     * @return List<String> of industries
+     * Add a job to the saved jobs list.
+     * @param jobRecord The JobRecord object to add
      */
-    List<String> getIndustries();
-    
+    void job2SavedList(JobRecord jobRecord);
+
     /**
-     * Adds a job to the saved jobs list.
+     * Check if a job is already in the saved jobs list.
      * 
-     * @param job The JobRecord object to add
+     * @param jobRecord The job record to check
+     * @return true if the job is already saved, false otherwise
      */
-    void job2SavedList(JobRecord job);
-    
+    boolean isJobAlreadySaved(JobRecord jobRecord);
+
     /**
-     * Removes a job from the saved jobs list.
-     * 
-     * @param id The index of the job to remove
+     * Remove a job from the saved jobs list.
+     * @param id The ID of the job to remove
      */
     void removeJobFromList(int id);
-    
+
     /**
-     * Saves the job records to a CSV file.
-     * @param filePath The file path to save the CSV file
+     * Writes the saved jobs to a CSV file.
+     * @param filePath The path to the CSV file
      */
     void path2CSV(String filePath);
     
     /**
-     * Exports the saved jobs to a specified format and file path.
+     * Exports job records to a file in the specified format.
      * @param jobs The list of JobRecord objects to export
-     * @param formatStr The format string (e.g., "csv", "json")
-     * @param filePath The file path to save the exported file
+     * @param formatStr The format string (e.g., "CSV", "JSON", "XML")
+     * @param filePath The path to save the file to
      */
     void export2FileType(List<JobRecord> jobs, String formatStr, String filePath);
-    
-    /**
-     * Gets the saved jobs tab.
-     * @return The saved jobs tab
-     */
-    List<JobRecord> getSavedJobs();
-    
 }

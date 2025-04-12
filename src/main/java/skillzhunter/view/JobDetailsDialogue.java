@@ -6,12 +6,26 @@ import java.util.List;
 
 import skillzhunter.model.JobRecord;
 import skillzhunter.controller.IController;
+import skillzhunter.controller.MainController;
 
+/**
+ * Dialog for displaying job details with the option to save the job.
+ * This is used specifically when opening a job from the Find Jobs tab.
+ */
 public class JobDetailsDialogue extends BaseJobDetailsDialogue {
+
+    // Icons for buttons and dialogs
+    /** info icon. */
+    private static final ImageIcon INFO_ICON = IconLoader.loadIcon("images/info.png");
+    /** warning icon. */
+    private static final ImageIcon WARNING_ICON = IconLoader.loadIcon("images/warning.png");
+    /** success icon. */
+    private static final ImageIcon SUCCESS_ICON = IconLoader.loadIcon("images/success.png");
 
     /**
      * Shows job details when accessed from the Find Jobs tab
      * with "Save this Job?" option and fields for user input.
+     * 
      * @param parent The parent component
      * @param job The job record from the controller
      * @param savedJobs List of saved jobs
@@ -20,18 +34,18 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
     public static void showJobDetails(Component parent, JobRecord job,
                                     List<JobRecord> savedJobs, IController controller) {
         if (job == null || controller == null) {
-            ImageIcon errorIcon = IconLoader.loadIcon("images/warning.png");
             JOptionPane.showMessageDialog(parent,
                     "Job or controller not provided.",
                     "Error",
                     JOptionPane.INFORMATION_MESSAGE,
-                    errorIcon);
+                    WARNING_ICON);
             return;
         }
         
-        boolean jobPresent = savedJobs != null && savedJobs.contains(job);
+        // Check if this job is already saved
+        boolean jobPresent = controller.isJobAlreadySaved(job);
         
-        // Check if this is being accessed from Saved Jobs tab
+        // If job is already saved, use the specialized SavedJobDetailsDialog
         if (jobPresent) {
             // Use the specialized SavedJobDetailsDialog for saved jobs
             SavedJobDetailsDialogue.show(parent, job, controller);
@@ -44,6 +58,7 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
     /**
      * Shows job details when accessed from Find Jobs tab
      * with "Save this Job?" option and fields for user input.
+     * 
      * @param parent The parent component
      * @param job The job record from the controller
      * @param controller The controller instance
@@ -52,6 +67,28 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
         // Create the dialog using the base class method
         JDialog dialog = createBaseDialog(parent, job, "Job Details");
         
+        // Create and add content
+        JPanel mainPanel = createContentPanel(job);
+        dialog.add(mainPanel, BorderLayout.CENTER);
+        
+        // Create button panel with Yes/No options
+        JPanel buttonPanel = createButtonPanel(dialog, parent, job, controller);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+        
+        // Set dialog properties
+        dialog.setSize(450, 580);
+        dialog.setLocationRelativeTo(parent);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setVisible(true);
+    }
+    
+    /**
+     * Creates the main content panel with job details and rating/comments fields.
+     * 
+     * @param job The job to display
+     * @return The created content panel
+     */
+    private static JPanel createContentPanel(JobRecord job) {
         // Create and add the main content panel
         JPanel mainPanel = createMainContentPanel(job);
         
@@ -60,6 +97,26 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
         JPanel contentPanel = (JPanel) scrollPane.getViewport().getView();
         
         // Add rating and comments section
+        JPanel ratingPanel = createRatingPanel(job);
+        contentPanel.add(ratingPanel);
+        
+        // Create a save question panel
+        JPanel confirmPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JLabel confirmLabel = new JLabel("Save this Job?");
+        confirmLabel.setFont(confirmLabel.getFont().deriveFont(Font.BOLD));
+        confirmPanel.add(confirmLabel);
+        contentPanel.add(confirmPanel);
+        
+        return mainPanel;
+    }
+    
+    /**
+     * Creates a panel for the star rating and comments input.
+     * 
+     * @param job The job to use for initial values
+     * @return The created rating panel
+     */
+    private static JPanel createRatingPanel(JobRecord job) {
         JPanel ratingPanel = new JPanel(new BorderLayout(5, 5));
         ratingPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
         
@@ -85,19 +142,24 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
         commentScrollPane.setBorder(BorderFactory.createTitledBorder("Your Comments"));
         ratingPanel.add(commentScrollPane, BorderLayout.CENTER);
         
-        contentPanel.add(ratingPanel);
+        // Store the components in the client properties for later access
+        ratingPanel.putClientProperty("starRating", starRating);
+        ratingPanel.putClientProperty("commentsArea", commentsArea);
         
-        // Create a save question panel
-        JPanel confirmPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JLabel confirmLabel = new JLabel("Save this Job?");
-        confirmLabel.setFont(confirmLabel.getFont().deriveFont(Font.BOLD));
-        confirmPanel.add(confirmLabel);
-        contentPanel.add(confirmPanel);
-        
-        // Add the main panel to the dialog
-        dialog.add(mainPanel, BorderLayout.CENTER);
-        
-        // Create button panel with Yes/No options
+        return ratingPanel;
+    }
+    
+    /**
+     * Creates the button panel with Yes/No buttons.
+     * 
+     * @param dialog The parent dialog
+     * @param parentComponent The original parent component
+     * @param job The job to save
+     * @param controller The controller
+     * @return The created button panel
+     */
+    private static JPanel createButtonPanel(JDialog dialog, Component parentComponent, 
+                                           JobRecord job, IController controller) {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         
         JButton yesButton = new JButton("Yes");
@@ -110,29 +172,74 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
         yesButton.setPreferredSize(new Dimension(buttonWidth, buttonHeight));
         noButton.setPreferredSize(new Dimension(buttonWidth, buttonHeight));
         
+        // Set up button actions
+        yesButton.addActionListener(e -> handleSaveAction(dialog, parentComponent, job, controller));
+        noButton.addActionListener(e -> dialog.dispose());
+        
         buttonPanel.add(yesButton);
         buttonPanel.add(noButton);
         
-        dialog.add(buttonPanel, BorderLayout.SOUTH);
-        
-        // Handle the button clicks using the helper class
-        yesButton.addActionListener(e -> {
-            // Get the rating and comments from UI
-            int newRating = starRating.getRating();
-            String commentText = commentsArea.getText().isEmpty() ? "No comments provided" : commentsArea.getText();
-            
-            // Use helper to save the job
-            JobActionHelper.saveJob(job, commentText, newRating, controller, parent);
-            
+        return buttonPanel;
+    }
+    
+    /**
+     * Handles the save action when the user clicks "Yes".
+     * 
+     * @param dialog The parent dialog
+     * @param parentComponent The original parent component
+     * @param job The job to save
+     * @param controller The controller
+     */
+    private static void handleSaveAction(JDialog dialog, Component parentComponent, 
+                                        JobRecord job, IController controller) {
+        // Check if the job is already saved
+        if (controller.isJobAlreadySaved(job)) {
+            // Show message that the job is already saved
+            JOptionPane.showMessageDialog(
+                dialog,
+                "This job is already saved.",
+                "Job Already Saved",
+                JOptionPane.INFORMATION_MESSAGE,
+                INFO_ICON
+            );
             dialog.dispose();
-        });
+            return;
+        }
         
-        noButton.addActionListener(e -> dialog.dispose());
+        // Get the rating panel from the dialog
+        JPanel mainPanel = (JPanel)dialog.getContentPane().getComponent(0);
+        JScrollPane scrollPane = (JScrollPane) mainPanel.getComponent(1);
+        JPanel contentPanel = (JPanel) scrollPane.getViewport().getView();
+        JPanel ratingPanel = (JPanel) contentPanel.getComponent(contentPanel.getComponentCount() - 2);
         
-        // Set dialog properties
-        dialog.setSize(450, 580);
-        dialog.setLocationRelativeTo(parent);
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        dialog.setVisible(true);
+        // Get the components from the client properties
+        StarRatingPanel starRating = (StarRatingPanel) ratingPanel.getClientProperty("starRating");
+        JTextArea commentsArea = (JTextArea) ratingPanel.getClientProperty("commentsArea");
+        
+        // Get the rating and comments from UI
+        int newRating = starRating.getRating();
+        String commentText = commentsArea.getText().isEmpty() ? "No comments provided" : commentsArea.getText();
+        
+        // First, add the job to the model through the controller
+        controller.job2SavedList(job);
+        
+        // Then update the job with the rating and comments through the controller
+        if (controller instanceof MainController cont) {
+            (cont).getUpdateJob(job.id(), commentText, newRating);
+        }
+        
+        // Show success message
+        JOptionPane.showMessageDialog(
+            dialog,
+            "Job saved successfully!",
+            "Job Saved",
+            JOptionPane.INFORMATION_MESSAGE,
+            SUCCESS_ICON
+        );
+        
+        // Switch to "Saved Jobs" tab after adding a job
+        JobActionHelper.switchToSavedJobsTab(parentComponent, controller);
+        
+        dialog.dispose();
     }
 }

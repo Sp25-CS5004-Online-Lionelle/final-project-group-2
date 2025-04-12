@@ -30,6 +30,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
 import skillzhunter.controller.IController;
+import skillzhunter.controller.MainController;
 import skillzhunter.model.JobRecord;
 
 /**
@@ -59,6 +60,10 @@ public class FindJobTab extends JobView {
     private final ImageIcon openIcon;
     /** save icon. */
     private final ImageIcon saveIcon;
+    /** info icon. */
+    private final ImageIcon infoIcon;
+    /** warning icon. */
+    private final ImageIcon warningIcon;
     /** Salary range viz. */
     private SalaryVisualizationPanel salaryVisualizationPanel;
     /** show vis button. */
@@ -83,6 +88,8 @@ public class FindJobTab extends JobView {
         // Use IconLoader to load icons
         this.openIcon = IconLoader.loadIcon("images/open.png");
         this.saveIcon = IconLoader.loadIcon("images/saveIcon.png");
+        this.infoIcon = IconLoader.loadIcon("images/info.png");
+        this.warningIcon = IconLoader.loadIcon("images/warning.png");
         
         super.initView();
 
@@ -371,13 +378,12 @@ public class FindJobTab extends JobView {
 
     /**
      * Saves the selected job directly without opening the dialog
-     * Uses helper class to save the job.
+     * Adds the job to saved jobs and switches to the Saved Jobs tab.
      */
     private void saveSelectedJob() {
         int viewIdx = jobsTable.getSelectedRow();
         if (viewIdx < 0) {
             // No job selected
-            ImageIcon warningIcon = IconLoader.loadIcon("images/warning.png");
             JOptionPane.showMessageDialog(this,
                     "Please select a job to save.",
                     "No Job Selected",
@@ -389,20 +395,101 @@ public class FindJobTab extends JobView {
         int modelIdx = jobsTable.convertRowIndexToModel(viewIdx);
         JobRecord selectedJob = jobsList.get(modelIdx);
         
-        // Check if job is already saved
-        List<JobRecord> savedJobs = controller.getSavedJobs();
-        if (savedJobs != null && savedJobs.contains(selectedJob)) {
-            ImageIcon infoIcon = IconLoader.loadIcon("images/info.png");
-            JOptionPane.showMessageDialog(this,
-                    "This job is already saved.",
-                    "Job Already Saved",
-                    JOptionPane.INFORMATION_MESSAGE,
-                    infoIcon);
-            return;
+        // Check if job is already saved using MainController's method
+        if (controller instanceof MainController mainController) {
+            if (mainController.isJobAlreadySaved(selectedJob)) {
+                JOptionPane.showMessageDialog(this,
+                        "This job is already saved.",
+                        "Job Already Saved",
+                        JOptionPane.INFORMATION_MESSAGE,
+                        infoIcon);
+                return;
+            }
+            
+            // Add the job to saved jobs
+            controller.job2SavedList(selectedJob);
+            
+            // Set default rating and comments
+            mainController.getUpdateJob(selectedJob.id(), "No comments provided", 0);
+        } else {
+            // Fallback to basic check if not using MainController
+            List<JobRecord> savedJobs = controller.getSavedJobs();
+            if (savedJobs != null && savedJobs.stream().anyMatch(job -> job.id() == selectedJob.id())) {
+                JOptionPane.showMessageDialog(this,
+                        "This job is already saved.",
+                        "Job Already Saved",
+                        JOptionPane.INFORMATION_MESSAGE,
+                        infoIcon);
+                return;
+            }
+            
+            // Add the job to saved jobs
+            controller.job2SavedList(selectedJob);
         }
         
-        // Use helper method to save the job with default values
-        JobActionHelper.saveJob(selectedJob, "No comments provided", 0, controller, this);
+        // Show success message
+        JOptionPane.showMessageDialog(this,
+                "Job saved successfully!",
+                "Job Saved",
+                JOptionPane.INFORMATION_MESSAGE,
+                IconLoader.loadIcon("images/success.png"));
+        
+        // Switch to Saved Jobs tab
+        switchToSavedJobsTab();
+    }
+    
+    /**
+     * Switches to the Saved Jobs tab and refreshes it.
+     */
+    private void switchToSavedJobsTab() {
+        // Method adapted from JobDetailsDialogue.switchToSavedJobsTab
+        javax.swing.JFrame frame = (javax.swing.JFrame) javax.swing.SwingUtilities.getWindowAncestor(this);
+        if (frame != null) {
+            // Look for the tabbed pane
+            javax.swing.JTabbedPane tabbedPane = findTabbedPane(frame.getContentPane());
+            if (tabbedPane != null) {
+                // Find and select the "Saved Jobs" tab
+                for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+                    String title = tabbedPane.getTitleAt(i);
+                    Component comp = tabbedPane.getTabComponentAt(i);
+                    
+                    if ("Saved Jobs".equals(title) 
+                        || (comp instanceof JLabel && "Saved Jobs".equals(((JLabel) comp).getText()))) {
+                        
+                        // Select the tab
+                        tabbedPane.setSelectedIndex(i);
+                        
+                        // Update the tab content if it's a SavedJobsTab
+                        Component tabComponent = tabbedPane.getComponentAt(i);
+                        if (tabComponent instanceof SavedJobsTab savedJobsTab) {
+                            savedJobsTab.updateJobsList(controller.getSavedJobs());
+                        }
+                        
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Recursively searches for a JTabbedPane in the component hierarchy
+     * Method copied from JobDetailsDialogue.
+     * @param component The component to search in
+     * @return The found JTabbedPane, or null if not found
+     */
+    private javax.swing.JTabbedPane findTabbedPane(Component component) {
+        if (component instanceof javax.swing.JTabbedPane comp) {
+            return comp;
+        } else if (component instanceof Container container) {
+            for (int i = 0; i < container.getComponentCount(); i++) {
+                javax.swing.JTabbedPane found = findTabbedPane(container.getComponent(i));
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
 
     /**
