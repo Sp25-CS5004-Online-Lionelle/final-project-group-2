@@ -9,9 +9,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 
 import skillzhunter.controller.IController;
 import skillzhunter.model.JobRecord;
@@ -32,6 +30,9 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
     /** warning icon. */
     private static final ImageIcon WARNING_ICON;
     
+    // Standard button dimensions
+    private static final int BUTTON_WIDTH = 100;
+    
     // Initialize icons
     static {
         EDIT_ICON = IconLoader.loadIcon("images/edit.png", 24, 24);
@@ -49,78 +50,158 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
      * @param controller The controller
      */
     public static void show(Component parent, JobRecord job, IController controller) {
+        if (!validateInputs(parent, job, controller)) {
+            return;
+        }
+        
+        // Create and configure the dialog
+        JDialog dialog = createBaseDialog(parent, job, "Job Details");
+        
+        // Create and add content panel
+        JPanel mainPanel = createMainContentPanel(job);
+        dialog.add(mainPanel, BorderLayout.CENTER);
+        
+        // Create and add button panel
+        JPanel buttonPanel = createButtonPanel(dialog, job, controller, parent);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+        
+        // Set dialog properties and display
+        configureDialogProperties(dialog, parent);
+    }
+    
+    /**
+     * Validates that required inputs are provided.
+     * 
+     * @param parent The parent component
+     * @param job The job to display
+     * @param controller The controller
+     * @return true if inputs are valid, false otherwise
+     */
+    private static boolean validateInputs(Component parent, JobRecord job, IController controller) {
         if (job == null || controller == null) {
             JOptionPane.showMessageDialog(parent,
                 "Job or controller not provided.",
                 "Error",
                 JOptionPane.INFORMATION_MESSAGE,
                 WARNING_ICON);
-            return;
+            return false;
         }
-        
-        // Create the dialog using the base class method
-        JDialog dialog = createBaseDialog(parent, job, "Job Details");
-        
-        // Create and add the main content panel
-        JPanel mainPanel = createMainContentPanel(job);
-        dialog.add(mainPanel, BorderLayout.CENTER);
-        
-        // Create button panel with appropriate options for saved jobs
+        return true;
+    }
+    
+    /**
+     * Creates the button panel with Edit, Delete, and Close buttons.
+     * 
+     * @param dialog The parent dialog
+     * @param job The job record
+     * @param controller The controller
+     * @param parent The parent component
+     * @return The created button panel
+     */
+    private static JPanel createButtonPanel(JDialog dialog, JobRecord job, IController controller, Component parent) {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         
-        // Create themed buttons with different button types
-        ThemedButton editButton = new ThemedButton("Edit", ThemedButton.ButtonType.INFO);
-        editButton.setIcon(EDIT_ICON);
-        editButton.setHorizontalTextPosition(SwingConstants.LEFT);
-        editButton.setIconTextGap(5);
+        // Create themed buttons
+        ThemedButton editButton = createButton("Edit", ThemedButton.ButtonType.INFO, EDIT_ICON);
+        ThemedButton deleteButton = createButton("Delete", ThemedButton.ButtonType.DANGER, DELETE_ICON);
+        ThemedButton closeButton = createButton("Close", ThemedButton.ButtonType.SECONDARY, CLOSE_ICON);
         
-        ThemedButton deleteButton = new ThemedButton("Delete", ThemedButton.ButtonType.DANGER);
-        deleteButton.setIcon(DELETE_ICON);
-        deleteButton.setHorizontalTextPosition(SwingConstants.LEFT);
-        deleteButton.setIconTextGap(5);
-        
-        ThemedButton closeButton = new ThemedButton("Close", ThemedButton.ButtonType.SECONDARY);
-        closeButton.setIcon(CLOSE_ICON);
-        closeButton.setHorizontalTextPosition(SwingConstants.LEFT);
-        closeButton.setIconTextGap(5);
-        
-        // Set consistent size for all buttons
-        int buttonWidth = 100;
-        int buttonHeight = Math.max(
-            editButton.getPreferredSize().height,
-            Math.max(
-                deleteButton.getPreferredSize().height,
-                closeButton.getPreferredSize().height
-            )
-        );
-        
-        editButton.setPreferredSize(new Dimension(buttonWidth, buttonHeight));
-        deleteButton.setPreferredSize(new Dimension(buttonWidth, buttonHeight));
-        closeButton.setPreferredSize(new Dimension(buttonWidth, buttonHeight));
+        // Set consistent button sizes
+        int buttonHeight = calculateButtonHeight(editButton, deleteButton, closeButton);
+        setButtonSizes(editButton, deleteButton, closeButton, buttonHeight);
         
         // Add buttons to panel
         buttonPanel.add(editButton);
         buttonPanel.add(deleteButton);
         buttonPanel.add(closeButton);
         
-        // Add button panel to dialog
-        dialog.add(buttonPanel, BorderLayout.SOUTH);
+        // Set button actions
+        configureButtonActions(dialog, editButton, deleteButton, closeButton, job, controller, parent);
         
-        // Set button actions using helper methods
+        return buttonPanel;
+    }
+    
+    /**
+     * Creates a themed button with specified text, type, and icon.
+     * 
+     * @param text The button text
+     * @param buttonType The button type
+     * @param icon The button icon
+     * @return The created button
+     */
+    private static ThemedButton createButton(String text, ThemedButton.ButtonType buttonType, ImageIcon icon) {
+        ThemedButton button = new ThemedButton(text, buttonType);
+        button.setIcon(icon);
+        button.setHorizontalTextPosition(SwingConstants.LEFT);
+        button.setIconTextGap(5);
+        return button;
+    }
+    
+    /**
+     * Calculates the maximum height required for the buttons.
+     * 
+     * @param buttons The buttons to calculate height for
+     * @return The maximum height
+     */
+    private static int calculateButtonHeight(ThemedButton... buttons) {
+        int maxHeight = 0;
+        for (ThemedButton button : buttons) {
+            maxHeight = Math.max(maxHeight, button.getPreferredSize().height);
+        }
+        return maxHeight;
+    }
+    
+    /**
+     * Sets consistent size for all buttons.
+     * 
+     * @param buttons The buttons to size
+     * @param height The height to set
+     */
+    private static void setButtonSizes(ThemedButton editButton, ThemedButton deleteButton, 
+                                      ThemedButton closeButton, int height) {
+        editButton.setPreferredSize(new Dimension(BUTTON_WIDTH, height));
+        deleteButton.setPreferredSize(new Dimension(BUTTON_WIDTH, height));
+        closeButton.setPreferredSize(new Dimension(BUTTON_WIDTH, height));
+    }
+    
+    /**
+     * Configures the action listeners for the buttons.
+     * 
+     * @param dialog The parent dialog
+     * @param editButton The edit button
+     * @param deleteButton The delete button
+     * @param closeButton The close button
+     * @param job The job record
+     * @param controller The controller
+     * @param parent The parent component
+     */
+    private static void configureButtonActions(JDialog dialog, ThemedButton editButton, 
+                                              ThemedButton deleteButton, ThemedButton closeButton,
+                                              JobRecord job, IController controller, Component parent) {
+        // Edit button action
         editButton.addActionListener(e -> {
             dialog.dispose(); // Close dialog first
             JobActionHelper.editJob(job, controller, parent); // Use helper method to edit
         });
         
+        // Delete button action
         deleteButton.addActionListener(e -> {
             if (JobActionHelper.deleteJob(job, controller, parent)) {
                 dialog.dispose(); // Only close the dialog if delete was confirmed
             }
         });
         
+        // Close button action
         closeButton.addActionListener(e -> dialog.dispose());
-        
-        // Set dialog properties
+    }
+    
+    /**
+     * Configures and displays the dialog.
+     * 
+     * @param dialog The dialog to configure
+     * @param parent The parent component
+     */
+    private static void configureDialogProperties(JDialog dialog, Component parent) {
         dialog.setSize(450, 450);
         dialog.setLocationRelativeTo(parent);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
