@@ -156,7 +156,7 @@ main *..  MainController: uses
 IController *.. IModel: uses
 IController *.. JobRecord: uses
 IController *.. IView: uses
-IController *.. SavedJobsTab: uses%% is this needed?
+IController *.. SavedJobsTab: uses %% is this needed?
 
 %% Main Controller
 IController <|-- MainController: Implements
@@ -169,7 +169,79 @@ MainController *.. MainView: uses
 MainController *.. SavedJobsTab: uses
 
 %% formatters
-DataFormatter
+DataFormatter *.. JobRecord: uses
+DataFormatter *.. Formats: uses
+DomainXmlWrapper *.. JobRecord: uses
+
+%% net
+JobBoardApi *.. JobBoardApiResult: uses
+JobBoardApi *.. JobRecord: uses
+JobBoardApi *.. JobBoardApiResult: uses
+
+%% IModel
+%% Note: why is the model setting the controller?? Controller should call model not the other way around
+IModel *.. IController: uses
+
+%% Jobs
+%% why is the model setting the controller?? Controller should call model not the other way around
+IModel <|.. Jobs: Implements
+Jobs *.. IController: uses 
+Jobs *.. DataFormatter: uses
+Jobs *.. Formats: uses
+Jobs *.. JobBoardApi: uses
+Jobs *.. JobBoardApiResult: uses
+
+%% BaseJobDetailsDialogue
+BaseJobDetailsDialogue *.. JobRecord: uses
+
+%% Find Job
+%% Note: We should call IController and never MainController
+%% Note: IMO this "switchToSavedJobsTab" seems odd to me I feel like this should be in mainView Or something.
+FindJobTab <|.. JobView: extends
+FindJobTab *.. IController: uses
+FindJobTab *.. MainController: uses
+FindJobTab *.. SavedJobsTab: uses
+FindJobTab *.. JobDetailsDialogue : uses
+
+
+%% IView
+%% Note: controller argument is not used but has a doc string?
+%% Note: does this class really have a point at this point. If so we should look at expanding it to all things common acorss Main, and Tabs
+%% Note: I think "Addfeatrues" is dead
+
+
+%% JobActionHelper
+%% Note: Needs Documentation and style clean up
+
+%% JobDetailsDialogue
+%% Note: Should note use MainController and only use IController
+%% Note: Style Clean up
+BaseJobDetailsDialogue <|.. JobDetailsDialogue: extends
+JobDetailsDialogue *.. JobRecord
+JobDetailsDialogue *.. IController
+JobDetailsDialogue *.. MainController
+JobDetailsDialogue *.. StarRatingPanel
+JobDetailsDialogue *.. SavedJobDetailsDialogue
+JobDetailsDialogue *.. JobActionHelper
+
+
+%% JobsLoader
+JobsLoader *.. JobRecord: uses
+
+%% JobView
+JobView *.. IController 
+JobView *.. ThemedButton  
+JobView *.. JobsTable   
+JobView *.. ColorTheme  
+
+
+
+
+
+
+
+
+
 
 
 
@@ -624,6 +696,11 @@ class IController {
 + getSavedJobsTab(): SavedJobsTab
 }
 
+
+%% Notes:
+%% * setModel, setView: Why are these protected this would be used externally
+%% * setController: why are we setting the controller? IMO The model should never call the controller.
+
 class MainController {
 - mode: IModel
 - view: IView
@@ -638,8 +715,8 @@ class MainController {
 + getUpdateJob(int, String, int): JobRecord
 + tryAddJobToSavedList(JobRecord): Boolean
 + setSavedJobs(List~JobRecord~): List~JobRecord~
-# setModel(IModel): void ?? Why are these protected this would be used externally?
-# setView(IModel): void ?? Why are these protected this would be used externally?
+# setModel(IModel): void
+# setView(IModel): void
 
 }
 
@@ -720,6 +797,8 @@ namespace model {
         + main(String[]): void
       }
 
+      %% Notes:
+      %% * why are we setting the controller in the model. the Model should NEVER call the controller
       class IModel {
       + setController(IController): void
       + addJob(JobRecord): void
