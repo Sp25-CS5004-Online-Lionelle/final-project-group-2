@@ -145,12 +145,14 @@ config:
   theme: mc
 title: Skillz Hunter App Initial Design
 ---
+
+
 classDiagram
 
 %% Main
-main *..  IModel: uses
-main *..  IView: uses
-main *..  MainController: uses
+Main *..  IModel: uses
+Main *..  IView: uses
+Main *..  MainController: uses
 
 %% IController
 IController *.. IModel: uses
@@ -177,19 +179,28 @@ DomainXmlWrapper *.. JobRecord: uses
 JobBoardApi *.. JobBoardApiResult: uses
 JobBoardApi *.. JobRecord: uses
 JobBoardApi *.. JobBoardApiResult: uses
+JobBoardApi *.. Artifacts: uses
+JobBoardApi *.. ResponseRecord: uses
+
+
 
 %% IModel
 %% Note: why is the model setting the controller?? Controller should call model not the other way around
 IModel *.. IController: uses
 
+
 %% Jobs
-%% why is the model setting the controller?? Controller should call model not the other way around
+%% Note: why is the model setting the controller?? Controller should call model not the other way around
+%% Note: - processJobRecords(List~JobRecord~): List~JobRecord~ ??? I see this was added back in. According to the styler this is not used why are we keeping it?
+%% Note: searchApi(String): List~JobRecord~ ?? this i should be private I think
+%% Note:  + setController(IController): void ??? I think we just need to add the Override Annotation.
 IModel <|.. Jobs: Implements
 Jobs *.. IController: uses 
 Jobs *.. DataFormatter: uses
 Jobs *.. Formats: uses
 Jobs *.. JobBoardApi: uses
 Jobs *.. JobBoardApiResult: uses
+Jobs *.. Artifacts: uses
 
 %% BaseJobDetailsDialogue
 BaseJobDetailsDialogue *.. JobRecord: uses
@@ -202,16 +213,22 @@ FindJobTab *.. IController: uses
 FindJobTab *.. MainController: uses
 FindJobTab *.. SavedJobsTab: uses
 FindJobTab *.. JobDetailsDialogue : uses
+FindJobTab *.. SalaryVisualizationPanel : uses
+FindJobTab *.. IconLoader : uses
+
+
 
 
 %% IView
 %% Note: controller argument is not used but has a doc string?
-%% Note: does this class really have a point at this point. If so we should look at expanding it to all things common acorss Main, and Tabs
+%% Note: does this class really have a point at this point. If so we should look at expanding it to all things common across Main, and Tabs
 %% Note: I think "Addfeatrues" is dead
 
 
 %% JobActionHelper
 %% Note: Needs Documentation and style clean up
+JobActionHelper *.. IconLoader : uses
+
 
 %% JobDetailsDialogue
 %% Note: Should note use MainController and only use IController
@@ -223,16 +240,25 @@ JobDetailsDialogue *.. MainController
 JobDetailsDialogue *.. StarRatingPanel
 JobDetailsDialogue *.. SavedJobDetailsDialogue
 JobDetailsDialogue *.. JobActionHelper
+JobDetailsDialogue *.. IconLoader
+
 
 
 %% JobsLoader
 JobsLoader *.. JobRecord: uses
 
 %% JobView
+%% Note: OShould most of the variables be private? 
 JobView *.. IController 
 JobView *.. ThemedButton  
 JobView *.. JobsTable   
 JobView *.. ColorTheme
+
+%% Random Icon loader
+CustomMenuBar *.. IconLoader
+CustomMenuBar *.. CustomHeader
+BaseJobDetailsDialogue *.. CustomHeader
+
 
 %% MainView
 MainView *.. IController : uses
@@ -240,19 +266,25 @@ MainView *.. JobView : uses
 MainView *.. CustomMenuBar : uses
 MainView *.. TabStyleManager : uses
 MainView *.. ColorTheme : uses
-MainView *.. JOptionPane : uses
-MainView *.. ImageIcon : uses 
+MainView *.. IconLoader : uses
 
 %% SavedJobsTab
 SavedJobsTab <|-- JobView : Inherits
-SavedJobsTab *.. IController : Uses
-SavedJobsTab *.. JobRecord : Uses
-SavedJobsTab *.. ThemedButton : Uses
-SavedJobsTab *.. JobActionHelper : Uses
-SavedJobsTab *.. IconLoader : Uses
+SavedJobsTab *.. IController : uses
+SavedJobsTab *.. JobRecord : uses
+SavedJobsTab *.. ThemedButton : uses
+SavedJobsTab *.. JobActionHelper : uses
+SavedJobsTab *.. IconLoader
 
 TabStyleManager *.. ColorTheme
 ThemedButton *.. ColorTheme
+JobsTable *.. ImageCellRenderer
+
+%% ColorTheme
+%% note:shouldn't most of them variables be private or protected?
+%% note: It seem like we are passing way to many variables in contructor
+
+
 
 
 
@@ -409,7 +441,6 @@ class MainView {
 
 class JobView {
         <<abstract>>
-        +??? shouldn't theses be private and then inherited? 
         # searchButton: ThemedButton
         # searchField: JTextArea
         # recordText: JTextArea
@@ -519,7 +550,7 @@ class IView {
       + addFeatures(controller: IController): void
   }
 
-class final ImageCellRenderer {
+class ImageCellRenderer {
     <<abstract>>
     - static final IMAGE_WIDTH: int
     - static final IMAGE_HEIGHT: int
@@ -532,7 +563,7 @@ class final ImageCellRenderer {
 }
 
 
-class final IconLoader {
+class IconLoader {
     <<final>>
     + static final loadIcon(String): ImageIcon
     + static final loadIcon(String, int, int): ImageIcon
@@ -621,7 +652,7 @@ class CustomHeader {
 
   class ColorTheme {
         <<final>>
-        - ??? VVV should these variables be private VVV
+        
         - buttonNormal: Color
         - buttonHover: Color
         - secondaryButtonNormal: Color
@@ -672,7 +703,7 @@ class CustomHeader {
         - macTabPaneBgLight: Color
         - macTabPaneBgDark: Color
 
-        + ColorTheme(color..., color) ?? this is way too many variables for a function we should re-configure this
+        + ColorTheme(color..., color) 
         + static final LIGHT: ColorTheme
         + static final DARK: ColorTheme
     }
@@ -730,7 +761,7 @@ class MainController {
 }
 
 namespace model {
-    class final DataFormatter {
+    class DataFormatter {
         + write(Collection~JobRecord~, Formats, OutputStream): void
         + exportCustomCSV(List~JobRecord~, String): void
         - prettyPrint(Collection~JobRecord~, OutputStream): void
@@ -745,7 +776,7 @@ namespace model {
     }
 
 
-  class final DomainXmlWrapper {
+  class DomainXmlWrapper {
   - private final Collection<JobRecord> job
 
   + DomainXmlWrapper(Collection<JobRecord>)
@@ -776,8 +807,8 @@ namespace model {
         + getJobBoard(String, Integer, String): JobBoardApiResult
         + getJobBoard(String, Integer, String, String): JobBoardApiResult
         + static replaceHtmlEntities(String): String
-        # searchApi(String): List~JobRecord~ ?? this i should be private I think
-        - processJobRecords(List~JobRecord~): List~JobRecord~ ??? is see this was added back in. According to the styler this is not used why are we keeping it?
+        # searchApi(String): List~JobRecord~ 
+        - processJobRecords(List~JobRecord~): List~JobRecord~ 
         + main(String[]): void
     
     }
@@ -829,8 +860,7 @@ namespace model {
       - final JobBoardApi api
 
       + jobs()
-      + setController(IController): void ??? I think we just need to add the Override Annotation.
-      +
+      + setController(IController): void
 
 
       }
@@ -938,11 +968,10 @@ namespace model {
 }
 
 
-class artifacts {
+class Artifacts {
 + /data/industries.csv Path
 + /data/locations.csv Path
 + /data/SavedJobs.csv Path
 }
-
 
 ```
