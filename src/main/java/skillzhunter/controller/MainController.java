@@ -3,7 +3,6 @@ package skillzhunter.controller;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +33,6 @@ public class MainController implements IController {
     public MainController() {
         // Model
         model = new Jobs();
-        model.setController(this);
 
         // Saved jobs tab initialized with actual saved jobs list
         savedJobsTab = new SavedJobsTab(this, model.getJobRecords());
@@ -81,7 +79,6 @@ public class MainController implements IController {
         savedJobsTab.updateJobsList(model.getJobRecords());
     }
     
-
     /**
      * Gets the locations from the API and capitalizes them appropriately.
      * @return List<String> of locations
@@ -181,14 +178,14 @@ public class MainController implements IController {
 
     /**
      * Checks if a job is already in the saved jobs list.
-     *
+     * 
      * @param jobRecord The job record to check
      * @return true if the job is already saved, false otherwise
      */
     @Override
     public boolean isJobAlreadySaved(JobRecord jobRecord) {
         List<JobRecord> savedJobs = getSavedJobs();
-
+        
         // Check if the job is already in the list
         return savedJobs.stream()
                 .anyMatch(job -> job.id() == jobRecord.id());
@@ -203,10 +200,10 @@ public class MainController implements IController {
     public void job2SavedList(JobRecord jobRecord) {
         model.addJob(jobRecord);
     }
-
+    
     /**
      * Try to add a job to the saved jobs list, checking for duplicates.
-     *
+     * 
      * @param jobRecord The JobRecord object to add
      * @return true if the job was added successfully, false if it was already in the list
      */
@@ -215,7 +212,7 @@ public class MainController implements IController {
         if (isJobAlreadySaved(jobRecord)) {
             return false;
         }
-
+        
         // Add the job to the list
         model.addJob(jobRecord);
         return true;
@@ -231,11 +228,10 @@ public class MainController implements IController {
         model.removeJob(index);
     }
 
-
     /**
      * Saves the job records to a CSV file using a custom CSV writer
      * that properly handles collections and HTML content.
-     *
+     * 
      * @param filePath The file path to save the CSV file
      */
     @Override
@@ -246,9 +242,7 @@ public class MainController implements IController {
         // Get from DataFormatter the custom CSV writer
         DataFormatter.exportCustomCSV(jobs, filePath);
     }
-
     
-
     /**
      * Exports the saved jobs to a specified format and file path.
      * @param jobs The list of JobRecord objects to export
@@ -274,7 +268,6 @@ public class MainController implements IController {
         return savedJobsTab;
     }
     
-
     /**
      * Updates a job with new comments and rating.
      * 
@@ -296,17 +289,8 @@ public class MainController implements IController {
                 return job;
             }
         }
+        
+        // Job not found
         return null;
-    }
-
-    public void sendAlert(String alert) {
-        if (this.view != null) {
-            this.view.notifyUser(alert);
-        }
-    }
-
-
-    public static void main(String[] args) {
-        MainController mainController = new MainController();
     }
 }
