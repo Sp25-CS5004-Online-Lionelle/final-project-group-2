@@ -133,59 +133,61 @@ public class Jobs implements IModel {
     }
 
     /**
-     * Update a job's comments and rating.
-     * @param id Job ID
-     * @param comments Comments to update
-     * @param rating Rating to update
-     */
-    @Override
-    public void updateJob(int id, String comments, int rating) {
-        // Debug output to verify values
-        System.out.println("Updating job " + id + " with rating: " + rating + " and comments: " + comments);
-        
-        for (JobRecord job : jobList) {
-            if (job.id() == id) {
-                // Create JobBean and set all fields in the same order as JobRecord
-                JobBean jobBean = new JobBean();
-                jobBean.setId(job.id());
-                jobBean.setUrl(job.url());
-                jobBean.setJobSlug(job.jobSlug());
-                jobBean.setJobTitle(job.jobTitle());
-                jobBean.setCompanyName(job.companyName());
-                jobBean.setCompanyLogo(job.companyLogo());
-                jobBean.setJobIndustry(job.jobIndustry());
-                jobBean.setJobType(job.jobType());
-                jobBean.setJobGeo(job.jobGeo());
-                jobBean.setJobLevel(job.jobLevel());
-                jobBean.setJobExcerpt(job.jobExcerpt());
-                jobBean.setJobDescription(job.jobDescription());
-                jobBean.setPubDate(job.pubDate());
-                jobBean.setAnnualSalaryMin(job.annualSalaryMin());
-                jobBean.setAnnualSalaryMax(job.annualSalaryMax());
-                jobBean.setSalaryCurrency(job.salaryCurrency());
-                
-                // Update comments and rating
-                jobBean.setRating(rating);
-                jobBean.setComments(comments);
-                
-                // Debug output to verify bean values before conversion
-                System.out.println("Job bean rating set to: " + jobBean.getRating());
-                System.out.println("Job bean comments set to: " + jobBean.getComments());
-                
-                // Convert back to JobRecord
-                JobRecord updatedJob = jobBean.toRecord();
-                
-                // Debug output to verify record values after conversion
-                System.out.println("Updated job record rating: " + updatedJob.rating());
-                System.out.println("Updated job record comments: " + updatedJob.comments());
-                
-                // Update the job in the list
-                jobList.remove(job);
-                jobList.add(updatedJob);
-                break;
-            }
+ * Update a job's comments and rating.
+ * @param id Job ID
+ * @param comments Comments to update
+ * @param rating Rating to update
+ */
+@Override
+public void updateJob(int id, String comments, int rating) {
+    // Debug output to verify values
+    System.out.println("Updating job " + id + " with rating: " + rating + " and comments: " + comments);
+    
+    for (int i = 0; i < jobList.size(); i++) {
+        JobRecord job = jobList.get(i);
+        if (job.id() == id) {
+            // Create JobBean and set all fields in the same order as JobRecord
+            JobBean jobBean = new JobBean();
+            jobBean.setId(job.id());
+            jobBean.setUrl(job.url());
+            jobBean.setJobSlug(job.jobSlug());
+            jobBean.setJobTitle(job.jobTitle());
+            jobBean.setCompanyName(job.companyName());
+            jobBean.setCompanyLogo(job.companyLogo());
+            jobBean.setJobIndustry(job.jobIndustry());
+            jobBean.setJobType(job.jobType());
+            jobBean.setJobGeo(job.jobGeo());
+            jobBean.setJobLevel(job.jobLevel());
+            jobBean.setJobExcerpt(job.jobExcerpt());
+            jobBean.setJobDescription(job.jobDescription());
+            jobBean.setPubDate(job.pubDate());
+            jobBean.setAnnualSalaryMin(job.annualSalaryMin());
+            jobBean.setAnnualSalaryMax(job.annualSalaryMax());
+            jobBean.setSalaryCurrency(job.salaryCurrency());
+            
+            // Update comments and rating
+            jobBean.setRating(rating);
+            jobBean.setComments(comments);
+            
+            // Debug output to verify bean values before conversion
+            System.out.println("Job bean rating set to: " + jobBean.getRating());
+            System.out.println("Job bean comments set to: " + jobBean.getComments());
+            
+            // Convert back to JobRecord
+            JobRecord updatedJob = jobBean.toRecord();
+            
+            // Debug output to verify record values after conversion
+            System.out.println("Updated job record rating: " + updatedJob.rating());
+            System.out.println("Updated job record comments: " + updatedJob.comments());
+            
+            // FIXED: Update in-place rather than removing and adding
+            jobList.set(i, updatedJob);
+            return; // Exit after updating
         }
     }
+    // Log if job not found
+    System.err.println("Job with ID " + id + " not found for update");
+}
     
     /**
      * Searches for jobs based on the given parameters.
