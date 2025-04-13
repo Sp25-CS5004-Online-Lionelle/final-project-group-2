@@ -30,8 +30,7 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
     private static final ImageIcon CLOSE_ICON;
     /** warning icon. */
     private static final ImageIcon WARNING_ICON;
-    
-    // Standard button dimensions
+    /** Standard button dimensions. */
     private static final int BUTTON_WIDTH = 100;
     
     // Initialize icons
@@ -156,7 +155,9 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
     /**
      * Sets consistent size for all buttons.
      * 
-     * @param buttons The buttons to size
+     * @param deleteButton Delete button to size
+     * @param editButton edit button to size
+     * @param closeButton button to size
      * @param height The height to set
      */
     private static void setButtonSizes(ThemedButton editButton, ThemedButton deleteButton, 

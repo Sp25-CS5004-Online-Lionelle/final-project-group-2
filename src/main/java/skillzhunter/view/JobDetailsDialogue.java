@@ -207,7 +207,7 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
         }
         
         // Get the rating panel from the dialog
-        JPanel mainPanel = (JPanel)dialog.getContentPane().getComponent(0);
+        JPanel mainPanel = (JPanel) dialog.getContentPane().getComponent(0);
         JScrollPane scrollPane = (JScrollPane) mainPanel.getComponent(1);
         JPanel contentPanel = (JPanel) scrollPane.getViewport().getView();
         JPanel ratingPanel = (JPanel) contentPanel.getComponent(contentPanel.getComponentCount() - 2);
