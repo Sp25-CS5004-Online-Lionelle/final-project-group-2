@@ -29,5 +29,7 @@ public interface IController {
     void getExportSavedJobs(List<JobRecord> jobs, String formatStr, String filePath);
     /** gets saved jobs */
     List<JobRecord> getSavedJobs();
+    /** used when the another part of the program needs to alert the user */
+    void sendAlert(String alert);
     
 }

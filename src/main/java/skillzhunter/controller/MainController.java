@@ -33,6 +33,7 @@ public class MainController implements IController {
     public MainController() {
         // Model
         model = new Jobs();
+        model.setController(this);
 
         // Saved jobs tab initialized with actual saved jobs list
         savedJobsTab = new SavedJobsTab(this, model.getJobRecords());
@@ -241,6 +242,13 @@ public class MainController implements IController {
         }
         return null;
     }
+
+    public void sendAlert(String alert) {
+        if (this.view != null) {
+            this.view.notifyUser(alert);
+        }
+    }
+
 
     public static void main(String[] args) {
         MainController mainController = new MainController();

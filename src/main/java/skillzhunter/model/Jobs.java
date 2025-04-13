@@ -10,9 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import skillzhunter.controller.IController;
 import skillzhunter.model.formatters.DataFormatter;
 import skillzhunter.model.formatters.Formats;
 import skillzhunter.model.net.JobBoardApi;
+import skillzhunter.model.net.JobBoardApiResult;
 
 public class Jobs implements IModel {
     /** map for storing industries and their slugs*/
@@ -21,6 +23,8 @@ public class Jobs implements IModel {
     /** map for storing locations and their slugs*/
     private static final Map<String, String> locationsMap = JobBoardApi.loadCsvData(
         Paths.get("data", "locations.csv").toString(), "location", "slug");
+    /** used for identifying the connected controller */
+    private IController controller;
 
     /** Job List */
     private final List<JobRecord> jobList;
@@ -51,6 +55,14 @@ public class Jobs implements IModel {
     }
 
     // CRUD functionality
+
+    /**
+     *
+     */
+    public void setController(IController controller) {
+      this.controller = controller;
+    }
+
     /**
      * Add a new job.
      * @param job JobRecord instance to add
@@ -181,8 +193,14 @@ public class Jobs implements IModel {
      */
     @Override
     public List<JobRecord> searchJobs(String query, Integer numberOfResults, String location, String industry) {
-        List<JobRecord> results = api.getJobBoard(query, numberOfResults, location, industry);
-        return results;
+        JobBoardApiResult result = api.getJobBoard(query, numberOfResults, location, industry);
+
+        // If there's an error message, send alert
+        if (result.hasError()) {
+            sendAlert(result.getErrorMessage());
+        }
+
+        return result.getJobs();
     }
 
     /**
@@ -282,6 +300,15 @@ public class Jobs implements IModel {
             e.printStackTrace();
             throw new RuntimeException("Failed to export jobs: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Used to send alerts to other parts of the program
+     * @param alert
+     */
+    @Override
+    public void sendAlert(String alert) {
+        controller.sendAlert(alert);
     }
 
     /**

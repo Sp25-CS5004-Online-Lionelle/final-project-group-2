@@ -19,7 +19,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import skillzhunter.controller.IController;
 import skillzhunter.model.JobRecord;
+import skillzhunter.model.Jobs;
 import skillzhunter.model.ResponseRecord;
 
 public class JobBoardApi {
@@ -78,7 +80,7 @@ public class JobBoardApi {
      * @param query
      * @return
      */
-    public List<JobRecord> getJobBoard(String query) {
+    public JobBoardApiResult getJobBoard(String query) {
         return getJobBoard(query, null, null, null);
     }
 
@@ -93,7 +95,7 @@ public class JobBoardApi {
      * @param numberOfResults
      * @return
      */
-    public List<JobRecord> getJobBoard(String query, Integer numberOfResults) {
+    public JobBoardApiResult getJobBoard(String query, Integer numberOfResults) {
         return getJobBoard(query, numberOfResults, null, null);
     }
 
@@ -109,7 +111,7 @@ public class JobBoardApi {
      * @param location
      * @return
      */
-    public List<JobRecord> getJobBoard(String query, Integer numberOfResults, String location) {
+    public JobBoardApiResult getJobBoard(String query, Integer numberOfResults, String location) {
         return getJobBoard(query, numberOfResults, location, null);
     }
     /**
@@ -129,8 +131,9 @@ public class JobBoardApi {
      * @param industry Industry to filter jobs (e.g., IT, healthcare).
      * @return List of job records matching the criteria.
      */
-    public List<JobRecord> getJobBoard(String query, Integer numberOfResults, String location, String industry){
+    public JobBoardApiResult getJobBoard(String query, Integer numberOfResults, String location, String industry){
         // getting slug for request, if it breaks we default
+        String errorMessage = null;
         if(location != null) {
             location = locationsMap.get(location.toLowerCase().trim());
         }
@@ -142,7 +145,8 @@ public class JobBoardApi {
 
         //defaulting and slugggin query
         if (query == null || query.isEmpty() || query.equalsIgnoreCase("any") || query.equalsIgnoreCase("all") || query.equalsIgnoreCase("all jobs") || query.equalsIgnoreCase("all job")) {
-            System.out.println("No query passed, using default values.");
+            // should add a bad API Values dialogue
+            errorMessage = "Search query was empty or generic, defaulted to showing first 10 avialable jobs.";
             query = "all";
         }
         if (numberOfResults == null || numberOfResults < 1) {
@@ -164,7 +168,7 @@ public class JobBoardApi {
         System.err.println("URL: " + url);
     
         List<JobRecord> jobs = this.searchApi(url);
-        return jobs;
+        return new JobBoardApiResult(jobs, errorMessage);
     }
     
     /** makes a request to the api and returns the response
@@ -200,7 +204,8 @@ public class JobBoardApi {
     public static void main(String[] args) {
 
         JobBoardApi api = new JobBoardApi();
-        List<JobRecord> results = api.getJobBoard("python", 5, "austria", "devops & sysadmin");
+        JobBoardApiResult apiResults = api.getJobBoard("python", 5, "austria", "devops & sysadmin");
+        List<JobRecord> results = apiResults.getJobs();
         System.out.println("Job Records: " + results.size());
         for (JobRecord job : results) {
             System.out.println("Job Title: " + job.jobTitle());
