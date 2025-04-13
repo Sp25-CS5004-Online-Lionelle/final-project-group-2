@@ -498,6 +498,7 @@ public class SavedJobsTab extends JobView {
 
     /**
      * Opens the selected job for viewing.
+     * Uses SavedJobDetailsDialogue directly for consistent behavior.
      */
     private void openSelectedJob() {
         int viewIdx = jobsTable.getSelectedRow();
@@ -511,7 +512,7 @@ public class SavedJobsTab extends JobView {
     }
     
     /**
-     * Edit the selected job using the helper class.
+     * Edit the selected job using JobActionHelper.
      */
     private void editSelectedJob() {
         int viewIdx = jobsTable.getSelectedRow();
@@ -527,7 +528,7 @@ public class SavedJobsTab extends JobView {
     }
     
     /**
-     * Delete the selected job using the helper class.
+     * Delete the selected job using JobActionHelper.
      */
     private void deleteSelectedJob() {
         int viewIdx = jobsTable.getSelectedRow();

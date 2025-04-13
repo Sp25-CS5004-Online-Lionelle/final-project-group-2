@@ -369,35 +369,34 @@ public class FindJobTab extends JobView {
         titleLabel.setForeground(color);
     }
 
-    // In the openSelectedJob method
     /**
      * Opens the selected job in a new dialog
      * Displays job details in a new dialog when a job is selected from the table.
+     * Uses JobDetailsDialogue directly for proper rating functionality.
      */
     private void openSelectedJob() {
         int viewIdx = jobsTable.getSelectedRow();
         if (viewIdx >= 0) {
             int modelIdx = jobsTable.convertRowIndexToModel(viewIdx);
             JobRecord selectedJob = jobsList.get(modelIdx);
-            // Use controller directly instead of SavedJobsLists
+            // Use controller directly with JobDetailsDialogue
             JobDetailsDialogue.showJobDetails(jobsTable, selectedJob, 
                     controller.getSavedJobs(), controller);
+        } else {
+            JobActionHelper.showNoSelectionMessage("Please select a job to open", this);
         }
     }
 
     /**
      * Saves the selected job directly without opening the dialog
      * Adds the job to saved jobs and switches to the Saved Jobs tab.
+     * Uses JobActionHelper for consistent save behavior.
      */
     private void saveSelectedJob() {
         int viewIdx = jobsTable.getSelectedRow();
         if (viewIdx < 0) {
             // No job selected
-            JOptionPane.showMessageDialog(this,
-                    "Please select a job to save.",
-                    "No Job Selected",
-                    JOptionPane.INFORMATION_MESSAGE,
-                    warningIcon);
+            JobActionHelper.showNoSelectionMessage("Please select a job to save", this);
             return;
         }
         
@@ -443,64 +442,10 @@ public class FindJobTab extends JobView {
                 JOptionPane.INFORMATION_MESSAGE,
                 IconLoader.loadIcon("images/success.png"));
         
-        // Switch to Saved Jobs tab
-        switchToSavedJobsTab();
+        // Switch to Saved Jobs tab using JobActionHelper
+        JobActionHelper.switchToSavedJobsTab(this, controller);
     }
     
-    /**
-     * Switches to the Saved Jobs tab and refreshes it.
-     */
-    private void switchToSavedJobsTab() {
-        // Method adapted from JobDetailsDialogue.switchToSavedJobsTab
-        javax.swing.JFrame frame = (javax.swing.JFrame) javax.swing.SwingUtilities.getWindowAncestor(this);
-        if (frame != null) {
-            // Look for the tabbed pane
-            javax.swing.JTabbedPane tabbedPane = findTabbedPane(frame.getContentPane());
-            if (tabbedPane != null) {
-                // Find and select the "Saved Jobs" tab
-                for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-                    String title = tabbedPane.getTitleAt(i);
-                    Component comp = tabbedPane.getTabComponentAt(i);
-                    
-                    if ("Saved Jobs".equals(title) 
-                        || (comp instanceof JLabel && "Saved Jobs".equals(((JLabel) comp).getText()))) {
-                        
-                        // Select the tab
-                        tabbedPane.setSelectedIndex(i);
-                        
-                        // Update the tab content if it's a SavedJobsTab
-                        Component tabComponent = tabbedPane.getComponentAt(i);
-                        if (tabComponent instanceof SavedJobsTab savedJobsTab) {
-                            savedJobsTab.updateJobsList(controller.getSavedJobs());
-                        }
-                        
-                        break;
-                    }
-                }
-            }
-        }
-    }
-    
-    /**
-     * Recursively searches for a JTabbedPane in the component hierarchy
-     * Method copied from JobDetailsDialogue.
-     * @param component The component to search in
-     * @return The found JTabbedPane, or null if not found
-     */
-    private javax.swing.JTabbedPane findTabbedPane(Component component) {
-        if (component instanceof javax.swing.JTabbedPane comp) {
-            return comp;
-        } else if (component instanceof Container container) {
-            for (int i = 0; i < container.getComponentCount(); i++) {
-                javax.swing.JTabbedPane found = findTabbedPane(container.getComponent(i));
-                if (found != null) {
-                    return found;
-                }
-            }
-        }
-        return null;
-    }
-
     /**
      * Updates the job list and visualization if needed.
      * @param jobsList The list of jobs to update
@@ -515,6 +460,7 @@ public class FindJobTab extends JobView {
             updateVisualizationIfNeeded(jobsList);
         }
     }
+    
     /**
      * Sets the job list and updates the visualization if needed.
      * @param jobsList The list of jobs to set
