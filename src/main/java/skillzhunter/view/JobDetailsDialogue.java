@@ -31,28 +31,47 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
      * @param savedJobs List of saved jobs
      * @param controller The controller instance
      */
-    public static void showJobDetails(Component parent, JobRecord job,
-                                    List<JobRecord> savedJobs, IController controller) {
-        if (job == null || controller == null) {
-            JOptionPane.showMessageDialog(parent,
-                    "Job or controller not provided.",
-                    "Error",
-                    JOptionPane.INFORMATION_MESSAGE,
-                    WARNING_ICON);
-            return;
+    /**
+ * Shows job details when accessed from the Find Jobs tab
+ * with "Save this Job?" option and fields for user input.
+ * 
+ * @param parent The parent component
+ * @param job The job record from the controller
+ * @param savedJobs List of saved jobs
+ * @param controller The controller instance
+ */
+public static void showJobDetails(Component parent, JobRecord job,
+    List<JobRecord> savedJobs, IController controller) {
+    if (job == null || controller == null) {
+        JOptionPane.showMessageDialog(parent,
+        "Job or controller not provided.",
+        "Error",
+        JOptionPane.INFORMATION_MESSAGE,
+        WARNING_ICON);
+        return;
+    }
+
+    // FIXED: Check if we have a more recent version of this job in saved jobs
+    JobRecord updatedJob = job;
+    for (JobRecord savedJob : savedJobs) {
+    if (savedJob.id() == job.id()) {
+        // Use the saved version which may have more recent data
+        updatedJob = savedJob;
+        break;
         }
-        
-        // Check if this job is already saved
-        boolean jobPresent = controller.isJobAlreadySaved(job);
-        
-        // If job is already saved, use the specialized SavedJobDetailsDialog
-        if (jobPresent) {
-            // Use the specialized SavedJobDetailsDialog for saved jobs
-            SavedJobDetailsDialogue.show(parent, job, controller);
-        } else {
-            // Keep the original implementation for Find Jobs tab
-            showFindJobDetails(parent, job, controller);
-        }
+    }
+
+    // Check if this job is already saved
+    boolean jobPresent = controller.isJobAlreadySaved(updatedJob);
+
+    // If job is already saved, use the specialized SavedJobDetailsDialog
+    if (jobPresent) {
+    // Use the specialized SavedJobDetailsDialog for saved jobs
+    SavedJobDetailsDialogue.show(parent, updatedJob, controller);
+    } else {
+    // Keep the original implementation for Find Jobs tab
+    showFindJobDetails(parent, updatedJob, controller);
+    }
     }
     
     /**
