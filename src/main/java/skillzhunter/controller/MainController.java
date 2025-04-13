@@ -293,4 +293,14 @@ public class MainController implements IController {
         // Job not found
         return null;
     }
+
+    public void sendAlert(String alert) {
+        if (this.view != null) {
+            this.view.notifyUser(alert);
+        }
+    }
+
+    public static void main(String[] args) {
+        MainController mainController = new MainController();
+    }
 }
