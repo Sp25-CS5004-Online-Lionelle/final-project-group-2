@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
+import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -245,6 +246,15 @@ public class MainView extends JFrame implements IView {
         
         // Force UI update and repaint
         repaint();
+    }
+
+    public void notifyUser(String message) {
+        ImageIcon warningIcon = IconLoader.loadIcon("images/warning.png");
+        JOptionPane.showMessageDialog(this,
+            message,
+            "User Alert",
+            JOptionPane.WARNING_MESSAGE,
+            warningIcon);
     }
 
     @Override
