@@ -2,6 +2,7 @@ package skillzhunter.view;
 
 import java.awt.FileDialog;
 import java.awt.FlowLayout;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -186,21 +187,44 @@ public class SavedJobsTab extends JobView {
                 int result = (value instanceof Integer) ? (Integer) value : JOptionPane.CLOSED_OPTION;
 
                 if (result == JOptionPane.YES_OPTION) {
-                    // Save to data/SavedJobs.csv in a fixed location (overwrite each time)
-                    String filePath = "data/SavedJobs.csv";
+                    // Create a File object pointing to the data directory in the application's root
+                    File dataDir = new File("data");
+                    if (!dataDir.exists()) {
+                        boolean created = dataDir.mkdirs();
+                        System.out.println("Created data directory: " + created);
+                    }
+                    
+                    // Use absolute path
+                    String filePath = new File(dataDir, "SavedJobs.csv").getAbsolutePath();
+                    System.out.println("Saving jobs to: " + filePath);
                     
                     // Create a cleaned version of the jobs for export
                     List<JobRecord> cleanedJobs = cleanJobRecordsForExport(savedJobs);
                     
-                    // Pass the cleaned jobs to the controller
-                    controller.export2FileType(cleanedJobs, "CSV", filePath);
-                    
-                    // Use save icon for success message
-                    JOptionPane.showMessageDialog(parentFrame,
-                        "Jobs successfully saved to " + filePath,
-                        "Save Complete",
-                        JOptionPane.INFORMATION_MESSAGE,
-                        successIcon);
+                    try {
+                        // Pass the cleaned jobs to the controller
+                        controller.export2FileType(cleanedJobs, "CSV", filePath);
+                        
+                        // Verify that the file was created
+                        File savedFile = new File(filePath);
+                        System.out.println("File exists after save: " + savedFile.exists() + 
+                            ", size: " + savedFile.length());
+                        
+                        // Use save icon for success message
+                        JOptionPane.showMessageDialog(parentFrame,
+                            "Jobs successfully saved to " + filePath,
+                            "Save Complete",
+                            JOptionPane.INFORMATION_MESSAGE,
+                            successIcon);
+                    } catch (Exception ex) {
+                        // Show error message if save fails
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(parentFrame,
+                            "Error saving jobs: " + ex.getMessage(),
+                            "Save Failed",
+                            JOptionPane.ERROR_MESSAGE,
+                            warningIcon);
+                    }
                 }
             }
         });
