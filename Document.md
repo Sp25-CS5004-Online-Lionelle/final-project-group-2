@@ -168,7 +168,8 @@ MainController *.. IView: uses
 MainController *.. MainView: uses
 MainController *.. SavedJobsTab: uses
 
-%% fomatters
+%% formatters
+DataFormatter
 
 
 
