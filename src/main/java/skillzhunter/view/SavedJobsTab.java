@@ -4,6 +4,7 @@ import java.awt.FileDialog;
 import java.awt.FlowLayout;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -28,10 +29,10 @@ public class SavedJobsTab extends JobView {
     private ThemedButton saveButton;
     /** export button. */
     private ThemedButton exportButton;
-    /** controller. */
-    private ThemedButton editButton;   // New edit button
-    /** controller. */
-    private ThemedButton deleteButton; // New delete button
+    /** edit button. */
+    private ThemedButton editButton;
+    /** delete button. */
+    private ThemedButton deleteButton;
 
     // Icons for buttons and dialogs
     /** open icon. */
@@ -45,9 +46,9 @@ public class SavedJobsTab extends JobView {
     /** success icon. */
     private final ImageIcon successIcon;
     /** edit icon. */
-    private final ImageIcon editIcon;      // New edit icon 
+    private final ImageIcon editIcon;
     /** delete icon. */
-    private final ImageIcon deleteIcon;    // New delete icon
+    private final ImageIcon deleteIcon;
 
     /**
      * Constructor for SavedJobsTab.
@@ -67,8 +68,8 @@ public class SavedJobsTab extends JobView {
         this.exportIcon = IconLoader.loadIcon("images/exportIcon.png");
         this.warningIcon = IconLoader.loadIcon("images/warning.png");
         this.successIcon = IconLoader.loadIcon("images/success.png");
-        this.editIcon = IconLoader.loadIcon("images/edit.png");      // Load edit icon
-        this.deleteIcon = IconLoader.loadIcon("images/delete.png");  // Load delete icon
+        this.editIcon = IconLoader.loadIcon("images/edit.png");
+        this.deleteIcon = IconLoader.loadIcon("images/delete.png");
         
         super.initView();
         updateJobsList(savedJobs);
@@ -91,13 +92,13 @@ public class SavedJobsTab extends JobView {
         openButton.setHorizontalTextPosition(SwingConstants.LEFT);
         openButton.setIconTextGap(5);
         
-        // New Edit button - using INFO type
+        // Edit button - using INFO type
         editButton = createThemedButton("Edit", ThemedButton.ButtonType.INFO);
         editButton.setIcon(editIcon);
         editButton.setHorizontalTextPosition(SwingConstants.LEFT);
         editButton.setIconTextGap(5);
         
-        // New Delete button - using DANGER type for destructive actions
+        // Delete button - using DANGER type for destructive actions
         deleteButton = createThemedButton("Delete", ThemedButton.ButtonType.DANGER);
         deleteButton.setIcon(deleteIcon);
         deleteButton.setHorizontalTextPosition(SwingConstants.LEFT);
@@ -153,148 +154,243 @@ public class SavedJobsTab extends JobView {
         openButton.addActionListener(e -> openSelectedJob());
         editButton.addActionListener(e -> editSelectedJob());
         deleteButton.addActionListener(e -> deleteSelectedJob());
-        
-        saveButton.addActionListener(e -> {
-            // Get the list of saved jobs
-            List<JobRecord> savedJobs = controller.getSavedJobs();
-
-            // Find the parent frame for centering dialogs
-            JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-
-            if (savedJobs.isEmpty()) {
-                // Use warning icon for empty list notification
-                JOptionPane.showMessageDialog(parentFrame,
-                    "No jobs to save.",
-                    "Save Jobs",
-                    JOptionPane.INFORMATION_MESSAGE,
-                    warningIcon);
-            } else {
-                // Create a custom confirm dialog using JOptionPane
-                JOptionPane optionPane = new JOptionPane(
-                    "Are you sure you want to save " + savedJobs.size() + " job(s) to file?",
-                    JOptionPane.QUESTION_MESSAGE,
-                    JOptionPane.YES_NO_OPTION);
-                
-                // Set a custom icon for the dialog
-                optionPane.setIcon(saveIcon);
-                
-                // Create and display the dialog
-                JDialog dialog = optionPane.createDialog(parentFrame, "Confirm Save");
-                dialog.setVisible(true);
-                
-                // Get the result
-                Object value = optionPane.getValue();
-                int result = (value instanceof Integer) ? (Integer) value : JOptionPane.CLOSED_OPTION;
-
-                if (result == JOptionPane.YES_OPTION) {
-                    // Create a File object pointing to the data directory in the application's root
-                    File dataDir = new File("data");
-                    if (!dataDir.exists()) {
-                        boolean created = dataDir.mkdirs();
-                        System.out.println("Created data directory: " + created);
-                    }
-                    
-                    // Use absolute path
-                    String filePath = new File(dataDir, "SavedJobs.csv").getAbsolutePath();
-                    System.out.println("Saving jobs to: " + filePath);
-                    
-                    // Create a cleaned version of the jobs for export
-                    List<JobRecord> cleanedJobs = cleanJobRecordsForExport(savedJobs);
-                    
-                    try {
-                        // Pass the cleaned jobs to the controller
-                        controller.export2FileType(cleanedJobs, "CSV", filePath);
-                        
-                        // Verify that the file was created
-                        File savedFile = new File(filePath);
-                        System.out.println("File exists after save: " + savedFile.exists() + 
-                            ", size: " + savedFile.length());
-                        
-                        // Use save icon for success message
-                        JOptionPane.showMessageDialog(parentFrame,
-                            "Jobs successfully saved to " + filePath,
-                            "Save Complete",
-                            JOptionPane.INFORMATION_MESSAGE,
-                            successIcon);
-                    } catch (Exception ex) {
-                        // Show error message if save fails
-                        ex.printStackTrace();
-                        JOptionPane.showMessageDialog(parentFrame,
-                            "Error saving jobs: " + ex.getMessage(),
-                            "Save Failed",
-                            JOptionPane.ERROR_MESSAGE,
-                            warningIcon);
-                    }
-                }
-            }
-        });
-
-        exportButton.addActionListener(e -> {
-            // Get the selected format from the dropdown
-            String selectedFormat = (String) formatDropdown.getSelectedItem();
-
-            // Get the list of saved jobs
-            List<JobRecord> savedJobs = controller.getSavedJobs();
-
-            // Find the parent frame for centering dialogs
-            JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-
-            if (savedJobs.isEmpty()) {
-                // Use warning icon for empty list notification
-                JOptionPane.showMessageDialog(parentFrame,
-                    "No jobs to export.",
-                    "Export Jobs",
-                    JOptionPane.INFORMATION_MESSAGE,
-                    warningIcon);
-                return;
-            }
-
-            if (selectedFormat != null) {
-                // Create a custom confirm dialog using JOptionPane for export
-                JOptionPane optionPane = new JOptionPane(
-                    "Are you sure you want to export to " + selectedFormat + "?",
-                    JOptionPane.QUESTION_MESSAGE,
-                    JOptionPane.YES_NO_OPTION);
-                
-                // Set export icon for the dialog
-                optionPane.setIcon(exportIcon);
-                
-                // Create and display the dialog
-                JDialog dialog = optionPane.createDialog(parentFrame, "Confirm Export");
-                dialog.setVisible(true);
-                
-                // Get the result
-                Object value = optionPane.getValue();
-                int result = (value instanceof Integer) ? (Integer) value : JOptionPane.CLOSED_OPTION;
-
-                if (result == JOptionPane.YES_OPTION) {
-                    // Export to a file
-                    FileDialog fd = new FileDialog(parentFrame, "Save File", FileDialog.SAVE);
-                    fd.setFile("SavedJobs." + selectedFormat.toLowerCase());
-                    fd.setVisible(true);
-
-                    // Get the selected file path
-                    if (fd.getFile() != null) {
-                        String filePath = fd.getDirectory() + fd.getFile();
-                        
-                        // Create clean version of jobs for export
-                        List<JobRecord> cleanedJobs = cleanJobRecordsForExport(savedJobs);
-                        
-                        // Pass the cleaned jobs to the controller
-                        controller.export2FileType(cleanedJobs, selectedFormat, filePath);
-
-                        // Show success message with export icon
-                        JOptionPane.showMessageDialog(parentFrame,
-                            "Jobs successfully exported in " + selectedFormat + " format to:\n" + filePath,
-                            "Export Complete",
-                            JOptionPane.INFORMATION_MESSAGE,
-                            exportIcon);
-                    }
-                }
-            }
-        });
+        saveButton.addActionListener(e -> handleSaveAction());
+        exportButton.addActionListener(e -> handleExportAction(formatDropdown));
 
         return bottomRow;
+    }
+
+    /**
+     * Handles the save button action.
+     * Shows confirmation dialog and saves jobs to CSV file.
+     */
+    private void handleSaveAction() {
+        // Get the list of saved jobs
+        List<JobRecord> savedJobs = controller.getSavedJobs();
+
+        // Find the parent frame for centering dialogs
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+
+        if (savedJobs.isEmpty()) {
+            showNoJobsMessage(parentFrame, "save");
+            return;
+        }
+
+        // Show confirmation dialog
+        if (!showSaveConfirmDialog(parentFrame, savedJobs.size())) {
+            return;
+        }
+
+        // Create a File object pointing to the data directory in the application's root
+        String filePath = createDataDirectoryAndGetFilePath("SavedJobs.csv");
+        
+        // Create a cleaned version of the jobs for export
+        List<JobRecord> cleanedJobs = cleanJobRecordsForExport(savedJobs);
+        
+        // Save the jobs to file
+        saveJobsToFile(parentFrame, cleanedJobs, "CSV", filePath);
+    }
+
+    /**
+     * Handles the export button action.
+     * Shows confirmation dialog and exports jobs to selected format.
+     * 
+     * @param formatDropdown The dropdown with the selected export format
+     */
+    private void handleExportAction(JComboBox<String> formatDropdown) {
+        // Get the selected format from the dropdown
+        String selectedFormat = (String) formatDropdown.getSelectedItem();
+        if (selectedFormat == null) return;
+
+        // Get the list of saved jobs
+        List<JobRecord> savedJobs = controller.getSavedJobs();
+
+        // Find the parent frame for centering dialogs
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+
+        if (savedJobs.isEmpty()) {
+            showNoJobsMessage(parentFrame, "export");
+            return;
+        }
+
+        // Show confirmation dialog
+        if (!showExportConfirmDialog(parentFrame, selectedFormat)) {
+            return;
+        }
+
+        // Get the export file path from user
+        String filePath = getExportFilePath(parentFrame, selectedFormat);
+        if (filePath == null) return;
+        
+        // Create clean version of jobs for export
+        List<JobRecord> cleanedJobs = cleanJobRecordsForExport(savedJobs);
+        
+        // Export the jobs to the selected format
+        exportJobsToFile(parentFrame, cleanedJobs, selectedFormat, filePath);
+    }
+
+    /**
+     * Shows a message when there are no jobs to save/export.
+     * 
+     * @param parentFrame The parent frame for the dialog
+     * @param action The action being performed ("save" or "export")
+     */
+    private void showNoJobsMessage(JFrame parentFrame, String action) {
+        JOptionPane.showMessageDialog(parentFrame,
+            "No jobs to " + action + ".",
+            action.substring(0, 1).toUpperCase() + action.substring(1) + " Jobs",
+            JOptionPane.INFORMATION_MESSAGE,
+            warningIcon);
+    }
+
+    /**
+     * Shows a confirmation dialog for saving jobs.
+     * 
+     * @param parentFrame The parent frame for the dialog
+     * @param jobCount The number of jobs to save
+     * @return true if the user confirms, false otherwise
+     */
+    private boolean showSaveConfirmDialog(JFrame parentFrame, int jobCount) {
+        JOptionPane optionPane = new JOptionPane(
+            "Are you sure you want to save " + jobCount + " job(s) to file?",
+            JOptionPane.QUESTION_MESSAGE,
+            JOptionPane.YES_NO_OPTION);
+        
+        optionPane.setIcon(saveIcon);
+        
+        JDialog dialog = optionPane.createDialog(parentFrame, "Confirm Save");
+        dialog.setVisible(true);
+        
+        Object value = optionPane.getValue();
+        return (value instanceof Integer) && (Integer) value == JOptionPane.YES_OPTION;
+    }
+
+    /**
+     * Shows a confirmation dialog for exporting jobs.
+     * 
+     * @param parentFrame The parent frame for the dialog
+     * @param format The export format
+     * @return true if the user confirms, false otherwise
+     */
+    private boolean showExportConfirmDialog(JFrame parentFrame, String format) {
+        JOptionPane optionPane = new JOptionPane(
+            "Are you sure you want to export to " + format + "?",
+            JOptionPane.QUESTION_MESSAGE,
+            JOptionPane.YES_NO_OPTION);
+        
+        optionPane.setIcon(exportIcon);
+        
+        JDialog dialog = optionPane.createDialog(parentFrame, "Confirm Export");
+        dialog.setVisible(true);
+        
+        Object value = optionPane.getValue();
+        return (value instanceof Integer) && (Integer) value == JOptionPane.YES_OPTION;
+    }
+
+    /**
+     * Creates the data directory if it doesn't exist and returns the absolute file path.
+     * 
+     * @param fileName The name of the file to create
+     * @return The absolute path to the file
+     */
+    private String createDataDirectoryAndGetFilePath(String fileName) {
+        File dataDir = new File("data");
+        if (!dataDir.exists()) {
+            boolean created = dataDir.mkdirs();
+            System.out.println("Created data directory: " + created);
+        }
+        
+        String filePath = new File(dataDir, fileName).getAbsolutePath();
+        System.out.println("File path: " + filePath);
+        
+        return filePath;
+    }
+
+    /**
+     * Gets a file path for exporting using a file dialog.
+     * 
+     * @param parentFrame The parent frame for the dialog
+     * @param format The export format
+     * @return The selected file path, or null if canceled
+     */
+    private String getExportFilePath(JFrame parentFrame, String format) {
+        FileDialog fd = new FileDialog(parentFrame, "Save File", FileDialog.SAVE);
+        fd.setFile("SavedJobs." + format.toLowerCase());
+        fd.setVisible(true);
+
+        if (fd.getFile() != null) {
+            return fd.getDirectory() + fd.getFile();
+        }
+        
+        return null;
+    }
+
+    /**
+     * Saves jobs to a CSV file and shows appropriate messages.
+     * 
+     * @param parentFrame The parent frame for dialogs
+     * @param jobs The jobs to save
+     * @param format The format to save as
+     * @param filePath The path to save to
+     */
+    private void saveJobsToFile(JFrame parentFrame, List<JobRecord> jobs, String format, String filePath) {
+        try {
+            // Pass the cleaned jobs to the controller
+            controller.export2FileType(jobs, format, filePath);
+            
+            // Verify that the file was created
+            File savedFile = new File(filePath);
+            System.out.println("File exists after save: " + savedFile.exists() + 
+                ", size: " + savedFile.length());
+            
+            // Extract just the filename from the path
+            String fileName = savedFile.getName();
+            
+            // Use save icon for success message - showing only the filename
+            JOptionPane.showMessageDialog(parentFrame,
+                "Jobs successfully saved to " + fileName,
+                "Save Complete",
+                JOptionPane.INFORMATION_MESSAGE,
+                successIcon);
+        } catch (Exception ex) {
+            // Show error message if save fails
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(parentFrame,
+                "Error saving jobs: " + ex.getMessage(),
+                "Save Failed",
+                JOptionPane.ERROR_MESSAGE,
+                warningIcon);
+        }
+    }
+
+    /**
+     * Exports jobs to a file and shows appropriate messages.
+     * 
+     * @param parentFrame The parent frame for dialogs
+     * @param jobs The jobs to export
+     * @param format The format to export as
+     * @param filePath The path to export to
+     */
+    private void exportJobsToFile(JFrame parentFrame, List<JobRecord> jobs, String format, String filePath) {
+        try {
+            // Pass the cleaned jobs to the controller
+            controller.export2FileType(jobs, format, filePath);
+            
+            // Show success message with export icon
+            JOptionPane.showMessageDialog(parentFrame,
+                "Jobs successfully exported in " + format + " format to:\n" + filePath,
+                "Export Complete",
+                JOptionPane.INFORMATION_MESSAGE,
+                exportIcon);
+        } catch (Exception ex) {
+            // Show error message if export fails
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(parentFrame,
+                "Error exporting jobs: " + ex.getMessage(),
+                "Export Failed",
+                JOptionPane.ERROR_MESSAGE,
+                warningIcon);
+        }
     }
 
     /**
@@ -454,26 +550,18 @@ public class SavedJobsTab extends JobView {
         // Call parent implementation for common styling
         super.applyTheme(theme);
         
-        // Explicitly apply theme to our buttons
-        if (openButton != null) {
-            openButton.applyTheme(theme);
-        }
-
-        if (saveButton != null) {
-            saveButton.applyTheme(theme);
-        }
-
-        if (exportButton != null) {
-            exportButton.applyTheme(theme);
-        }
+        // Create a list of all buttons and apply theme to each
+        List<ThemedButton> buttons = Arrays.asList(
+            openButton, 
+            saveButton, 
+            exportButton, 
+            editButton, 
+            deleteButton
+        );
         
-        // Apply theme to new buttons
-        if (editButton != null) {
-            editButton.applyTheme(theme);
-        }
-        
-        if (deleteButton != null) {
-            deleteButton.applyTheme(theme);
+        // Apply theme to all buttons
+        for (ThemedButton button : buttons) {
+            button.applyTheme(theme);
         }
 
         // Make sure changes are visible

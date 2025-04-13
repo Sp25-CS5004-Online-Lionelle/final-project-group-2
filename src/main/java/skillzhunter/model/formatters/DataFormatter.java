@@ -159,8 +159,6 @@ public final class DataFormatter {
         }
         
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            // Print debugging information
-            System.out.println("Writing CSV to: " + new File(filePath).getAbsolutePath());
             
             writer.write("id,url,jobSlug,jobTitle,companyName,companyLogo,jobIndustry,jobType,jobGeo,jobLevel,jobExcerpt,jobDescription,pubDate,annualSalaryMin,annualSalaryMax,salaryCurrency,rating,comments");
             writer.newLine();
@@ -209,9 +207,6 @@ public final class DataFormatter {
                 // Force flush after each record to ensure data is written
                 writer.flush();
             }
-            
-            // Print success message
-            System.out.println("Successfully wrote " + jobs.size() + " jobs to CSV");
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Error writing CSV file: " + e.getMessage());

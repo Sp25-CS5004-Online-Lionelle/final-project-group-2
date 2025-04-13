@@ -1,13 +1,10 @@
 package skillzhunter.controller;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import skillzhunter.model.IModel;
 import skillzhunter.model.JobRecord;
@@ -24,7 +21,7 @@ public class MainController implements IController {
     /** View. */
     private IView view;
     /** Saved jobs tab. */
-    private final SavedJobsTab savedJobsTab;
+    private SavedJobsTab savedJobsTab;
 
     /**
      * Constructor for MainController.
@@ -33,12 +30,15 @@ public class MainController implements IController {
     public MainController() {
         // Model
         model = new Jobs();
+        
+        // Set the controller on the model first
+        model.setController(this);
 
         // Saved jobs tab initialized with actual saved jobs list
         savedJobsTab = new SavedJobsTab(this, model.getJobRecords());
 
-        // View
-        view = new MainView(this);  // You might want to make sure MainView takes savedJobsTab
+        // View - create after model and controller are properly linked
+        view = new MainView(this);
     }
 
     /**
@@ -76,6 +76,7 @@ public class MainController implements IController {
      */
     protected void setModel(IModel model) {
         this.model = model;
+        model.setController(this);  // Make sure to set controller on new model
         savedJobsTab.updateJobsList(model.getJobRecords());
     }
     
@@ -239,7 +240,18 @@ public class MainController implements IController {
         // Get all job records
         List<JobRecord> jobs = model.getJobRecords();
 
+        // Make sure the parent directory exists
+        File file = new File(filePath);
+        File parentDir = file.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            boolean dirCreated = parentDir.mkdirs();
+            if (!dirCreated) {
+                System.err.println("Failed to create directory: " + parentDir.getAbsolutePath());
+            }
+        }
+
         // Get from DataFormatter the custom CSV writer
+        System.out.println("Saving to: " + file.getAbsolutePath());
         DataFormatter.exportCustomCSV(jobs, filePath);
     }
     
@@ -251,19 +263,36 @@ public class MainController implements IController {
      */
     @Override
     public void export2FileType(List<JobRecord> jobs, String formatStr, String filePath) {
+        // Make sure the parent directory exists
+        File file = new File(filePath);
+        File parentDir = file.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            boolean dirCreated = parentDir.mkdirs();
+            if (!dirCreated) {
+                System.err.println("Failed to create directory: " + parentDir.getAbsolutePath());
+            }
+        }
+
+        System.out.println("Exporting " + jobs.size() + " jobs to " + formatStr + ": " + file.getAbsolutePath());
+        
         if ("CSV".equalsIgnoreCase(formatStr)) {
-        // Use the static method in DataFormatter
-        DataFormatter.exportCustomCSV(jobs, filePath);
+            // Use the static method in DataFormatter
+            DataFormatter.exportCustomCSV(jobs, filePath);
         } else {
             // Use the model's export for other formats
             model.exportSavedJobs(jobs, formatStr, filePath);
         }
+        
+        // Verify the file was created
+        File savedFile = new File(filePath);
+        System.out.println("File exists after export: " + savedFile.exists() + ", size: " + savedFile.length());
     }
 
     /**
      * Gets the saved jobs tab.
      * @return The saved jobs tab
      */
+    @Override
     public SavedJobsTab getSavedJobsTab() {
         return savedJobsTab;
     }
@@ -294,13 +323,27 @@ public class MainController implements IController {
         return null;
     }
 
+    /**
+     * Sends an alert to the view.
+     * 
+     * @param alert The alert message
+     */
     public void sendAlert(String alert) {
         if (this.view != null) {
             this.view.notifyUser(alert);
+        } else {
+            // Fallback if view is not yet initialized
+            System.err.println("Alert (view not initialized): " + alert);
         }
     }
 
+    /**
+     * Main method for testing purposes.
+     * @param args Command line arguments (not used).
+     */
     public static void main(String[] args) {
         MainController mainController = new MainController();
+        IView mainView = mainController.getView();
+        mainView.run();
     }
 }

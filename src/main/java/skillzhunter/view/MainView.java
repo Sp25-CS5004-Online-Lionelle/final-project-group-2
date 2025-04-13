@@ -21,16 +21,16 @@ import javax.swing.SwingUtilities;
 import skillzhunter.controller.IController;
 
 public class MainView extends JFrame implements IView {
-    /** Mian Pane. */
+    /** Main Pane. */
     private final JPanel mainPane = new JPanel();
     /** Find Job Tab. */
-    private final JobView findJobTab;
+    private JobView findJobTab;
     /** Saved Job Tab. */
-    private final JobView savedJobTab;
+    private JobView savedJobTab; // Removed final modifier
     /** Tabbed Pane. */
     private JTabbedPane tabbedPane;
     /** Tab Style Manager. */
-    private final TabStyleManager tabStyleManager;
+    private TabStyleManager tabStyleManager;
     /** Controller. */
     private final IController controller;
     /** Custom Menu Bar. */
@@ -52,37 +52,46 @@ public class MainView extends JFrame implements IView {
         // Set default theme (light mode) early
         theme = ColorTheme.LIGHT;
 
-        // Building tabs
-        findJobTab = new FindJobTab(controller);
-        savedJobTab = new SavedJobsTab(controller, controller.getSavedJobs());
-
-        // Building tabbed pane
-        tabbedPane = buildTabbedPane(findJobTab, savedJobTab);
-
-        // Adds tabs to main view
-        mainPane.add(tabbedPane);
-        add(mainPane, BorderLayout.CENTER);
-
-        // Create tab style manager
-        String[] tabNames = {"Find Jobs", "Saved Jobs"};
-        tabStyleManager = new TabStyleManager(tabbedPane, tabNames);
-
-        // Create custom menu
-        createCustomMenu();
-        
-        // Apply the theme after everything is set up
-        applyTheme(theme);
-        
-        // Apply theme once more after showing the frame to ensure it takes effect
-        SwingUtilities.invokeLater(() -> {
+        try {
+            // First get the saved jobs tab from the controller (already created)
+            savedJobTab = controller.getSavedJobsTab();
+            
+            // Create find jobs tab
+            findJobTab = new FindJobTab(controller);
+            
+            // Building tabbed pane
+            tabbedPane = buildTabbedPane(findJobTab, savedJobTab);
+            
+            // Adds tabs to main view
+            mainPane.add(tabbedPane);
+            add(mainPane, BorderLayout.CENTER);
+            
+            // Create tab style manager
+            String[] tabNames = {"Find Jobs", "Saved Jobs"};
+            tabStyleManager = new TabStyleManager(tabbedPane, tabNames);
+            
+            // Create custom menu
+            createCustomMenu();
+            
+            // Apply the theme after everything is set up
             applyTheme(theme);
-        });
-
-        pack();
-        setupExitKeyAction();
+            
+            // Apply theme once more after showing the frame to ensure it takes effect
+            SwingUtilities.invokeLater(() -> {
+                applyTheme(theme);
+            });
+            
+            pack();
+            setupExitKeyAction();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, 
+                "Error initializing UI: " + ex.getMessage(),
+                "Initialization Error",
+                JOptionPane.ERROR_MESSAGE);
+        }
     }
 
-    //These next two methods are all about setting up the enter key to search
     /**
      * Sets up the exit key (Ctrl+Q).
      */
@@ -109,27 +118,6 @@ public class MainView extends JFrame implements IView {
         ActionMap actionMap = rootPane.getActionMap();
         actionMap.put("exit", exitAction);
     }
-
-    // //Helper method to disable Enter key default behavior in text components
-    // private void disableEnterKeyTraversalIn(Container container) {
-    //     for (Component comp : container.getComponents()) {
-    //         if (comp instanceof JTextField || comp instanceof TextField) {
-    //             comp.addKeyListener(new KeyAdapter() {
-    //                 @Override
-    //                 public void keyPressed(KeyEvent e) {
-    //                     if (e.getKeyCode() == KeyEvent.VK_Q) {
-    //                         System.exit(0);
-    //                         e.consume(); // Prevent default handling
-    //                     }
-    //                 }
-    //             });
-    //         }
-    //         // Recursively process nested containers
-    //         if (comp instanceof Container) {
-    //             disableEnterKeyTraversalIn((Container) comp);
-    //         }
-    //     }
-    // }
     
     /**
      * Builds the tabbed pane for the main view.
@@ -139,18 +127,18 @@ public class MainView extends JFrame implements IView {
      */
     private JTabbedPane buildTabbedPane(JobView findJobTab, JobView savedJobTab) {
         // Create the tabbed pane
-        tabbedPane = new JTabbedPane();
+        JTabbedPane pane = new JTabbedPane();
 
         // Add tabs with components
-        tabbedPane.addTab("Find Jobs", findJobTab);
-        tabbedPane.addTab("Saved Jobs", savedJobTab);
+        pane.addTab("Find Jobs", findJobTab);
+        pane.addTab("Saved Jobs", savedJobTab);
         
         // Add change listener to update the selected tab
-        tabbedPane.addChangeListener(e -> {
+        pane.addChangeListener(e -> {
             // Get the selected tab
-            int selectedIndex = tabbedPane.getSelectedIndex();
+            int selectedIndex = pane.getSelectedIndex();
             if (selectedIndex >= 0) {
-                Component selectedComponent = tabbedPane.getComponentAt(selectedIndex);
+                Component selectedComponent = pane.getComponentAt(selectedIndex);
                 
                 // If it's a JobView, update its job list
                 if (selectedComponent instanceof JobView) {
@@ -160,7 +148,7 @@ public class MainView extends JFrame implements IView {
             }
         });
         
-        return tabbedPane;
+        return pane;
     }
 
     /**
@@ -212,8 +200,6 @@ public class MainView extends JFrame implements IView {
                 applyTheme(theme);
             });
         });
-        
-        // Download options could be added here if needed
     }
     
     /**
@@ -248,6 +234,11 @@ public class MainView extends JFrame implements IView {
         repaint();
     }
 
+    /**
+     * Notifies the user with a message dialog.
+     * 
+     * @param message The message to display
+     */
     public void notifyUser(String message) {
         ImageIcon warningIcon = IconLoader.loadIcon("images/warning.png");
         JOptionPane.showMessageDialog(this,
@@ -259,7 +250,7 @@ public class MainView extends JFrame implements IView {
 
     @Override
     public void addFeatures(IController controller) {
-        // Not needed
+        // Not needed for this implementation
     } 
 
     @Override
