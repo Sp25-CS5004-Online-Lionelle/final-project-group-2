@@ -232,20 +232,27 @@ JobsLoader *.. JobRecord: uses
 JobView *.. IController 
 JobView *.. ThemedButton  
 JobView *.. JobsTable   
-JobView *.. ColorTheme  
+JobView *.. ColorTheme
 
+%% MainView
+MainView *.. IController : uses
+MainView *.. JobView : uses
+MainView *.. CustomMenuBar : uses
+MainView *.. TabStyleManager : uses
+MainView *.. ColorTheme : uses
+MainView *.. JOptionPane : uses
+MainView *.. ImageIcon : uses 
 
+%% SavedJobsTab
+SavedJobsTab <|-- JobView : Inherits
+SavedJobsTab *.. IController : Uses
+SavedJobsTab *.. JobRecord : Uses
+SavedJobsTab *.. ThemedButton : Uses
+SavedJobsTab *.. JobActionHelper : Uses
+SavedJobsTab *.. IconLoader : Uses
 
-
-
-
-
-
-
-
-
-
-
+TabStyleManager *.. ColorTheme
+ThemedButton *.. ColorTheme
 
 
 
