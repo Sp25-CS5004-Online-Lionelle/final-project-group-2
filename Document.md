@@ -147,16 +147,221 @@ title: Skillz Hunter App Initial Design
 ---
 classDiagram
 
+%% Main
+main *..  IModel: uses
+main *..  IView: uses
+main *..  MainController: uses
+
+%% IController
+IController *.. IModel: uses
+IController *.. JobRecord: uses
+IController *.. IView: uses
+IController *.. SavedJobsTab: uses%% is this needed?
+
+%% Main Controller
+IController <|-- MainController: Implements
+MainController *.. IModel: uses
+MainController *.. JobRecord: uses
+MainController *.. Jobs: uses
+MainController *.. DataFormatter: uses
+MainController *.. IView: uses
+MainController *.. MainView: uses
+MainController *.. SavedJobsTab: uses
+
+%% fomatters
+
+
+
+
+
+
 
 class Main{
 <<driver>>
++ SkillsHunterApp():void
++ main(): void
 
 }
 
 
 
 namespace view {
-    class JobsTable {
+  class ThemedButton {
+        - ColorTheme theme
+        - boolean isHovering
+        - ButtonType buttonType
+        + ThemedButton(String)
+        + ThemedButton(String, ButtonType)
+        - void initializeButton()
+        + void applyTheme(ColorTheme)
+        + void setButtonType(ButtonType)
+        + ButtonType getButtonType()
+        - void updateButtonColors()
+        + ColorTheme getTheme()
+    }
+
+
+  class TabStyleManager {
+        - final JTabbedPane tabbedPane
+        - final JLabel[] tabLabels
+        - ColorTheme theme
+        - final boolean isMacOS
+        + TabStyleManager(JTabbedPane, String[])
+        - boolean isMacOSPlatform()
+        + void applyTheme(ColorTheme)
+        - Color[] getTabColors(boolean)
+        - void updateTabStyles()
+        + int getSelectedTabIndex()
+        + void setSelectedTab(int)
+    }
+
+  class StarRatingPanel {
+          - final JLabel[] stars
+          - int rating
+          - RatingChangeListener listener
+          + StarRatingPanel(int)
+          + void setRating(int)
+          + int getRating()
+          + void setRatingChangeListener(RatingChangeListener)
+          - void updateStarsDisplay(int)
+          - ImageIcon getEmptyStar()
+          - ImageIcon getFilledStar()
+      }
+
+    class SavedJobsTab {
+        - openButton: ThemedButton
+        - saveButton: ThemedButton
+        - exportButton: ThemedButton
+        - editButton: ThemedButton
+        - deleteButton: ThemedButton
+        - final openIcon: ImageIcon
+        - final saveIcon: ImageIcon
+        - final exportIcon: ImageIcon
+        - final warningIcon: ImageIcon
+        - final successIcon: ImageIcon
+        - final editIcon: ImageIcon
+        - final deleteIcon: ImageIcon
+        + SavedJobsTab(IController, List~JobRecord~)
+        - handleSaveAction(): void
+        - handleExportAction(JComboBox~String~): void
+        - showNoJobsMessage(JFrame, String): void
+        - showSaveConfirmDialog(JFrame, int): boolean
+        - showExportConfirmDialog(JFrame, String): boolean
+        - createDataDirectoryAndGetFilePath(String): String
+        - getExportFilePath(JFrame, String): String
+        - saveJobsToFile(JFrame, List~JobRecord~, String, String): void
+        - exportJobsToFile(JFrame, List~JobRecord~, String, String): void
+        - cleanJobRecordsForExport(List~JobRecord~): List~JobRecord~
+        - stripHTML(String): String
+        - extractFirstSentence(String): String
+        - openSelectedJob(): void
+        - editSelectedJob(): void
+        - deleteSelectedJob(): void
+    }
+
+
+
+
+    class SavedJobDetailsDialogue {
+        - static final EDIT_ICON: ImageIcon
+        - static final DELETE_ICON: ImageIcon
+        - static final CLOSE_ICON: ImageIcon
+        - static final WARNING_ICON: ImageIcon
+        - static final BUTTON_WIDTH: int
+        + static show(Component, JobRecord, IController): void
+        - static validateInputs(Component, JobRecord, IController): boolean
+        - static createButtonPanel(JDialog, JobRecord, IController, Component): JPanel
+        - static createButton(String, ThemedButton.ButtonType, ImageIcon): ThemedButton
+        - static calculateButtonHeight(ThemedButton...): int
+        - static setButtonSizes(ThemedButton, ThemedButton, ThemedButton, int): void
+        - static configureButtonActions(JDialog, ThemedButton, ThemedButton, ThemedButton, JobRecord, IController, Component): void
+        - static configureDialogProperties(JDialog, Component): void
+    }
+
+
+   class SalaryVisualizationPanel {
+        - jobs: List~JobRecord~
+        - static final PADDING: int
+        - static final POINT_SIZE: int
+        - static final POINT_COLOR: Color
+        - static final POINT_HOVER_COLOR: Color
+        - static final LINE_COLOR: Color
+        - dataPoints: List~Point2D~
+        - hitBoxes: List~Rectangle2D~
+        - hoveredIndex: int
+        - theme: ColorTheme
+        + SalaryVisualizationPanel(jobs: List~JobRecord~)
+        - sortJobsBySalary(): void
+        + updateJobs(List~JobRecord~): void
+        + applyTheme(ColorTheme): void
+        # paintComponent(Graphics): void
+        - drawNoDataMessage(Graphics): void
+        - drawAxes(Graphics2D, int, int, int): void
+        - formatSalaryLabel(int): String
+        - drawDataPoints(Graphics2D, int, int, int): void
+        - calculateAverageSalary(JobRecord): int
+        - truncateString(String, int): String
+    }
+
+
+
+
+class MainView {
+        <<final>>
+        - mainPane: JPanel
+        - findJobTab: JobView
+        - savedJobTab: JobView
+        - tabbedPane: JTabbedPane
+        - tabStyleManager: TabStyleManager
+        - controller: IController
+        - customMenuBar: CustomMenuBar
+        - theme: ColorTheme
+        + MainView(IController)
+        + setupExitKeyAction()
+        + buildTabbedPane(JobView, JobView): JTabbedPane
+        + createCustomMenu()
+        + mapMenuEvents()
+        + applyTheme(ColorTheme)
+        + notifyUser(String)
+        + addFeatures(IController)
+        + run()
+    }
+
+class JobView {
+        <<abstract>>
+        +??? shouldn't theses be private and then inherited? 
+        # searchButton: ThemedButton
+        # searchField: JTextArea
+        # recordText: JTextArea
+        # jobsTable: JobsTable
+        # theme: ColorTheme
+        # jobsList: List~JobRecord~
+        # openJob: ThemedButton
+        # controller: IController
+        # topButtonLayout: JPanel
+        # mainPanel: JPanel
+        # savedJobs: boolean
+
+
+        + JobView()
+        + initView()
+        + makeTopButtonPanel(): JPanel
+        + makeBottomButtonPanel(): JPanel
+        + makeTablePanel(): JPanel
+        + applyTheme(ColorTheme)
+        + setJobsList(List~JobRecord~)
+        + getJobsList(): List~JobRecord~
+        + setRecordText(String)
+        + addJobRecord(JobRecord)
+        + removeJobRecord(int)
+        + updateJobsList(List~JobRecord~)
+        + addFeatures(IController)
+        + getTheme(): ColorTheme
+        + createThemedButton(String): ThemedButton
+        + createThemedButton(String,ThemedButton.ButtonType): ThemedButton
+    }
+  
+  class JobsTable {
         <<final>>
         - tableModel: DefaultTableModel
         - sorter: TableRowSorter~DefaultTableModel~
