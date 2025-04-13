@@ -55,8 +55,12 @@ public interface IController {
 
     void job2SavedList(JobRecord jobRecord);
     
-    /** used when the another part of the program needs to alert the user */
+    /** used when the another part of
+     * the program needs to alert the user
+     * @param alert the alert message to be sent
+     **/
     void sendAlert(String alert);
+
     /**
      * Check if a job is already in the saved jobs list.
      *

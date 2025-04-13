@@ -1,7 +1,6 @@
 package skillzhunter.view;
 
 import java.awt.Component;
-import java.awt.Window;
 import javax.swing.*;
 
 import skillzhunter.controller.IController;
@@ -10,43 +9,48 @@ import skillzhunter.model.JobRecord;
 
 /**
  * Helper class for common job-related actions across different views.
+ * This utility class provides static methods for saving, editing, and deleting jobs,
+ * as well as navigation functionality between different tabs in the application.
+ * It serves as a centralized location for job-related UI interactions.
  */
 public final class JobActionHelper {
 
-    // Common icons used across job actions
+    /** Icon for edit operations, loaded from resources. */
     private static final ImageIcon EDIT_ICON = IconLoader.loadIcon("images/edit.png", 24, 24);
+    
+    /** Icon for delete operations, loaded from resources. */
     private static final ImageIcon DELETE_ICON = IconLoader.loadIcon("images/delete.png", 24, 24);
+    
+    /** Warning icon for alert dialogs, loaded from resources. */
     private static final ImageIcon WARNING_ICON = IconLoader.loadIcon("images/warning.png");
+    
+    /** Success icon for confirmation dialogs, loaded from resources. */
     private static final ImageIcon SUCCESS_ICON = IconLoader.loadIcon("images/success.png");
+
+    /** Information icon for informational dialogs, loaded from resources. */
     private static final ImageIcon INFO_ICON = IconLoader.loadIcon("images/info.png");
 
+    /**
+     * Private constructor to prevent instantiation of this utility class.
+     * 
+     * @throws UnsupportedOperationException if an attempt is made to instantiate this class
+     */
     private JobActionHelper() {
         throw new UnsupportedOperationException("Utility class cannot be instantiated");
     }
 
     /**
-     * Saves a job with comments and rating.
+     * Saves a job to the saved jobs list with the provided comments and rating.
+     * Displays a success message and switches to the Saved Jobs tab.
      * 
-     * @param job The job to save
-     * @param comments The comments to save
-     * @param rating The rating to save
-     * @param controller The application controller
-     * @param parent The parent component
-     * @return true if the save was successful
+     * @param job the JobRecord to be saved
+     * @param comments user comments for the job, can be null or empty
+     * @param rating user rating for the job
+     * @param controller the controller to handle the save operation
+     * @param parent the parent component for dialog display
      */
-    public static boolean saveJob(JobRecord job, String comments, int rating, 
+    public static void saveJob(JobRecord job, String comments, int rating, 
                                IController controller, Component parent) {
-        if (job == null || controller == null) {
-            showErrorMessage(parent, "Job or controller not provided.");
-            return false;
-        }
-        
-        // Check if job is already saved
-        if (controller.isJobAlreadySaved(job)) {
-            showInfoMessage(parent, "This job is already saved.", "Job Already Saved");
-            return false;
-        }
-
         controller.job2SavedList(job);
 
         if (controller instanceof MainController cont) {
@@ -64,24 +68,19 @@ public final class JobActionHelper {
         }
 
         switchToSavedJobsTab(parent, controller);
-        return true;
     }
 
     /**
-     * Shows dialog to edit a job's rating and comments.
+     * Opens a dialog to edit an existing job with comments and rating.
+     * If confirmed, updates the job in the system and shows a success message.
      * 
-     * @param job The job to edit
-     * @param controller The application controller
-     * @param parent The parent component
-     * @return The updated job record, or null if edit was cancelled
+     * @param job the JobRecord to be edited
+     * @param controller the controller to handle the update operation
+     * @param parent the parent component for dialog display
+     * @return the updated JobRecord if edited successfully, or null if canceled
      */
     public static JobRecord editJob(JobRecord job, IController controller, Component parent) {
-        if (job == null || controller == null) {
-            showErrorMessage(parent, "Job or controller not provided.");
-            return null;
-        }
-        
-        Window parentWindow = getParentWindow(parent);
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(parent);
         JPanel editPanel = new JPanel(new java.awt.BorderLayout(10, 10));
 
         StarRatingPanel starRating = new StarRatingPanel(Math.max(job.rating(), 0));
@@ -100,7 +99,7 @@ public final class JobActionHelper {
         editPanel.add(commentScrollPane, java.awt.BorderLayout.CENTER);
 
         int result = JOptionPane.showConfirmDialog(
-            parentWindow,
+            parentFrame,
             editPanel,
             "Edit Job: " + job.jobTitle(),
             JOptionPane.OK_CANCEL_OPTION,
@@ -117,7 +116,7 @@ public final class JobActionHelper {
 
             if (updatedJob != null) {
                 JOptionPane.showMessageDialog(
-                    parentWindow,
+                    parentFrame,
                     "Job updated successfully!",
                     "Update Complete",
                     JOptionPane.INFORMATION_MESSAGE,
@@ -133,24 +132,20 @@ public final class JobActionHelper {
     }
 
     /**
-     * Shows confirmation dialog to delete a job.
+     * Displays a confirmation dialog to delete a job and processes the deletion
+     * if confirmed by the user.
      * 
-     * @param job The job to delete
-     * @param controller The application controller
-     * @param parent The parent component
-     * @return true if the job was deleted
+     * @param job the JobRecord to be deleted
+     * @param controller the controller to handle the deletion operation
+     * @param parent the parent component for dialog display
+     * @return true if the job was deleted, false if the operation was canceled
      */
     public static boolean deleteJob(JobRecord job, IController controller, Component parent) {
-        if (job == null || controller == null) {
-            showErrorMessage(parent, "Job or controller not provided.");
-            return false;
-        }
-        
-        Window parentWindow = getParentWindow(parent);
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(parent);
 
         Object[] options = {"Delete", "Cancel"};
         int result = JOptionPane.showOptionDialog(
-            parentWindow,
+            parentFrame,
             "Are you sure you want to delete the job: " + job.jobTitle() + "?",
             "Confirm Delete",
             JOptionPane.YES_NO_OPTION,
@@ -165,7 +160,7 @@ public final class JobActionHelper {
             updateSavedJobsTabView(parent, controller);
 
             JOptionPane.showMessageDialog(
-                parentWindow,
+                parentFrame,
                 "Job deleted successfully!",
                 "Delete Complete",
                 JOptionPane.INFORMATION_MESSAGE,
@@ -179,65 +174,30 @@ public final class JobActionHelper {
     }
 
     /**
-     * Shows a message when no job is selected.
+     * Shows a warning message when no job is selected but an action requires a selection.
      * 
-     * @param message The message to display
-     * @param parent The parent component
+     * @param message the warning message to display
+     * @param parent the parent component for dialog display
      */
     public static void showNoSelectionMessage(String message, Component parent) {
-        Window parentWindow = getParentWindow(parent);
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(parent);
 
         JOptionPane.showMessageDialog(
-            parentWindow,
+            parentFrame,
             message,
             "No Selection",
             JOptionPane.WARNING_MESSAGE,
             WARNING_ICON
         );
     }
-    
-    /**
-     * Shows an error message.
-     * 
-     * @param parent The parent component
-     * @param message The error message
-     */
-    public static void showErrorMessage(Component parent, String message) {
-        Window parentWindow = getParentWindow(parent);
-        
-        JOptionPane.showMessageDialog(
-            parentWindow,
-            message,
-            "Error",
-            JOptionPane.ERROR_MESSAGE,
-            WARNING_ICON
-        );
-    }
-    
-    /**
-     * Shows an information message.
-     * 
-     * @param parent The parent component
-     * @param message The information message
-     * @param title The dialog title
-     */
-    public static void showInfoMessage(Component parent, String message, String title) {
-        Window parentWindow = getParentWindow(parent);
-        
-        JOptionPane.showMessageDialog(
-            parentWindow,
-            message,
-            title,
-            JOptionPane.INFORMATION_MESSAGE,
-            INFO_ICON
-        );
-    }
 
     /**
-     * Updates the Saved Jobs tab if visible.
+     * Updates the Saved Jobs tab view with the current list of saved jobs from the controller.
+     * Handles different component types and traverses component hierarchy to find and update
+     * the SavedJobsTab component.
      * 
-     * @param component The context component
-     * @param controller The application controller
+     * @param component the component from which to start traversing the component hierarchy
+     * @param controller the controller to retrieve the updated list of saved jobs
      */
     public static void updateSavedJobsTabView(Component component, IController controller) {
         if (component instanceof JTable) {
@@ -256,10 +216,12 @@ public final class JobActionHelper {
     }
 
     /**
-     * Switches to the Saved Jobs tab and refreshes it.
+     * Switches the application view to the Saved Jobs tab and updates its content.
+     * Locates the tabbed pane in the component hierarchy and selects the tab
+     * with the title "Saved Jobs".
      * 
-     * @param component The context component
-     * @param controller The application controller
+     * @param component the component from which to start traversing the component hierarchy
+     * @param controller the controller to retrieve the updated list of saved jobs
      */
     public static void switchToSavedJobsTab(Component component, IController controller) {
         JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(component);
@@ -269,12 +231,12 @@ public final class JobActionHelper {
                 for (int i = 0; i < tabbedPane.getTabCount(); i++) {
                     String title = tabbedPane.getTitleAt(i);
                     Component comp = tabbedPane.getTabComponentAt(i);
-                    
+
                     if ("Saved Jobs".equals(title) 
                         || (comp instanceof JLabel label && "Saved Jobs".equals(label.getText()))) {
-                        
+
                         tabbedPane.setSelectedIndex(i);
-                        
+
                         Component tabComponent = tabbedPane.getComponentAt(i);
                         if (tabComponent instanceof SavedJobsTab tab) {
                             tab.updateJobsList(controller.getSavedJobs());
@@ -287,28 +249,10 @@ public final class JobActionHelper {
     }
 
     /**
-     * Gets the parent window for a component.
-     * 
-     * @param component The component
-     * @return The parent window, or null if not found
-     */
-    private static Window getParentWindow(Component component) {
-        if (component == null) {
-            return null;
-        }
-        
-        if (component instanceof Window) {
-            return (Window) component;
-        }
-        
-        return SwingUtilities.getWindowAncestor(component);
-    }
-
-    /**
      * Recursively searches for a JTabbedPane in the component hierarchy.
      * 
-     * @param component The component to search in
-     * @return The found JTabbedPane, or null if not found
+     * @param component the component from which to start the search
+     * @return the first JTabbedPane found in the hierarchy, or null if none is found
      */
     private static JTabbedPane findTabbedPane(Component component) {
         if (component instanceof JTabbedPane tabbedPane) {
