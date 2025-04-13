@@ -1,5 +1,6 @@
 package skillzhunter.controller;
 
+import java.awt.Component;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.swing.JTabbedPane;
 
 import skillzhunter.model.IModel;
 import skillzhunter.model.JobRecord;
@@ -34,11 +37,64 @@ public class MainController implements IController {
         // Model
         model = new Jobs();
 
-        // Saved jobs tab initialized with actual saved jobs list
-        savedJobsTab = new SavedJobsTab(this, model.getJobRecords());
-
         // View
-        view = new MainView(this);  // You might want to make sure MainView takes savedJobsTab
+        view = new MainView(this);
+        
+        // Initialize savedJobsTab, which will be properly created by MainView
+        savedJobsTab = getSavedJobsTabFromView();
+        
+        //Update the saved jobs tab with current data
+        if (savedJobsTab != null) {
+            savedJobsTab.updateJobsList(model.getJobRecords());
+        }
+    }
+
+    /**
+     * Gets the SavedJobsTab component from the view.
+     * 
+     * @return The SavedJobsTab instance
+     */
+    private SavedJobsTab getSavedJobsTabFromView() {
+        if (view instanceof MainView mainView) {
+            // Find the tabbed pane
+            Component contentPane = mainView.getContentPane();
+            JTabbedPane tabbedPane = findTabbedPane(contentPane);
+            
+            if (tabbedPane != null) {
+                // Find the "Saved Jobs" tab
+                for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+                    String title = tabbedPane.getTitleAt(i);
+                    if ("Saved Jobs".equals(title)) {
+                        Component component = tabbedPane.getComponentAt(i);
+                        if (component instanceof SavedJobsTab) {
+                            return (SavedJobsTab) component;
+                        }
+                    }
+                }
+            }
+        }
+        // Fallback in case we can't find it
+        return new SavedJobsTab(this, model.getJobRecords());
+    }
+
+    /**
+     * Recursively finds a JTabbedPane in a component hierarchy.
+     * 
+     * @param component The component to search in
+     * @return The JTabbedPane, or null if not found
+     */
+    private JTabbedPane findTabbedPane(Component component) {
+        if (component instanceof JTabbedPane tabbedPane) {
+            return tabbedPane;
+        } else if (component instanceof java.awt.Container container) {
+            for (int i = 0; i < container.getComponentCount(); i++) {
+                JTabbedPane found = findTabbedPane(container.getComponent(i));
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -76,7 +132,9 @@ public class MainController implements IController {
      */
     protected void setModel(IModel model) {
         this.model = model;
-        savedJobsTab.updateJobsList(model.getJobRecords());
+        if (savedJobsTab != null) {
+            savedJobsTab.updateJobsList(model.getJobRecords());
+        }
     }
     
 
@@ -173,7 +231,9 @@ public class MainController implements IController {
             model.addJob(job);
         }
         List<JobRecord> savedJobsList = model.getJobRecords();
-        savedJobsTab.updateJobsList(savedJobsList);
+        if (savedJobsTab != null) {
+            savedJobsTab.updateJobsList(savedJobsList);
+        }
         return savedJobsList;
     }
 
@@ -419,7 +479,6 @@ public class MainController implements IController {
         return savedJobsTab;
     }
     
-
     /**
      * Updates a job with new comments and rating.
      * 
@@ -429,11 +488,16 @@ public class MainController implements IController {
      * @return The updated JobRecord
      */
     public JobRecord getUpdateJob(int id, String comments, int rating) {
+        // Debug output to verify values
+        System.out.println("Updating job " + id + " with rating: " + rating + " and comments: " + comments);
+        
         // Call model to update the job
         model.updateJob(id, comments, rating);
         
         // Update the view with the latest data
-        savedJobsTab.updateJobsList(model.getJobRecords());
+        if (savedJobsTab != null) {
+            savedJobsTab.updateJobsList(model.getJobRecords());
+        }
         
         // Return the updated job record so the view can use it
         for (JobRecord job : model.getJobRecords()) {
@@ -441,6 +505,9 @@ public class MainController implements IController {
                 return job;
             }
         }
+        
+        // Job not found
+        System.err.println("Job with ID " + id + " not found after update");
         return null;
     }
 }
