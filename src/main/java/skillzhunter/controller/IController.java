@@ -5,6 +5,7 @@ import java.util.List;
 import skillzhunter.model.IModel;
 import skillzhunter.model.JobRecord;
 import skillzhunter.view.IView;
+import skillzhunter.view.SavedJobsTab;
 
 public interface IController {
     /**
@@ -51,12 +52,11 @@ public interface IController {
      * Add a job to the saved jobs list.
      * @param jobRecord The JobRecord object to add
      */
+
     void job2SavedList(JobRecord jobRecord);
+    
     /** used when the another part of the program needs to alert the user */
     void sendAlert(String alert);
-
-
-
     /**
      * Check if a job is already in the saved jobs list.
      *
@@ -84,4 +84,10 @@ public interface IController {
      * @param filePath The path to save the file to
      */
     void export2FileType(List<JobRecord> jobs, String formatStr, String filePath);
+
+    /**
+     * Gets the saved jobs tab.
+     * @return The saved jobs tab
+     */
+    SavedJobsTab getSavedJobsTab();
 }
