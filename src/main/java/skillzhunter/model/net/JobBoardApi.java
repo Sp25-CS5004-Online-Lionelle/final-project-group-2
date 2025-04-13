@@ -39,6 +39,8 @@ public class JobBoardApi {
     private static final Map<String, String> LOCATION_MAP = JobBoardApi.loadCsvData(
     Paths.get("data", "locations.csv").toString(), "location", "slug");
 
+    private String errorMessage = null;
+
     /** empty contructor.*/
     public JobBoardApi() {
         // empty constructor
@@ -161,7 +163,7 @@ public class JobBoardApi {
                           || query.equalsIgnoreCase("all jobs")
                           || query.equalsIgnoreCase("all job")) {
             System.out.println("No query passed, using default values.");
-            errorMessage = "Search query was empty or generic, defaulted to showing first 10 avialable jobs.";
+            errorMessage = "Search query was empty or generic, defaulted to showing first 10 available jobs.";
             query = "all";
         }
         if (numberOfResults == null || numberOfResults < 1) {
