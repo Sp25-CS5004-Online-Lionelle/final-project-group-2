@@ -225,7 +225,7 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
         
         // Then update the job with the rating and comments through the controller
         if (controller instanceof MainController cont) {
-            (cont).getUpdateJob(job.id(), commentText, newRating);
+            cont.getUpdateJob(job.id(), commentText, newRating);
         }
         
         // Show success message

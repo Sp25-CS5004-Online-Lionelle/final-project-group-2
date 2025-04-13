@@ -17,6 +17,7 @@ import skillzhunter.model.JobRecord;
 /**
  * Dialog for displaying saved job details with Edit/Delete/Close options.
  * This is used specifically when opening a job from the Saved Jobs tab.
+ * Uses JobActionHelper for consistent job management across the application.
  */
 public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
     
@@ -91,6 +92,7 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
     
     /**
      * Creates the button panel with Edit, Delete, and Close buttons.
+     * Uses JobActionHelper for job management actions.
      * 
      * @param dialog The parent dialog
      * @param job The job record
@@ -115,7 +117,7 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
         buttonPanel.add(deleteButton);
         buttonPanel.add(closeButton);
         
-        // Set button actions
+        // Set button actions using JobActionHelper
         configureButtonActions(dialog, editButton, deleteButton, closeButton, job, controller, parent);
         
         return buttonPanel;
@@ -166,6 +168,7 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
     
     /**
      * Configures the action listeners for the buttons.
+     * Uses JobActionHelper for job management actions.
      * 
      * @param dialog The parent dialog
      * @param editButton The edit button
@@ -181,11 +184,13 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
         // Edit button action
         editButton.addActionListener(e -> {
             dialog.dispose(); // Close dialog first
-            JobActionHelper.editJob(job, controller, parent); // Use helper method to edit
+            // Use JobActionHelper for editing
+            JobActionHelper.editJob(job, controller, parent);
         });
         
         // Delete button action
         deleteButton.addActionListener(e -> {
+            // Use JobActionHelper for deleting
             if (JobActionHelper.deleteJob(job, controller, parent)) {
                 dialog.dispose(); // Only close the dialog if delete was confirmed
             }
