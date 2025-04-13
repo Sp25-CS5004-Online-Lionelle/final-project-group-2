@@ -429,13 +429,15 @@ public class MainController implements IController {
      * @return The updated JobRecord
      */
     public JobRecord getUpdateJob(int id, String comments, int rating) {
-        //IDEA: if model.updateJob returns a record then you can delete the loop at the end
+        // Call model to update the job
         model.updateJob(id, comments, rating);
+        
+        // Update the view with the latest data
         savedJobsTab.updateJobsList(model.getJobRecords());
         
         // Return the updated job record so the view can use it
         for (JobRecord job : model.getJobRecords()) {
-            if (job.id() == job.id()) {
+            if (job.id() == id) { // FIXED: Compare with parameter id instead of job.id()
                 return job;
             }
         }
