@@ -1,23 +1,25 @@
 package skillzhunter.view;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.TextField;
-import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
-import java.util.List;
-import java.util.ArrayList;
-
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.InputMap;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -26,10 +28,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
-import javax.swing.JCheckBox;
-import javax.swing.BorderFactory;
 
 import skillzhunter.controller.IController;
+import skillzhunter.controller.MainController;
 import skillzhunter.model.JobRecord;
 
 /**
@@ -37,18 +38,46 @@ import skillzhunter.model.JobRecord;
  * It allows users to search for jobs and view the results in a table.
  */
 public class FindJobTab extends JobView {
-    private IController controller;
-    private String[] locations;
-    private String[] industries;
+    /** Controller. */
+    private final IController controller;
+    /** location list. */
+    private final String[] locations;
+    /** industry list. */
+    private final String[] industries;
+    /** search results list. */
     private List<JobRecord> searchResults = new ArrayList<>();
     
     // UI components
-    private JLabel industryLabel, locationLabel, resultsLabel, titleLabel;
-    private ImageIcon openIcon;
+    /** Industry label. */
+    private JLabel industryLabel;
+    /** Location label. */
+    private JLabel locationLabel;
+    /** Search button label. */
+    private JLabel resultsLabel;
+    /** title label. */
+    private JLabel titleLabel;
+    /** Search button. */
+    private final ImageIcon openIcon;
+    /** save icon. */
+    private final ImageIcon saveIcon;
+    /** info icon. */
+    private final ImageIcon infoIcon;
+    /** warning icon. */
+    private final ImageIcon warningIcon;
+    /** Salary range viz. */
     private SalaryVisualizationPanel salaryVisualizationPanel;
+    /** show vis button. */
     private JCheckBox showVisualizationCheckbox;
+    /** table panel. */
     private JPanel tablePanel;
+    /** theme button.*/
+    private ThemedButton saveJob; // Now using ThemedButton instead of javax.swing.JButton
 
+    /** 
+     * Constructor for FindJobTab.
+     * Initializes the controller and sets up the UI components.
+     * @param controller The controller to interact with the model
+     */
     public FindJobTab(IController controller) {
         super();
         
@@ -58,6 +87,9 @@ public class FindJobTab extends JobView {
 
         // Use IconLoader to load icons
         this.openIcon = IconLoader.loadIcon("images/open.png");
+        this.saveIcon = IconLoader.loadIcon("images/saveIcon.png");
+        this.infoIcon = IconLoader.loadIcon("images/info.png");
+        this.warningIcon = IconLoader.loadIcon("images/warning.png");
         
         super.initView();
 
@@ -107,20 +139,21 @@ public class FindJobTab extends JobView {
     }
 
     /**
-     * Modifies the table panel to include the visualization panel
+     * Modifies the table panel to include the visualization panel.
      */
     private void modifyTablePanel() {
-        // Find the table panel
-        for (int i = 0; i < mainPanel.getComponentCount(); i++) {
-            if (mainPanel.getComponent(i) instanceof JPanel && 
-                ((JPanel)mainPanel.getComponent(i)).getLayout() instanceof BorderLayout) {
-                tablePanel = (JPanel)mainPanel.getComponent(i);
+         // Find the table panel
+         for (int i = 0; i < mainPanel.getComponentCount(); i++) {
+            if (mainPanel.getComponent(i) instanceof JPanel
+                && ((JPanel) mainPanel.getComponent(i)).getLayout() instanceof BorderLayout) {
+                tablePanel = (JPanel) mainPanel.getComponent(i);
                 break;
             }
         }
         
-        if (tablePanel == null) return;
-        
+        if (tablePanel == null) {
+            return;
+        }        
         // Create and set up visualization
         salaryVisualizationPanel = new SalaryVisualizationPanel(searchResults);
         salaryVisualizationPanel.setPreferredSize(new Dimension(800, 200));
@@ -173,7 +206,7 @@ public class FindJobTab extends JobView {
 
         // Create UI components
         TextField searchField = new TextField("", 20);    
-        searchButton = createThemedButton("Find Jobs \t🔎");
+        searchButton = createThemedButton("Find Jobs \t🔎", ThemedButton.ButtonType.PRIMARY);
         Integer[] results = {5, 10, 20, 50};
         JComboBox<String> industryCombo = new JComboBox<>(industries);
         industryCombo.setEditable(true);
@@ -215,11 +248,11 @@ public class FindJobTab extends JobView {
             String industry = (industryObj != null) ? industryObj.toString() : "any";
 
             // If resultsObj is null, set to default
-            if (resultsObj instanceof Integer) {
-                numberOfResults = (Integer) resultsObj;
-            } else if (resultsObj instanceof String) {
+            if (resultsObj instanceof Integer num) {
+                numberOfResults = num;
+            } else if (resultsObj instanceof String res) {
                 try {
-                    numberOfResults = Integer.parseInt((String) resultsObj);
+                    numberOfResults = Integer.parseInt(res);
                 } catch (NumberFormatException ex) {
                     //add non-numeric dialogue
                     ImageIcon warningIcon = IconLoader.loadIcon("images/warning.png");
@@ -267,21 +300,30 @@ public class FindJobTab extends JobView {
 
     @Override
     public JPanel makeBottomButtonPanel() {
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
 
-        // Create and configure button
-        openJob = createThemedButton("Open Job");
+        // Create and configure Open button with PRIMARY type
+        openJob = createThemedButton("Open", ThemedButton.ButtonType.PRIMARY);
         openJob.setIcon(openIcon);
         openJob.setHorizontalTextPosition(SwingConstants.LEFT);
         openJob.setIconTextGap(5);
         openJob.addActionListener(e -> openSelectedJob());
 
+        // Create and configure Save button with SUCCESS type
+        saveJob = createThemedButton("Save", ThemedButton.ButtonType.SUCCESS);
+        saveJob.setIcon(saveIcon);
+        saveJob.setHorizontalTextPosition(SwingConstants.LEFT);
+        saveJob.setIconTextGap(5);
+        saveJob.addActionListener(e -> saveSelectedJob());
+
         buttonPanel.add(openJob);
+        buttonPanel.add(saveJob);
         return buttonPanel;
     }
     
     /**
-     * Updates the visualization panel with job data if needed
+     * Updates the visualization panel with job data if needed.
+     * @param jobs The list of jobs to update the visualization with
      */
     private void updateVisualizationIfNeeded(List<JobRecord> jobs) {
         if (salaryVisualizationPanel != null && jobs != null && !jobs.isEmpty()) {
@@ -290,7 +332,8 @@ public class FindJobTab extends JobView {
     }
     
     /**
-     * Applies theme to visualization components
+     * Applies theme to visualization components.
+     * @param theme The color theme to apply
      */
     private void applyThemeToVisualization(ColorTheme theme) {
         if (salaryVisualizationPanel != null) {
@@ -311,9 +354,14 @@ public class FindJobTab extends JobView {
         // Apply theme to visualization components
         applyThemeToVisualization(theme);
         
+        // Apply theme to saveJob button (which might not be handled by parent)
+        if (saveJob != null) {
+            saveJob.applyTheme(theme);
+        }
+        
         // Use correct theme foreground color for labels
-        java.awt.Color color = (theme == ColorTheme.DARK) ? 
-                ColorTheme.DARK.labelForeground : ColorTheme.LIGHT.labelForeground;
+        java.awt.Color color = (theme == ColorTheme.DARK)
+                ? ColorTheme.DARK.labelForeground : ColorTheme.LIGHT.labelForeground;
                 
         industryLabel.setForeground(color);
         locationLabel.setForeground(color);
@@ -321,18 +369,141 @@ public class FindJobTab extends JobView {
         titleLabel.setForeground(color);
     }
 
+    // In the openSelectedJob method
+    /**
+     * Opens the selected job in a new dialog
+     * Displays job details in a new dialog when a job is selected from the table.
+     */
     private void openSelectedJob() {
         int viewIdx = jobsTable.getSelectedRow();
         if (viewIdx >= 0) {
             int modelIdx = jobsTable.convertRowIndexToModel(viewIdx);
             JobRecord selectedJob = jobsList.get(modelIdx);
+            // Use controller directly instead of SavedJobsLists
             JobDetailsDialogue.showJobDetails(jobsTable, selectedJob, 
-                    SavedJobsLists.getSavedJobs(), controller);
+                    controller.getSavedJobs(), controller);
+        }
+    }
+
+    /**
+     * Saves the selected job directly without opening the dialog
+     * Adds the job to saved jobs and switches to the Saved Jobs tab.
+     */
+    private void saveSelectedJob() {
+        int viewIdx = jobsTable.getSelectedRow();
+        if (viewIdx < 0) {
+            // No job selected
+            JOptionPane.showMessageDialog(this,
+                    "Please select a job to save.",
+                    "No Job Selected",
+                    JOptionPane.INFORMATION_MESSAGE,
+                    warningIcon);
+            return;
+        }
+        
+        int modelIdx = jobsTable.convertRowIndexToModel(viewIdx);
+        JobRecord selectedJob = jobsList.get(modelIdx);
+        
+        // Check if job is already saved using MainController's method
+        if (controller instanceof MainController mainController) {
+            if (mainController.isJobAlreadySaved(selectedJob)) {
+                JOptionPane.showMessageDialog(this,
+                        "This job is already saved.",
+                        "Job Already Saved",
+                        JOptionPane.INFORMATION_MESSAGE,
+                        infoIcon);
+                return;
+            }
+            
+            // Add the job to saved jobs
+            controller.job2SavedList(selectedJob);
+            
+            // Set default rating and comments
+            mainController.getUpdateJob(selectedJob.id(), "No comments provided", 0);
+        } else {
+            // Fallback to basic check if not using MainController
+            List<JobRecord> savedJobs = controller.getSavedJobs();
+            if (savedJobs != null && savedJobs.stream().anyMatch(job -> job.id() == selectedJob.id())) {
+                JOptionPane.showMessageDialog(this,
+                        "This job is already saved.",
+                        "Job Already Saved",
+                        JOptionPane.INFORMATION_MESSAGE,
+                        infoIcon);
+                return;
+            }
+            
+            // Add the job to saved jobs
+            controller.job2SavedList(selectedJob);
+        }
+        
+        // Show success message
+        JOptionPane.showMessageDialog(this,
+                "Job saved successfully!",
+                "Job Saved",
+                JOptionPane.INFORMATION_MESSAGE,
+                IconLoader.loadIcon("images/success.png"));
+        
+        // Switch to Saved Jobs tab
+        switchToSavedJobsTab();
+    }
+    
+    /**
+     * Switches to the Saved Jobs tab and refreshes it.
+     */
+    private void switchToSavedJobsTab() {
+        // Method adapted from JobDetailsDialogue.switchToSavedJobsTab
+        javax.swing.JFrame frame = (javax.swing.JFrame) javax.swing.SwingUtilities.getWindowAncestor(this);
+        if (frame != null) {
+            // Look for the tabbed pane
+            javax.swing.JTabbedPane tabbedPane = findTabbedPane(frame.getContentPane());
+            if (tabbedPane != null) {
+                // Find and select the "Saved Jobs" tab
+                for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+                    String title = tabbedPane.getTitleAt(i);
+                    Component comp = tabbedPane.getTabComponentAt(i);
+                    
+                    if ("Saved Jobs".equals(title) 
+                        || (comp instanceof JLabel && "Saved Jobs".equals(((JLabel) comp).getText()))) {
+                        
+                        // Select the tab
+                        tabbedPane.setSelectedIndex(i);
+                        
+                        // Update the tab content if it's a SavedJobsTab
+                        Component tabComponent = tabbedPane.getComponentAt(i);
+                        if (tabComponent instanceof SavedJobsTab savedJobsTab) {
+                            savedJobsTab.updateJobsList(controller.getSavedJobs());
+                        }
+                        
+                        break;
+                    }
+                }
+            }
         }
     }
     
     /**
-     * Override to maintain search results when updating jobs list
+     * Recursively searches for a JTabbedPane in the component hierarchy
+     * Method copied from JobDetailsDialogue.
+     * @param component The component to search in
+     * @return The found JTabbedPane, or null if not found
+     */
+    private javax.swing.JTabbedPane findTabbedPane(Component component) {
+        if (component instanceof javax.swing.JTabbedPane comp) {
+            return comp;
+        } else if (component instanceof Container container) {
+            for (int i = 0; i < container.getComponentCount(); i++) {
+                javax.swing.JTabbedPane found = findTabbedPane(container.getComponent(i));
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Updates the job list and visualization if needed.
+     * @param jobsList The list of jobs to update
      */
     @Override
     public void updateJobsList(List<JobRecord> jobsList) {
@@ -344,7 +515,10 @@ public class FindJobTab extends JobView {
             updateVisualizationIfNeeded(jobsList);
         }
     }
-    
+    /**
+     * Sets the job list and updates the visualization if needed.
+     * @param jobsList The list of jobs to set
+     */
     @Override
     public void setJobsList(List<JobRecord> jobsList) {
         super.setJobsList(jobsList);

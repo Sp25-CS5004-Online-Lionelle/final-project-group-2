@@ -1,6 +1,5 @@
 package skillzhunter.view;
 
-import skillzhunter.controller.IController;
 import skillzhunter.model.JobRecord;
 
 import javax.swing.*;
@@ -12,27 +11,34 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * A panel that visualizes job salaries as a line graph with interactive tooltips.
  */
 public class SalaryVisualizationPanel extends JPanel {
-    
+    /** lsit of current jobs. */
     private List<JobRecord> jobs;
-    private final int PADDING = 40;
-    private final int POINT_SIZE = 6;
-    private final Color POINT_COLOR = new Color(0, 120, 215);
-    private final Color POINT_HOVER_COLOR = new Color(255, 69, 0);
-    private final Color LINE_COLOR = new Color(0, 120, 215, 150);
+    /** padding. */
+    private static final int PADDING = 40;
+    /** color theme. */
+    private static final int POINT_SIZE = 6;
+    /** color theme for point. */
+    private static final Color POINT_COLOR = new Color(0, 120, 215);
+    /** color theme for hover. */
+    private static final Color POINT_HOVER_COLOR = new Color(255, 69, 0);
+    /** color theme for line color. */
+    private static final Color LINE_COLOR = new Color(0, 120, 215, 150);
+    /** data points for 2d array.*/
     private List<Point2D> dataPoints = new ArrayList<>();
+    /** Data points for rectangle. */
     private List<Rectangle2D> hitBoxes = new ArrayList<>();
+    /** hoover index. */
     private int hoveredIndex = -1;
+    /** color theme (light vs dark). */
     private ColorTheme theme = ColorTheme.LIGHT; // Default theme
     
     /**
@@ -59,7 +65,7 @@ public class SalaryVisualizationPanel extends JPanel {
                 for (int i = 0; i < hitBoxes.size(); i++) {
                     if (hitBoxes.get(i).contains(e.getPoint())) {
                         hoveredIndex = i;
-                        JobRecord job = jobs.get(i);
+                        // JobRecord job = jobs.get(i); //not used
                         break;
                     }
                 }
@@ -140,7 +146,7 @@ public class SalaryVisualizationPanel extends JPanel {
         // Add 10% padding to the max value
         maxSalary = (int) (maxSalary * 1.1);
         
-        // Clear previous points and hitboxes
+        // Clear previous points and hit boxes
         dataPoints.clear();
         hitBoxes.clear();
         
@@ -155,6 +161,7 @@ public class SalaryVisualizationPanel extends JPanel {
     
     /**
      * Draws a message when no data is available.
+     * @param g The graphics context
      */
     private void drawNoDataMessage(Graphics g) {
         Graphics2D g2d = (Graphics2D) g.create();
@@ -170,6 +177,11 @@ public class SalaryVisualizationPanel extends JPanel {
     
     /**
      * Draws the X and Y axes with labels.
+     * 
+     * @param g2d The graphics context
+     * @param width The width of the panel
+     * @param height The height of the panel
+     * @param maxSalary The maximum salary for scaling
      */
     private void drawAxes(Graphics2D g2d, int width, int height, int maxSalary) {
         // Set color based on theme
@@ -212,6 +224,8 @@ public class SalaryVisualizationPanel extends JPanel {
     
     /**
      * Formats a salary value for display on the Y axis.
+     * @param salary The salary value
+     * @return A formatted string representation of the salary
      */
     private String formatSalaryLabel(int salary) {
         if (salary >= 1000000) {
@@ -225,6 +239,11 @@ public class SalaryVisualizationPanel extends JPanel {
     
     /**
      * Draws the data points and connecting lines.
+     * 
+     * @param g2d The graphics context
+     * @param width The width of the panel
+     * @param height The height of the panel
+     * @param maxSalary The maximum salary for scaling
      */
     private void drawDataPoints(Graphics2D g2d, int width, int height, int maxSalary) {
         int graphWidth = width - (2 * PADDING);
@@ -249,16 +268,16 @@ public class SalaryVisualizationPanel extends JPanel {
             
             // Calculate point position
             int x = PADDING + (graphWidth * i) / (numJobs - 1);
-            int y = height - PADDING - (int)((double)graphHeight * salary / maxSalary);
+            int y = height - PADDING - (int) ((double) graphHeight * salary / maxSalary);
             
             pointPositions.add(new Point2D.Double(x, y));
         }
         
         // Draw lines connecting points
         g2d.setStroke(new BasicStroke(2));
-        g2d.setColor(theme == ColorTheme.DARK ? 
-                    new Color(0, 183, 195, 150) : // Teal in dark mode
-                    LINE_COLOR); // Blue in light mode
+        g2d.setColor(theme == ColorTheme.DARK
+                    ? new Color(0, 183, 195, 150) // Teal in dark mode
+                    : LINE_COLOR); // Blue in light mode
         
         for (int i = 0; i < pointPositions.size() - 1; i++) {
             Point2D p1 = pointPositions.get(i);
@@ -266,7 +285,7 @@ public class SalaryVisualizationPanel extends JPanel {
             g2d.draw(new Line2D.Double(p1, p2));
         }
         
-        // Store points for hitbox detection
+        // Store points for hit box detection
         this.dataPoints = pointPositions;
         
         // Draw points and labels after drawing lines so they appear on top
@@ -276,23 +295,23 @@ public class SalaryVisualizationPanel extends JPanel {
             // Create hitbox for this point
             int hitBoxSize = POINT_SIZE * 3;
             hitBoxes.add(new Rectangle2D.Double(
-                point.getX() - hitBoxSize/2, point.getY() - hitBoxSize/2, 
+                point.getX() - hitBoxSize / 2, point.getY() - hitBoxSize / 2, 
                 hitBoxSize, hitBoxSize));
             
             // Draw point (highlighted if hovered)
             if (i == hoveredIndex) {
-                g2d.setColor(theme == ColorTheme.DARK ? 
-                            new Color(255, 140, 0) : // Brighter orange in dark mode
-                            POINT_HOVER_COLOR); // Normal orange in light mode
+                g2d.setColor(theme == ColorTheme.DARK
+                            ? new Color(255, 140, 0) // Brighter orange in dark mode
+                            : POINT_HOVER_COLOR); // Normal orange in light mode
                 g2d.fill(new Ellipse2D.Double(
                     point.getX() - POINT_SIZE, point.getY() - POINT_SIZE, 
                     POINT_SIZE * 2, POINT_SIZE * 2));
             } else {
-                g2d.setColor(theme == ColorTheme.DARK ? 
-                            new Color(0, 183, 195) : // Teal in dark mode
-                            POINT_COLOR); // Blue in light mode
+                g2d.setColor(theme == ColorTheme.DARK
+                           ? new Color(0, 183, 195) // Teal in dark mode
+                           : POINT_COLOR); // Blue in light mode
                 g2d.fill(new Ellipse2D.Double(
-                    point.getX() - POINT_SIZE/2, point.getY() - POINT_SIZE/2, 
+                    point.getX() - POINT_SIZE / 2, point.getY() - POINT_SIZE / 2, 
                     POINT_SIZE, POINT_SIZE));
             }
             
@@ -309,7 +328,7 @@ public class SalaryVisualizationPanel extends JPanel {
             
             // Rotate and position the text
             g2d.rotate(Math.toRadians(-45), point.getX(), height - PADDING + 5);
-            g2d.drawString(label, (int)point.getX(), height - PADDING + 10);
+            g2d.drawString(label, (int) point.getX(), height - PADDING + 10);
             
             // Restore the original transform
             g2d.setTransform(originalTransform);
@@ -319,6 +338,8 @@ public class SalaryVisualizationPanel extends JPanel {
     /**
      * Calculates the average of min and max salary.
      * Returns 0 if no valid salary data.
+     * @param job The job record
+     * @return The average salary
      */
     private int calculateAverageSalary(JobRecord job) {
         int min = job.annualSalaryMin();
@@ -341,6 +362,9 @@ public class SalaryVisualizationPanel extends JPanel {
     
     /**
      * Truncates a string to a maximum length with an ellipsis.
+     * @param str The string to truncate
+     * @param maxLength The maximum length
+     * @return The truncated string
      */
     private String truncateString(String str, int maxLength) {
         if (str == null || str.length() <= maxLength) {

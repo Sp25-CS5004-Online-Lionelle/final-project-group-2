@@ -23,7 +23,7 @@ public final class DomainXmlWrapper {
 
     /** List of the records. */
     @JacksonXmlElementWrapper(useWrapping = false)
-    private Collection<JobRecord> job;
+    private final Collection<JobRecord> job;
 
     /**
      * Constructor.

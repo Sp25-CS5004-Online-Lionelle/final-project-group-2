@@ -2,27 +2,52 @@ package skillzhunter.view;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import javax.swing.JButton;
 
 /**
  * A custom button class that automatically applies theme styling and hover effects.
  * This centralizes button styling logic across the application.
+ * Supports multiple button types based on Bootstrap styling (primary, secondary, success, etc.)
  */
 public class ThemedButton extends JButton {
     private ColorTheme theme;
     private boolean isHovering = false;
+    private ButtonType buttonType = ButtonType.PRIMARY; // Default to primary
+    
+    /**
+     * Button types based on Bootstrap styling
+     */
+    public enum ButtonType {
+        PRIMARY,
+        SECONDARY,
+        SUCCESS,
+        DANGER,
+        WARNING,
+        INFO
+    }
     
     /**
      * Creates a new themed button with the given text.
+     * Uses PRIMARY button type by default.
      * 
      * @param text The button text
      */
     public ThemedButton(String text) {
+        this(text, ButtonType.PRIMARY);
+    }
+    
+    /**
+     * Creates a new themed button with the given text and button type.
+     * 
+     * @param text The button text
+     * @param buttonType The button type (PRIMARY, SECONDARY, etc.)
+     */
+    public ThemedButton(String text, ButtonType buttonType) {
         super(text);
+        this.buttonType = buttonType;
         initializeButton();
     }
     
@@ -70,18 +95,78 @@ public class ThemedButton extends JButton {
     }
     
     /**
-     * Updates button colors based on current theme and hover state.
+     * Sets the button type (PRIMARY, SECONDARY, etc.)
+     * 
+     * @param buttonType The new button type
+     */
+    public void setButtonType(ButtonType buttonType) {
+        this.buttonType = buttonType;
+        updateButtonColors();
+    }
+    
+    /**
+     * Gets the current button type.
+     * 
+     * @return The current ButtonType
+     */
+    public ButtonType getButtonType() {
+        return buttonType;
+    }
+    
+    /**
+     * Updates button colors based on current theme, button type, and hover state.
      */
     private void updateButtonColors() {
         if (theme == null) return;
         
-        if (isHovering) {
-            setBackground(theme.buttonHover);
-        } else {
-            setBackground(theme.buttonNormal);
+        Color normalColor;
+        Color hoverColor;
+        
+        // Select the appropriate colors based on button type
+        switch (buttonType) {
+            case PRIMARY:
+                normalColor = theme.buttonNormal;
+                hoverColor = theme.buttonHover;
+                break;
+            case SECONDARY:
+                normalColor = theme.secondaryButtonNormal;
+                hoverColor = theme.secondaryButtonHover;
+                break;
+            case SUCCESS:
+                normalColor = theme.successButtonNormal;
+                hoverColor = theme.successButtonHover;
+                break;
+            case DANGER:
+                normalColor = theme.dangerButtonNormal;
+                hoverColor = theme.dangerButtonHover;
+                break;
+            case WARNING:
+                normalColor = theme.warningButtonNormal;
+                hoverColor = theme.warningButtonHover;
+                break;
+            case INFO:
+                normalColor = theme.infoButtonNormal;
+                hoverColor = theme.infoButtonHover;
+                break;
+            default:
+                normalColor = theme.buttonNormal;
+                hoverColor = theme.buttonHover;
         }
         
-        setForeground(theme.buttonForeground);
+        // Apply the appropriate color based on hover state
+        setBackground(isHovering ? hoverColor : normalColor);
+        
+        // Set appropriate text color - check if we need white or black text
+        // For warning buttons which are typically yellow, use black text
+        if (buttonType == ButtonType.WARNING) {
+            setForeground(Color.BLACK);
+        } else if (buttonType == ButtonType.INFO && theme == ColorTheme.LIGHT) {
+            // For info buttons in light mode (typically cyan), use black text
+            setForeground(Color.BLACK);
+        } else {
+            // For all other buttons, use white text
+            setForeground(theme.buttonForeground);
+        }
     }
     
     /**
@@ -92,6 +177,4 @@ public class ThemedButton extends JButton {
     public ColorTheme getTheme() {
         return theme;
     }
-
-
 }

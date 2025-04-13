@@ -1,12 +1,9 @@
 package skillzhunter.view;
 
 import java.awt.FlowLayout;
-import java.awt.Image;
 import java.awt.Cursor;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -22,16 +19,19 @@ import javax.swing.UIManager;
  * Used as an alternative to JMenuBar for better styling control, especially on macOS.
  */
 public class CustomMenuBar extends JPanel {
-    
-    private JButton settingsButton;
-    private JPopupMenu settingsMenu;
+    /** Setting button. */
+    private final JButton settingsButton;
+    /** Popup menu for settings. */
+    private final JPopupMenu settingsMenu;
+    /** exit menu item. */
     private JMenuItem exitItem;
-    private JMenuItem csvDownloadItem;
-    private JMenuItem jsonDownloadItem;
-    private JMenuItem xmlDownloadItem;
+    /** Light mode menu item. */
     private JMenuItem lightModeItem;
+    /** Dark mode menue item. */
     private JMenuItem darkModeItem;
+    /** Color for the bottom line. */
     private Color lineColor = new Color(0, 183, 195); // Teal color matching the button normal from DARK theme
+    /** Thickness of the bottom line. */
     private int lineThickness = 2; // Thickness of the bottom line in pixels
     
     /**
@@ -59,6 +59,7 @@ public class CustomMenuBar extends JPanel {
     
     /**
      * Creates the settings button with the default icon.
+     * @return The created settings button
      */
     private JButton createSettingsButton() {
         JButton button = new JButton();
@@ -83,7 +84,8 @@ public class CustomMenuBar extends JPanel {
     }
     
     /**
-     * Override paintComponent to draw the teal line at the bottom
+     * Override paintComponent to draw the teal line at the bottom.
+     * @param g The Graphics object to paint on
      */
     @Override
     protected void paintComponent(Graphics g) {
@@ -98,15 +100,6 @@ public class CustomMenuBar extends JPanel {
      * Builds the menu structure with all necessary items.
      */
     private void buildMenuStructure() {
-        // Download submenu
-        JMenu downloadMenu = new JMenu("Download Data");
-        csvDownloadItem = new JMenuItem("csv");
-        jsonDownloadItem = new JMenuItem("json");
-        xmlDownloadItem = new JMenuItem("xml");
-        downloadMenu.add(xmlDownloadItem);
-        downloadMenu.add(jsonDownloadItem);
-        downloadMenu.add(csvDownloadItem);
-        
         // View mode items
         JMenu viewMenu = new JMenu("View Mode");
         
@@ -130,7 +123,7 @@ public class CustomMenuBar extends JPanel {
         exitItem = new JMenuItem("Exit");
         
         // Add items to menu
-        settingsMenu.add(downloadMenu);
+        // settingsMenu.add(downloadMenu);
         settingsMenu.add(viewMenu);
         settingsMenu.addSeparator();
         settingsMenu.add(exitItem);
@@ -168,25 +161,25 @@ public class CustomMenuBar extends JPanel {
         }
         
         // Theme popup menus - this is system-wide and will affect all popups
-        UIManager.put("PopupMenu.background", theme == ColorTheme.DARK ? 
-            theme.menuBarBackgroundDark : theme.menuBarBackgroundLight);
-        UIManager.put("PopupMenu.foreground", theme == ColorTheme.DARK ? 
-            theme.menuBarForegroundDark : theme.menuBarForegroundLight);
-        UIManager.put("MenuItem.background", theme == ColorTheme.DARK ? 
-            theme.menuBarBackgroundDark : theme.menuBarBackgroundLight);
-        UIManager.put("MenuItem.foreground", theme == ColorTheme.DARK ? 
-            theme.menuBarForegroundDark : theme.menuBarForegroundLight);
-        UIManager.put("Menu.background", theme == ColorTheme.DARK ? 
-            theme.menuBarBackgroundDark : theme.menuBarBackgroundLight);
-        UIManager.put("Menu.foreground", theme == ColorTheme.DARK ? 
-            theme.menuBarForegroundDark : theme.menuBarForegroundLight);
+        UIManager.put("PopupMenu.background", theme == ColorTheme.DARK
+            ? theme.menuBarBackgroundDark : theme.menuBarBackgroundLight);
+        UIManager.put("PopupMenu.foreground", theme == ColorTheme.DARK
+            ? theme.menuBarForegroundDark : theme.menuBarForegroundLight);
+        UIManager.put("MenuItem.background", theme == ColorTheme.DARK
+            ? theme.menuBarBackgroundDark : theme.menuBarBackgroundLight);
+        UIManager.put("MenuItem.foreground", theme == ColorTheme.DARK
+            ? theme.menuBarForegroundDark : theme.menuBarForegroundLight);
+        UIManager.put("Menu.background", theme == ColorTheme.DARK 
+            ? theme.menuBarBackgroundDark : theme.menuBarBackgroundLight);
+        UIManager.put("Menu.foreground", theme == ColorTheme.DARK
+            ? theme.menuBarForegroundDark : theme.menuBarForegroundLight);
         
         // Repaint to show the updated line color
         repaint();
     }
     
     /**
-     * Sets the thickness of the bottom line
+     * Sets the thickness of the bottom line.
      * 
      * @param thickness Line thickness in pixels
      */
@@ -200,34 +193,17 @@ public class CustomMenuBar extends JPanel {
     // Getters for menu items so listeners can be attached
     
     /**
+     * retrieves exit item.
      * @return The exit menu item
      */
     public JMenuItem getExitItem() {
         return exitItem;
     }
     
-    /**
-     * @return The CSV download menu item
-     */
-    public JMenuItem getCsvDownloadItem() {
-        return csvDownloadItem;
-    }
+
     
     /**
-     * @return The JSON download menu item
-     */
-    public JMenuItem getJsonDownloadItem() {
-        return jsonDownloadItem;
-    }
-    
-    /**
-     * @return The XML download menu item
-     */
-    public JMenuItem getXmlDownloadItem() {
-        return xmlDownloadItem;
-    }
-    
-    /**
+     * retrieves light mode item.
      * @return The light mode menu item
      */
     public JMenuItem getLightModeItem() {
@@ -235,6 +211,7 @@ public class CustomMenuBar extends JPanel {
     }
     
     /**
+     * retrieves dark mode item.
      * @return The dark mode menu item
      */
     public JMenuItem getDarkModeItem() {

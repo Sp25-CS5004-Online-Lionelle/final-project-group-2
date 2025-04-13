@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import skillzhunter.controller.IController;
 import skillzhunter.model.formatters.DataFormatter;
@@ -17,16 +15,17 @@ import skillzhunter.model.net.JobBoardApi;
 import skillzhunter.model.net.JobBoardApiResult;
 
 public class Jobs implements IModel {
-    /** map for storing industries and their slugs*/
-    private static final Map<String, String> industriesMap = JobBoardApi.loadCsvData(
+    /** map for storing industries and their slugs. */
+    private static final Map<String, String> INDUSTRY_MAP = JobBoardApi.loadCsvData(
         Paths.get("data", "industries.csv").toString(), "industry", "slug");
-    /** map for storing locations and their slugs*/
-    private static final Map<String, String> locationsMap = JobBoardApi.loadCsvData(
+
+    /** map for storing locations and their slugs. */
+    private static final Map<String, String> LOCATION_MAP = JobBoardApi.loadCsvData(
         Paths.get("data", "locations.csv").toString(), "location", "slug");
     /** used for identifying the connected controller */
     private IController controller;
 
-    /** Job List */
+    /** Job List. */
     private final List<JobRecord> jobList;
 
     /** used to track number of times the joblist is accessed*/
@@ -35,6 +34,10 @@ public class Jobs implements IModel {
     /** Jobs Api */
     private final JobBoardApi api = new JobBoardApi();
 
+    /**
+     * Constructor for Jobs class.
+     * Initializes the job list.
+     */
     public Jobs() {
         this.jobList = new ArrayList<>();
     }
@@ -43,15 +46,18 @@ public class Jobs implements IModel {
      * Gets the industries to be used in the search in a list.
      * @return Map of industries based on keys and is sorted to a list.
      */
+    @Override
     public List<String> getIndustries() {
-        return industriesMap.keySet().stream().sorted().toList();
+        return INDUSTRY_MAP.keySet().stream().sorted().toList();
     }
 
     /**
      * Gets locations to be used in the search in a list.
+     * @return location list
      */
+    @Override
     public List<String> getLocations() {
-        return locationsMap.keySet().stream().sorted().toList();
+        return LOCATION_MAP.keySet().stream().sorted().toList();
     }
 
     // CRUD functionality
@@ -67,6 +73,7 @@ public class Jobs implements IModel {
      * Add a new job.
      * @param job JobRecord instance to add
      */
+    @Override
     public void addJob(JobRecord job) {
         JobBean jobBean = new JobBean();
         // Set fields in the same order as JobRecord
@@ -76,18 +83,29 @@ public class Jobs implements IModel {
         jobBean.setJobTitle(job.jobTitle() != null && !job.jobTitle().isBlank() ? job.jobTitle() : "");
         jobBean.setCompanyName(job.companyName() != null && !job.companyName().isBlank() ? job.companyName() : "");
         jobBean.setCompanyLogo(job.companyLogo());
-        jobBean.setJobIndustry(job.jobIndustry() != null && job.jobIndustry().stream().noneMatch(String::isBlank) ? job.jobIndustry() : new ArrayList<>());
-        jobBean.setJobType(job.jobType() != null && job.jobType().stream().noneMatch(String::isBlank) ? job.jobType() : new ArrayList<>());
-        jobBean.setJobGeo(job.jobGeo() != null && !job.jobGeo().isBlank() ? job.jobGeo() : "");
+
+        jobBean.setJobIndustry(job.jobIndustry() != null
+                            && job.jobIndustry().stream().noneMatch(String::isBlank)
+                            ? job.jobIndustry() : new ArrayList<>());
+        jobBean.setJobType(job.jobType() != null
+                        && job.jobType().stream().noneMatch(String::isBlank)
+                        ? job.jobType() : new ArrayList<>());
+
+        jobBean.setJobGeo(job.jobGeo()
+                        != null && !job.jobGeo().isBlank() ? job.jobGeo() : "");
         jobBean.setJobLevel(job.jobLevel() != null && !job.jobLevel().isBlank() ? job.jobLevel() : "");
         jobBean.setJobExcerpt(job.jobExcerpt());
         jobBean.setJobDescription(job.jobDescription());
         jobBean.setPubDate(job.pubDate() != null && !job.pubDate().isBlank() ? job.pubDate() : "");
         jobBean.setAnnualSalaryMin(job.annualSalaryMin());
         jobBean.setAnnualSalaryMax(job.annualSalaryMax());
-        jobBean.setSalaryCurrency(job.salaryCurrency() != null && !job.salaryCurrency().isBlank() ? job.salaryCurrency() : "");
+        jobBean.setSalaryCurrency(job.salaryCurrency() != null
+                                && !job.salaryCurrency().isBlank()
+                                ? job.salaryCurrency() : "");
         jobBean.setRating(job.rating());
-        jobBean.setComments(job.comments() != null && !job.comments().isBlank() ? job.comments() : "No comments provided");
+        jobBean.setComments(job.comments() != null
+                            && !job.comments().isBlank()
+                            ? job.comments() : "No comments provided");
         
         jobList.add(jobBean.toRecord());
     }
@@ -97,6 +115,7 @@ public class Jobs implements IModel {
      * @param jobTitle Job title
      * @return JobRecord if found, otherwise null
      */
+    @Override
     public JobRecord getJobRecord(String jobTitle) {
         for (JobRecord job : jobList) {
             if (job.jobTitle().equals(jobTitle)) {
@@ -110,6 +129,7 @@ public class Jobs implements IModel {
      * Retrieve all job records.
      * @return List of JobRecords
      */
+    @Override
     public List<JobRecord> getJobRecords() {
         if (jobList.isEmpty() && runs > 0) {
             System.out.println("Job List is empty. Ensure jobs are added before retrieving.");
@@ -124,6 +144,7 @@ public class Jobs implements IModel {
      * @param id Job ID to remove
      * @return true if removed, false otherwise
      */
+    @Override
     public boolean removeJob(int id) {
         return jobList.removeIf(job -> job.id() == id);
     }
@@ -204,37 +225,6 @@ public class Jobs implements IModel {
     }
 
     /**
-     * Creates a version of the job list with empty URLs and HTML content for export.
-     * 
-     * @param jobs The original job records
-     * @return A new list with URLs and HTML content removed
-     */
-    private List<JobRecord> createExportableJobs(List<JobRecord> jobs) {
-        return jobs.stream()
-            .map(job -> new JobRecord(
-                job.id(),
-                "", // Empty URL
-                job.jobSlug(),
-                job.jobTitle(),
-                job.companyName(),
-                "", // Empty company logo URL
-                job.jobIndustry(),
-                job.jobType(),
-                job.jobGeo(),
-                job.jobLevel(),
-                "", // Empty jobExcerpt
-                "", // Empty jobDescription
-                job.pubDate(),
-                job.annualSalaryMin(),
-                job.annualSalaryMax(),
-                job.salaryCurrency(),
-                job.rating(),
-                job.comments()
-            ))
-            .collect(Collectors.toList());
-    }
-
-    /**
      * Saves the job records (saved jobs) in the jobList to a CSV file.
      * @param fileName Name of the CSV file to save to
      */
@@ -243,29 +233,18 @@ public class Jobs implements IModel {
         // Debug information before export
         System.out.println("Saving " + jobList.size() + " jobs to CSV: " + fileName);
         for (JobRecord job : jobList) {
-            System.out.println("Job before export: " + job.jobTitle() + 
-                               ", Rating: " + job.rating() + 
-                               ", Comments: " + job.comments());
+            System.out.println("Job before export: " + job.jobTitle()
+                            + ", Rating: " + job.rating()
+                            + ", Comments: " + job.comments());
         }
         
         try (OutputStream out = new FileOutputStream(fileName)) {
-            // Create exportable jobs that have cleaned data and empty URLs
-            List<JobRecord> exportableJobs = createExportableJobs(jobList);
-            
-            // Debug information after transformation
-            System.out.println("Transformed jobs for export:");
-            for (JobRecord job : exportableJobs) {
-                System.out.println("Transformed job: " + job.jobTitle() + 
-                                   ", Rating: " + job.rating() + 
-                                   ", Comments: " + job.comments());
-            }
-            
-            // Write to file
-            DataFormatter.write(exportableJobs, Formats.CSV, out);
+            // Write to file - DataFormatter now handles escaping correctly
+            DataFormatter.write(jobList, Formats.CSV, out);
             System.out.println("CSV export completed successfully");
         } catch (IOException e) {
             System.err.println("Error writing to CSV file: " + e.getMessage());
-            e.printStackTrace();
+            // e.printStackTrace();
             throw new RuntimeException("Error writing to CSV file", e);
         }
     }
@@ -287,17 +266,14 @@ public class Jobs implements IModel {
         // Debug information before export
         System.out.println("Exporting " + jobs.size() + " jobs to " + formatStr + ": " + filePath);
         
-        // Export the jobs to the specified file with URLs cleared
+        // Export the jobs to the specified file
         try (OutputStream out = new FileOutputStream(filePath)) {
-            // Create exportable jobs
-            List<JobRecord> exportableJobs = createExportableJobs(jobs);
-            
-            // Write to file
-            DataFormatter.write(exportableJobs, format, out);
+            // DataFormatter now handles escaping correctly for each format
+            DataFormatter.write(jobs, format, out);
             System.out.println("Export completed successfully");
         } catch (IOException e) {
             System.err.println("Failed to export jobs: " + e.getMessage());
-            e.printStackTrace();
+            // e.printStackTrace();
             throw new RuntimeException("Failed to export jobs: " + e.getMessage(), e);
         }
     }
@@ -316,22 +292,31 @@ public class Jobs implements IModel {
      * @param args Command line arguments (not used).
      */
     public static void main(String[] args) {
-        Jobs jobs = new Jobs();
-        // Test adding, updating, removing jobs
-        JobRecord job = new JobRecord(1, "url", "slug", "Python Developer", "Company A", "logo", Arrays.asList("Tech"), Arrays.asList("Full-time"), "NYC", "Senior", "Job excerpt", "Job description", "2025-03-30", 60000, 80000, "USD", 4, "Great job");
-        System.out.println("Adding job" + job);
-        jobs.addJob(job);
+        // Jobs jobs = new Jobs();
+        // // Test adding, updating, removing jobs
+        // JobRecord job = new JobRecord(1, "https://example.com/job", "slug",
+        // "Python Developer & Data Scientist", "Company A", "logo",
+        // Arrays.asList("Tech"), Arrays.asList("Full-time"), "NYC", "Senior",
+        // "Job excerpt", "Job description", "2025-03-30", 60000,
+        // 80000, "USD", 4, "Great job");
+        // System.out.println("Adding job" + job);
+        // jobs.addJob(job);
 
-        // Search job by title
-        JobRecord searchedJob = jobs.getJobRecord("Python Developer");
-        System.out.println("Searched job: " + searchedJob);
-        System.out.println(searchedJob);
+        // // Search job by title
+        // JobRecord searchedJob = jobs.getJobRecord("Python Developer");
+        // System.out.println("Searched job: " + searchedJob);
+        // System.out.println(searchedJob);
 
-        // Remove job
-        System.out.println("Removing job with ID 1");
-        jobs.removeJob(1);
+        // // Export test
+        // jobs.exportSavedJobs(jobs.getJobRecords(), "CSV", "test_jobs.csv");
+        // jobs.exportSavedJobs(jobs.getJobRecords(), "JSON", "test_jobs.json");
+        // jobs.exportSavedJobs(jobs.getJobRecords(), "XML", "test_jobs.xml");
 
-        jobs.getIndustries().forEach(System.out::println);
-        jobs.getLocations().forEach(System.out::println);
+        // // Remove job
+        // System.out.println("Removing job with ID 1");
+        // jobs.removeJob(1);
+
+        // jobs.getIndustries().forEach(System.out::println);
+        // jobs.getLocations().forEach(System.out::println);
     }
 }

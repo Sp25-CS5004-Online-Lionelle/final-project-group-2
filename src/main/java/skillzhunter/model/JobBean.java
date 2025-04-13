@@ -6,26 +6,81 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class JobBean {
-
+    /**
+     * ID of the job.
+     */
     private int id;
+    /**
+     * URL of the job.
+     */
     private String url;
+    /**
+     * Slug of the job.
+     */
     private String jobSlug;
+    /**
+     * Title of the job.
+     */
     private String jobTitle;
+    /**
+     * Name of the company.
+     */
     private String companyName;
+    /**
+     * Logo of the company.
+     */
     private String companyLogo;
+    /**
+     * Industry of the job.
+     */
     private List<String> jobIndustry;
+    /**
+     * Type of the job.
+     */
     private List<String> jobType;
+    /**
+     * Geographical location of the job.
+     */
     private String jobGeo;
+    /**
+     * Level of the job.
+     */
     private String jobLevel;
+    /**
+     * Excerpt of the job.
+     */
     private String jobExcerpt;
+    /**
+     * Description of the job.
+     */
     private String jobDescription;
+    /**
+     * Publication date of the job.
+     */
     private String pubDate;
+    /**
+     * Minimum annual salary for the job.
+     */
     private int annualSalaryMin;
+    /**
+     * Maximum annual salary for the job.
+     */
     private int annualSalaryMax;
+    /**
+     * Currency of the salary.
+     */
     private String salaryCurrency;
+    /**
+     * Rating of the job.
+     */
     private int rating;
+    /**
+     * Comments about the job.
+     */
     private String comments;
-
+    /**
+     * EMPTY constructor for Jackson and JavaBeans.
+     */
     public JobBean() {
         // no-arg constructor for Jackson and JavaBeans
     }
@@ -213,87 +268,145 @@ public class JobBean {
     public void setJobExcerpt(String jobExcerpt) {
         this.jobExcerpt = jobExcerpt;
     }
-
+    /**
+     * Get the description of the job.
+     * @return the description of the job
+     */
     public String getJobDescription() {
         return jobDescription;
     }
-
+    /**
+     * Set the description of the job.
+     * @param jobDescription
+     */
     public void setJobDescription(String jobDescription) {
         this.jobDescription = jobDescription;
     }
-
+    /**
+     * Get the publication date of the job.
+     * @return the publication date of the job
+     */
     public String getPubDate() {
         return pubDate;
     }
-
+    /**
+     * Set the publication date of the job.
+     * @param pubDate
+     */
     public void setPubDate(String pubDate) {
         this.pubDate = pubDate;
     }
-
+    /**
+     * Get the minimum annual salary for the job.
+     * @return the minimum annual salary for the job
+     */
     public int getAnnualSalaryMin() {
         return annualSalaryMin;
     }
-
+    /**
+     * Set the minimum annual salary for the job.
+     * @param annualSalaryMin
+     */
     public void setAnnualSalaryMin(int annualSalaryMin) {
         this.annualSalaryMin = annualSalaryMin;
     }
-
+    /**
+     * Get the maximum annual salary for the job.
+     * @return the maximum annual salary for the job
+     */
     public int getAnnualSalaryMax() {
         return annualSalaryMax;
     }
-
+    /**
+     * Set the maximum annual salary for the job.
+     * @param annualSalaryMax
+     */
     public void setAnnualSalaryMax(int annualSalaryMax) {
         this.annualSalaryMax = annualSalaryMax;
     }
-
+    /**
+     * Get the currency of the salary.
+     * @return the currency of the salary
+     */
     public String getSalaryCurrency() {
         return salaryCurrency;
     }
-
+    /**
+     * Set the currency of the salary.
+     * @param salaryCurrency
+     */
     public void setSalaryCurrency(String salaryCurrency) {
         this.salaryCurrency = salaryCurrency;
     }
-
+    /**
+     * Get the rating of the job.
+     * @return the rating of the job
+     */
     public int getRating() {
         return rating;
     }
+    /**
+     * Set the rating of the job.
+     * @param rating
+     */
     public void setRating(int rating) {
         this.rating = rating;
     }
+    /**
+     * Get the comments about the job.
+     * @return the comments about the job
+     */
     public String getComments() {
         return comments;
     }
+    /**
+     * Set the comments about the job.
+     * @param comments
+     */
     public void setComments(String comments) {
         this.comments = comments;
     }
-    //add comments and records to the bean and record
+    /**
+     * Get the job record.
+     * @return the job record
+     */
     @Override
     public String toString() {
-        return "JobBean{" +
-                "id=" + id +
-                ", url='" + url + '\'' +
-                ", jobSlug='" + jobSlug + '\'' +
-                ", jobTitle='" + jobTitle + '\'' +
-                ", companyName='" + companyName + '\'' +
-                ", companyLogo='" + companyLogo + '\'' +
-                ", jobIndustry=" + jobIndustry +
-                ", jobType=" + jobType +
-                ", jobGeo='" + jobGeo + '\'' +
-                ", jobLevel='" + jobLevel + '\'' +
-                ", jobExcerpt='" + jobExcerpt + '\'' +
-                ", jobDescription='" + jobDescription + '\'' +
-                ", pubDate='" + pubDate + '\'' +
-                ", annualSalaryMin=" + annualSalaryMin +
-                ", annualSalaryMax=" + annualSalaryMax +
-                ", salaryCurrency='" + salaryCurrency + '\'' +
-                ", rating=" + rating +
-                ", comments='" + comments + '\'' +
-                '}';
+        return "JobBean{"
+                + "id=" + id
+                + ", url='" + url + '\''
+                + ", jobSlug='" + jobSlug + '\''
+                + ", jobTitle='" + jobTitle + '\''
+                + ", companyName='" + companyName + '\''
+                + ", companyLogo='" + companyLogo + '\''
+                + ", jobIndustry=" + jobIndustry
+                + ", jobType=" + jobType
+                + ", jobGeo='" + jobGeo + '\''
+                + ", jobLevel='" + jobLevel + '\''
+                + ", jobExcerpt='" + jobExcerpt + '\''
+                + ", jobDescription='" + jobDescription + '\''
+                + ", pubDate='" + pubDate + '\''
+                + ", annualSalaryMin=" + annualSalaryMin
+                + ", annualSalaryMax=" + annualSalaryMax
+                + ", salaryCurrency='" + salaryCurrency + '\''
+                + ", rating=" + rating
+                + ", comments='" + comments + '\''
+                + '}';
     }
-
+    /**
+     * Compare this jobrecord equality.
+     * @param obj the object to compare with
+     * @return true if the objects are equal, false otherwise
+     */
     @Override
     public boolean equals(Object obj) {
-        return EqualsBuilder.reflectionEquals(this, obj);
+        if (this == obj) {
+            return true;
+        } else if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        } else {
+            return EqualsBuilder.reflectionEquals(this, obj);
+        }
     }
 
     /**
