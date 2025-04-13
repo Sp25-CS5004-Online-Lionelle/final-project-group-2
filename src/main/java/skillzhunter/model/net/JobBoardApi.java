@@ -19,9 +19,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import skillzhunter.model.JobBean;
-import skillzhunter.controller.IController;
 import skillzhunter.model.JobRecord;
-import skillzhunter.model.Jobs;
 import skillzhunter.model.ResponseRecord;
 
 public class JobBoardApi {
@@ -140,7 +138,7 @@ public class JobBoardApi {
      * @param industry Industry to filter jobs (e.g., IT, healthcare).
      * @return List of job records matching the criteria.
      */
-    public JobBoardApiResult getJobBoard(String query, Integer numberOfResults, String location, String industry){
+    public JobBoardApiResult getJobBoard(String query, Integer numberOfResults, String location, String industry) {
         // getting slug for request, if it breaks we default
         if (location != null) {
             location = LOCATION_MAP.get(location.toLowerCase().trim());
