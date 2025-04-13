@@ -3,7 +3,6 @@ package skillzhunter.controller;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +78,6 @@ public class MainController implements IController {
         savedJobsTab.updateJobsList(model.getJobRecords());
     }
     
-
     /**
      * Gets the locations from the API and capitalizes them appropriately.
      * @return List<String> of locations
@@ -229,7 +227,6 @@ public class MainController implements IController {
         model.removeJob(index);
     }
 
-    
     /**
      * Saves the job records to a CSV file using a custom CSV writer
      * that properly handles collections and HTML content.
@@ -254,88 +251,98 @@ public class MainController implements IController {
     private void exportToCSV(List<JobRecord> jobs, String filePath) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             // Write header
-            writer.write("id,url,jobSlug,jobTitle,companyName,companyLogo,jobIndustry,jobType,jobGeo,jobLevel,jobExcerpt,jobDescription,pubDate,annualSalaryMin,annualSalaryMax,salaryCurrency,rating,comments");
+            writer.write("id,url,jobSlug,jobTitle,companyName,companyLogo,jobIndustry,jobType,jobGeo," +
+                    "jobLevel,jobExcerpt,jobDescription,pubDate,annualSalaryMin,annualSalaryMax," +
+                    "salaryCurrency,rating,comments");
             writer.newLine();
             
             // Write each job record
             for (JobRecord job : jobs) {
-                StringBuilder line = new StringBuilder();
-                
-                // ID
-                line.append(job.id()).append(",");
-                
-                // URL
-                line.append(escapeCSV(job.url())).append(",");
-                
-                // jobSlug
-                line.append(escapeCSV(job.jobSlug())).append(",");
-                
-                // jobTitle
-                line.append(escapeCSV(job.jobTitle())).append(",");
-                
-                // companyName
-                line.append(escapeCSV(job.companyName())).append(",");
-                
-                // companyLogo
-                line.append(escapeCSV(job.companyLogo())).append(",");
-                
-                // jobIndustry - join with commas and handle null/empty
-                if (job.jobIndustry() != null && !job.jobIndustry().isEmpty()) {
-                    String industries = job.jobIndustry().stream().collect(Collectors.joining(", "));
-                    line.append(escapeCSV(industries));
-                }
-                line.append(",");
-                
-                // jobType - join with commas and handle null/empty
-                if (job.jobType() != null && !job.jobType().isEmpty()) {
-                    String types = job.jobType().stream().collect(Collectors.joining(", "));
-                    line.append(escapeCSV(types));
-                }
-                line.append(",");
-                
-                // jobGeo
-                line.append(escapeCSV(job.jobGeo())).append(",");
-                
-                // jobLevel
-                line.append(escapeCSV(job.jobLevel())).append(",");
-                
-                // jobExcerpt - extract first sentence without HTML
-                String excerpt = "";
-                if (job.jobExcerpt() != null && !job.jobExcerpt().isEmpty()) {
-                    excerpt = extractFirstSentence(stripHTML(job.jobExcerpt()));
-                }
-                line.append(escapeCSV(excerpt)).append(",");
-                
-                // jobDescription - simplified version without HTML
-                String description = "Position at " + job.companyName() + " - " + job.jobTitle();
-                line.append(escapeCSV(description)).append(",");
-                
-                // pubDate
-                line.append(escapeCSV(job.pubDate())).append(",");
-                
-                // annualSalaryMin
-                line.append(job.annualSalaryMin()).append(",");
-                
-                // annualSalaryMax
-                line.append(job.annualSalaryMax()).append(",");
-                
-                // salaryCurrency
-                line.append(escapeCSV(job.salaryCurrency())).append(",");
-                
-                // rating
-                line.append(job.rating()).append(",");
-                
-                // comments
-                line.append(escapeCSV(job.comments()));
-                
-                // Write the line
-                writer.write(line.toString());
+                writer.write(formatCSVLine(job));
                 writer.newLine();
             }
         } catch (IOException e) {
-            e.printStackTrace();
             System.err.println("Error writing CSV file: " + e.getMessage());
         }
+    }
+    
+    /**
+     * Formats a job record as a CSV line.
+     * 
+     * @param job The job record to format
+     * @return Formatted CSV line
+     */
+    private String formatCSVLine(JobRecord job) {
+        StringBuilder line = new StringBuilder();
+        
+        // ID
+        line.append(job.id()).append(",");
+        
+        // URL
+        line.append(escapeCSV(job.url())).append(",");
+        
+        // jobSlug
+        line.append(escapeCSV(job.jobSlug())).append(",");
+        
+        // jobTitle
+        line.append(escapeCSV(job.jobTitle())).append(",");
+        
+        // companyName
+        line.append(escapeCSV(job.companyName())).append(",");
+        
+        // companyLogo
+        line.append(escapeCSV(job.companyLogo())).append(",");
+        
+        // jobIndustry - join with commas and handle null/empty
+        if (job.jobIndustry() != null && !job.jobIndustry().isEmpty()) {
+            String industries = job.jobIndustry().stream().collect(Collectors.joining(", "));
+            line.append(escapeCSV(industries));
+        }
+        line.append(",");
+        
+        // jobType - join with commas and handle null/empty
+        if (job.jobType() != null && !job.jobType().isEmpty()) {
+            String types = job.jobType().stream().collect(Collectors.joining(", "));
+            line.append(escapeCSV(types));
+        }
+        line.append(",");
+        
+        // jobGeo
+        line.append(escapeCSV(job.jobGeo())).append(",");
+        
+        // jobLevel
+        line.append(escapeCSV(job.jobLevel())).append(",");
+        
+        // jobExcerpt - extract first sentence without HTML
+        String excerpt = "";
+        if (job.jobExcerpt() != null && !job.jobExcerpt().isEmpty()) {
+            excerpt = extractFirstSentence(stripHTML(job.jobExcerpt()));
+        }
+        line.append(escapeCSV(excerpt)).append(",");
+        
+        // jobDescription - simplified version without HTML
+        String description = "Position at " + job.companyName() + " - " + job.jobTitle();
+        line.append(escapeCSV(description)).append(",");
+        
+        // pubDate
+        line.append(escapeCSV(job.pubDate())).append(",");
+        
+        // annualSalaryMin
+        line.append(job.annualSalaryMin()).append(",");
+        
+        // annualSalaryMax
+        line.append(job.annualSalaryMax()).append(",");
+        
+        // salaryCurrency
+        line.append(escapeCSV(job.salaryCurrency())).append(",");
+        
+        // rating
+        line.append(job.rating()).append(",");
+        
+        // comments
+        line.append(escapeCSV(job.comments()));
+        
+        return line.toString();
     }
     
     /**
@@ -419,7 +426,6 @@ public class MainController implements IController {
         return savedJobsTab;
     }
     
-
     /**
      * Updates a job with new comments and rating.
      * 
@@ -429,16 +435,20 @@ public class MainController implements IController {
      * @return The updated JobRecord
      */
     public JobRecord getUpdateJob(int id, String comments, int rating) {
-        //IDEA: if model.updateJob returns a record then you can delete the loop at the end
+        // Call model to update the job
         model.updateJob(id, comments, rating);
+        
+        // Update the view with the latest data
         savedJobsTab.updateJobsList(model.getJobRecords());
         
         // Return the updated job record so the view can use it
         for (JobRecord job : model.getJobRecords()) {
-            if (job.id() == job.id()) {
+            if (job.id() == id) { // FIXED: Compare with parameter id instead of job.id()
                 return job;
             }
         }
+        
+        // Job not found
         return null;
     }
 }
