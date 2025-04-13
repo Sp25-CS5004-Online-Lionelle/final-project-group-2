@@ -2,6 +2,7 @@ package skillzhunter.model.formatters;
 
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -144,57 +145,79 @@ public final class DataFormatter {
      * @param jobs
      * @param filePath
      */
-public static void exportCustomCSV(List<JobRecord> jobs, String filePath) {
-    try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-        writer.write("id,url,jobSlug,jobTitle,companyName,companyLogo,jobIndustry,jobType,jobGeo,jobLevel,jobExcerpt,jobDescription,pubDate,annualSalaryMin,annualSalaryMax,salaryCurrency,rating,comments");
-        writer.newLine();
-
-        for (JobRecord job : jobs) {
-            StringBuilder line = new StringBuilder();
-            line.append(job.id()).append(",");
-            line.append(escapeCSV(job.url())).append(",");
-            line.append(escapeCSV(job.jobSlug())).append(",");
-            line.append(escapeCSV(job.jobTitle())).append(",");
-            line.append(escapeCSV(job.companyName())).append(",");
-            line.append(escapeCSV(job.companyLogo())).append(",");
-
-            if (job.jobIndustry() != null && !job.jobIndustry().isEmpty()) {
-                line.append(escapeCSV(String.join(", ", job.jobIndustry())));
+    public static void exportCustomCSV(List<JobRecord> jobs, String filePath) {
+        // Create a File object to check directory existence
+        File file = new File(filePath);
+        File parentDir = file.getParentFile();
+        
+        // Ensure the directory exists
+        if (parentDir != null && !parentDir.exists()) {
+            boolean dirCreated = parentDir.mkdirs();
+            if (!dirCreated) {
+                System.err.println("Failed to create directory: " + parentDir.getAbsolutePath());
             }
-            line.append(",");
-
-            if (job.jobType() != null && !job.jobType().isEmpty()) {
-                line.append(escapeCSV(String.join(", ", job.jobType())));
-            }
-            line.append(",");
-
-            line.append(escapeCSV(job.jobGeo())).append(",");
-            line.append(escapeCSV(job.jobLevel())).append(",");
-
-            String excerpt = "";
-            if (job.jobExcerpt() != null && !job.jobExcerpt().isEmpty()) {
-                excerpt = extractFirstSentence(stripHTML(job.jobExcerpt()));
-            }
-            line.append(escapeCSV(excerpt)).append(",");
-
-            String description = "Position at " + job.companyName() + " - " + job.jobTitle();
-            line.append(escapeCSV(description)).append(",");
-
-            line.append(escapeCSV(job.pubDate())).append(",");
-            line.append(job.annualSalaryMin()).append(",");
-            line.append(job.annualSalaryMax()).append(",");
-            line.append(escapeCSV(job.salaryCurrency())).append(",");
-            line.append(job.rating()).append(",");
-            line.append(escapeCSV(job.comments()));
-
-            writer.write(line.toString());
-            writer.newLine();
         }
-    } catch (IOException e) {
-        e.printStackTrace();
-        System.err.println("Error writing CSV file: " + e.getMessage());
+        
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            // Print debugging information
+            System.out.println("Writing CSV to: " + new File(filePath).getAbsolutePath());
+            
+            writer.write("id,url,jobSlug,jobTitle,companyName,companyLogo,jobIndustry,jobType,jobGeo,jobLevel,jobExcerpt,jobDescription,pubDate,annualSalaryMin,annualSalaryMax,salaryCurrency,rating,comments");
+            writer.newLine();
+
+            for (JobRecord job : jobs) {
+                StringBuilder line = new StringBuilder();
+                line.append(job.id()).append(",");
+                line.append(escapeCSV(job.url())).append(",");
+                line.append(escapeCSV(job.jobSlug())).append(",");
+                line.append(escapeCSV(job.jobTitle())).append(",");
+                line.append(escapeCSV(job.companyName())).append(",");
+                line.append(escapeCSV(job.companyLogo())).append(",");
+
+                if (job.jobIndustry() != null && !job.jobIndustry().isEmpty()) {
+                    line.append(escapeCSV(String.join(", ", job.jobIndustry())));
+                }
+                line.append(",");
+
+                if (job.jobType() != null && !job.jobType().isEmpty()) {
+                    line.append(escapeCSV(String.join(", ", job.jobType())));
+                }
+                line.append(",");
+
+                line.append(escapeCSV(job.jobGeo())).append(",");
+                line.append(escapeCSV(job.jobLevel())).append(",");
+
+                String excerpt = "";
+                if (job.jobExcerpt() != null && !job.jobExcerpt().isEmpty()) {
+                    excerpt = extractFirstSentence(stripHTML(job.jobExcerpt()));
+                }
+                line.append(escapeCSV(excerpt)).append(",");
+
+                String description = "Position at " + job.companyName() + " - " + job.jobTitle();
+                line.append(escapeCSV(description)).append(",");
+
+                line.append(escapeCSV(job.pubDate())).append(",");
+                line.append(job.annualSalaryMin()).append(",");
+                line.append(job.annualSalaryMax()).append(",");
+                line.append(escapeCSV(job.salaryCurrency())).append(",");
+                line.append(job.rating()).append(",");
+                line.append(escapeCSV(job.comments()));
+
+                writer.write(line.toString());
+                writer.newLine();
+                
+                // Force flush after each record to ensure data is written
+                writer.flush();
+            }
+            
+            // Print success message
+            System.out.println("Successfully wrote " + jobs.size() + " jobs to CSV");
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error writing CSV file: " + e.getMessage());
+            throw new RuntimeException("Failed to save jobs to CSV: " + e.getMessage(), e);
+        }
     }
-}
 
 private static String stripHTML(String html) {
     if (html == null) return "";
