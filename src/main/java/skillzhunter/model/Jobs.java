@@ -8,23 +8,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import skillzhunter.controller.IController;
 import skillzhunter.model.formatters.DataFormatter;
 import skillzhunter.model.formatters.Formats;
 import skillzhunter.model.net.JobBoardApi;
+import skillzhunter.model.net.JobBoardApiResult;
 
 public class Jobs implements IModel {
     /** map for storing industries and their slugs. */
     private static final Map<String, String> INDUSTRY_MAP = JobBoardApi.loadCsvData(
         Paths.get("data", "industries.csv").toString(), "industry", "slug");
-    
+
     /** map for storing locations and their slugs. */
     private static final Map<String, String> LOCATION_MAP = JobBoardApi.loadCsvData(
         Paths.get("data", "locations.csv").toString(), "location", "slug");
+    /** used for identifying the connected controller */
+    private IController controller;
 
     /** Job List. */
     private final List<JobRecord> jobList;
 
-    /** Jobs Api. */
+    /** used to track number of times the joblist is accessed*/
+    private int runs = 0;
+
+    /** Jobs Api */
     private final JobBoardApi api = new JobBoardApi();
 
     /**
@@ -54,6 +61,14 @@ public class Jobs implements IModel {
     }
 
     // CRUD functionality
+
+    /**
+     *
+     */
+    public void setController(IController controller) {
+      this.controller = controller;
+    }
+
     /**
      * Add a new job.
      * @param job JobRecord instance to add
@@ -69,14 +84,14 @@ public class Jobs implements IModel {
         jobBean.setCompanyName(job.companyName() != null && !job.companyName().isBlank() ? job.companyName() : "");
         jobBean.setCompanyLogo(job.companyLogo());
 
-        jobBean.setJobIndustry(job.jobIndustry() != null 
-                            && job.jobIndustry().stream().noneMatch(String::isBlank) 
+        jobBean.setJobIndustry(job.jobIndustry() != null
+                            && job.jobIndustry().stream().noneMatch(String::isBlank)
                             ? job.jobIndustry() : new ArrayList<>());
-        jobBean.setJobType(job.jobType() != null 
+        jobBean.setJobType(job.jobType() != null
                         && job.jobType().stream().noneMatch(String::isBlank)
                         ? job.jobType() : new ArrayList<>());
 
-        jobBean.setJobGeo(job.jobGeo() 
+        jobBean.setJobGeo(job.jobGeo()
                         != null && !job.jobGeo().isBlank() ? job.jobGeo() : "");
         jobBean.setJobLevel(job.jobLevel() != null && !job.jobLevel().isBlank() ? job.jobLevel() : "");
         jobBean.setJobExcerpt(job.jobExcerpt());
@@ -84,11 +99,11 @@ public class Jobs implements IModel {
         jobBean.setPubDate(job.pubDate() != null && !job.pubDate().isBlank() ? job.pubDate() : "");
         jobBean.setAnnualSalaryMin(job.annualSalaryMin());
         jobBean.setAnnualSalaryMax(job.annualSalaryMax());
-        jobBean.setSalaryCurrency(job.salaryCurrency() != null 
+        jobBean.setSalaryCurrency(job.salaryCurrency() != null
                                 && !job.salaryCurrency().isBlank()
                                 ? job.salaryCurrency() : "");
         jobBean.setRating(job.rating());
-        jobBean.setComments(job.comments() != null 
+        jobBean.setComments(job.comments() != null
                             && !job.comments().isBlank()
                             ? job.comments() : "No comments provided");
         
@@ -116,9 +131,11 @@ public class Jobs implements IModel {
      */
     @Override
     public List<JobRecord> getJobRecords() {
-        if (jobList.isEmpty()) {
+        if (jobList.isEmpty() && runs > 0) {
             System.out.println("Job List is empty. Ensure jobs are added before retrieving.");
+            runs++;
         }
+
         return new ArrayList<>(jobList);
     }
 
@@ -197,8 +214,14 @@ public class Jobs implements IModel {
      */
     @Override
     public List<JobRecord> searchJobs(String query, Integer numberOfResults, String location, String industry) {
-        List<JobRecord> results = api.getJobBoard(query, numberOfResults, location, industry);
-        return results;
+        JobBoardApiResult result = api.getJobBoard(query, numberOfResults, location, industry);
+
+        // If there's an error message, send alert
+        if (result.hasError()) {
+            sendAlert(result.getErrorMessage());
+        }
+
+        return result.getJobs();
     }
 
     /**
@@ -210,7 +233,7 @@ public class Jobs implements IModel {
         // Debug information before export
         System.out.println("Saving " + jobList.size() + " jobs to CSV: " + fileName);
         for (JobRecord job : jobList) {
-            System.out.println("Job before export: " + job.jobTitle() 
+            System.out.println("Job before export: " + job.jobTitle()
                             + ", Rating: " + job.rating()
                             + ", Comments: " + job.comments());
         }
@@ -256,16 +279,25 @@ public class Jobs implements IModel {
     }
 
     /**
+     * Used to send alerts to other parts of the program
+     * @param alert
+     */
+    @Override
+    public void sendAlert(String alert) {
+        controller.sendAlert(alert);
+    }
+
+    /**
      * Main method for testing purposes.
      * @param args Command line arguments (not used).
      */
     public static void main(String[] args) {
         // Jobs jobs = new Jobs();
         // // Test adding, updating, removing jobs
-        // JobRecord job = new JobRecord(1, "https://example.com/job", "slug", 
-        // "Python Developer & Data Scientist", "Company A", "logo", 
-        // Arrays.asList("Tech"), Arrays.asList("Full-time"), "NYC", "Senior", 
-        // "Job excerpt", "Job description", "2025-03-30", 60000, 
+        // JobRecord job = new JobRecord(1, "https://example.com/job", "slug",
+        // "Python Developer & Data Scientist", "Company A", "logo",
+        // Arrays.asList("Tech"), Arrays.asList("Full-time"), "NYC", "Senior",
+        // "Job excerpt", "Job description", "2025-03-30", 60000,
         // 80000, "USD", 4, "Great job");
         // System.out.println("Adding job" + job);
         // jobs.addJob(job);

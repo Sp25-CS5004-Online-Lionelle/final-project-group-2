@@ -13,6 +13,13 @@ void run();
  * This method is used to set the controller for the view.
  * @param controller The controller to be set for the view.
  */
-void addFeatures(IController controller);
 
+/**
+ * This method is used when an alert from another part
+ * of the program needs to be sent to the user.
+ * @param message The message the user needs to see.
+ */
+void notifyUser(String message);
+
+void addFeatures(IController controller);
 }

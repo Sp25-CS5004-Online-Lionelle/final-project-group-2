@@ -19,7 +19,9 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import skillzhunter.model.JobBean;
+import skillzhunter.controller.IController;
 import skillzhunter.model.JobRecord;
+import skillzhunter.model.Jobs;
 import skillzhunter.model.ResponseRecord;
 
 public class JobBoardApi {
@@ -28,14 +30,16 @@ public class JobBoardApi {
 
     /** object mapper for parsing json response.*/
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    
+
     /** map for storing industries and their slugs.*/
     private static final Map<String, String> INDUSTRY_MAP = JobBoardApi.loadCsvData(
     Paths.get("data", "industries.csv").toString(), "industry", "slug");
-    
+
     /** map for storing locations and their slugs.*/
     private static final Map<String, String> LOCATION_MAP = JobBoardApi.loadCsvData(
     Paths.get("data", "locations.csv").toString(), "location", "slug");
+
+    private String errorMessage = null;
 
     /** empty contructor.*/
     public JobBoardApi() {
@@ -43,7 +47,7 @@ public class JobBoardApi {
     }
     
 
-    /** 
+    /**
      * loads csv data into a map.
      * @param filePath path to the csv file
      * @param key column name for the key
@@ -85,7 +89,7 @@ public class JobBoardApi {
      * @param query
      * @return List<JobRecord> list of jobs given criteria
      */
-    public List<JobRecord> getJobBoard(String query) {
+    public JobBoardApiResult getJobBoard(String query) {
         return getJobBoard(query, null, null, null);
     }
 
@@ -100,7 +104,7 @@ public class JobBoardApi {
      * @param numberOfResults
      * @return List<JobRecord> list of jobs given criteria
      */
-    public List<JobRecord> getJobBoard(String query, Integer numberOfResults) {
+    public JobBoardApiResult getJobBoard(String query, Integer numberOfResults) {
         return getJobBoard(query, numberOfResults, null, null);
     }
 
@@ -116,7 +120,7 @@ public class JobBoardApi {
      * @param location
      * @return List<JobRecord> list of jobs given criteria
      */
-    public List<JobRecord> getJobBoard(String query, Integer numberOfResults, String location) {
+    public JobBoardApiResult getJobBoard(String query, Integer numberOfResults, String location) {
         return getJobBoard(query, numberOfResults, location, null);
     }
     /**
@@ -136,7 +140,7 @@ public class JobBoardApi {
      * @param industry Industry to filter jobs (e.g., IT, healthcare).
      * @return List of job records matching the criteria.
      */
-    public List<JobRecord> getJobBoard(String query, Integer numberOfResults, String location, String industry) {
+    public JobBoardApiResult getJobBoard(String query, Integer numberOfResults, String location, String industry){
         // getting slug for request, if it breaks we default
         if (location != null) {
             location = LOCATION_MAP.get(location.toLowerCase().trim());
@@ -144,21 +148,22 @@ public class JobBoardApi {
         if (industry != null) {
             industry = INDUSTRY_MAP.get(industry.toLowerCase().trim());
         }
-        Boolean locationPassed = location != null && !location.isEmpty() 
+        Boolean locationPassed = location != null && !location.isEmpty()
                                  && !location.equalsIgnoreCase("anywhere");
 
 
-        Boolean industryPassed = industry != null && !industry.isEmpty() 
-                                && !industry.equalsIgnoreCase("all") 
+        Boolean industryPassed = industry != null && !industry.isEmpty()
+                                && !industry.equalsIgnoreCase("all")
                                 && !industry.equalsIgnoreCase("any");
 
         //defualting and slugggin query
-        if (query == null || query.isEmpty() 
+        if (query == null || query.isEmpty()
                           || query.equalsIgnoreCase("any")
                           || query.equalsIgnoreCase("all")
                           || query.equalsIgnoreCase("all jobs")
                           || query.equalsIgnoreCase("all job")) {
             System.out.println("No query passed, using default values.");
+            errorMessage = "Search query was empty or generic, defaulted to showing first 10 available jobs.";
             query = "all";
         }
         if (numberOfResults == null || numberOfResults < 1) {
@@ -183,37 +188,38 @@ public class JobBoardApi {
         System.err.println("URL: " + url);
     
         List<JobRecord> jobs = this.searchApi(url);
-        return processJobRecords(jobs);
+        return new JobBoardApiResult(jobs, errorMessage);
+
     }
-    
+
     /**
      * Process job records to replace HTML special characters with improved debugging.
-     * 
+     *
      * @param jobs List of job records from API
      * @return List of job records with decoded HTML special characters
      */
     private List<JobRecord> processJobRecords(List<JobRecord> jobs) {
         System.out.println("Processing " + jobs.size() + " job records to replace HTML entities");
-        
+
         List<JobRecord> processedJobs = jobs.stream().map(job -> {
             // Create a new JobBean and copy all values
             JobBean bean = new JobBean();
             bean.setId(job.id());
             bean.setUrl(job.url());
             bean.setJobSlug(job.jobSlug());
-            
+
             // Process and log the job title
             String originalTitle = job.jobTitle();
             String processedTitle = replaceHtmlEntities(originalTitle);
             if (!originalTitle.equals(processedTitle)) {
-                System.out.println("Replaced HTML entities in job title: '" 
+                System.out.println("Replaced HTML entities in job title: '"
                                     + originalTitle
                                     + "' -> '"
                                     + processedTitle
                                     + "'");
             }
             bean.setJobTitle(processedTitle);
-            
+
             // Process and log company name
             String originalCompanyName = job.companyName();
             String processedCompanyName = replaceHtmlEntities(originalCompanyName);
@@ -224,9 +230,9 @@ public class JobBoardApi {
                                     + "'");
             }
             bean.setCompanyName(processedCompanyName);
-            
+
             bean.setCompanyLogo(job.companyLogo());
-            
+
             // Replace HTML special characters in industry list with improved debugging
             if (job.jobIndustry() != null) {
                 List<String> cleanedIndustries = job.jobIndustry().stream()
@@ -243,7 +249,7 @@ public class JobBoardApi {
             } else {
                 bean.setJobIndustry(job.jobIndustry());
             }
-            
+
             // Replace HTML special characters in job type list with improved debugging
             if (job.jobType() != null) {
                 List<String> cleanedTypes = job.jobType().stream()
@@ -260,7 +266,7 @@ public class JobBoardApi {
             } else {
                 bean.setJobType(job.jobType());
             }
-            
+
             // Process and log job geo
             String originalGeo = job.jobGeo();
             String processedGeo = replaceHtmlEntities(originalGeo);
@@ -269,7 +275,7 @@ public class JobBoardApi {
                                     + originalGeo + "' -> '" + processedGeo + "'");
             }
             bean.setJobGeo(processedGeo);
-            
+
             // Process and log job level
             String originalLevel = job.jobLevel();
             String processedLevel = replaceHtmlEntities(originalLevel);
@@ -278,7 +284,7 @@ public class JobBoardApi {
                                     + originalLevel + "' -> '" + processedLevel + "'");
             }
             bean.setJobLevel(processedLevel);
-            
+
             // Process and log job excerpt
             String originalExcerpt = job.jobExcerpt();
             String processedExcerpt = replaceHtmlEntities(originalExcerpt);
@@ -286,7 +292,7 @@ public class JobBoardApi {
                 System.out.println("Replaced HTML entities in job excerpt");
             }
             bean.setJobExcerpt(processedExcerpt);
-            
+
             // Process job description - this can be long so don't log the whole thing
             String originalDescription = job.jobDescription();
             String processedDescription = replaceHtmlEntities(originalDescription);
@@ -294,24 +300,24 @@ public class JobBoardApi {
                 System.out.println("Replaced HTML entities in job description for job: " + processedTitle);
             }
             bean.setJobDescription(processedDescription);
-            
+
             bean.setPubDate(job.pubDate());
             bean.setAnnualSalaryMin(job.annualSalaryMin());
             bean.setAnnualSalaryMax(job.annualSalaryMax());
             bean.setSalaryCurrency(job.salaryCurrency());
             bean.setRating(job.rating());
             bean.setComments(job.comments());
-            
+
             return bean.toRecord();
         }).collect(Collectors.toList());
-        
+
         System.out.println("Processed " + processedJobs.size() + " job records");
         return processedJobs;
     }
-    
+
     /**
      * Replaces common HTML special characters in a string with more comprehensive handling.
-     * 
+     *
      * @param text Text with potential HTML special characters
      * @return Text with replaced HTML special characters
      */
@@ -319,7 +325,7 @@ public class JobBoardApi {
         if (text == null || text.isEmpty()) {
             return text;
         }
-        
+
         // Create a more comprehensive map of HTML entities and their replacements
         java.util.Map<String, String> htmlEntities = new java.util.HashMap<>();
         htmlEntities.put("&amp;", "&");
@@ -343,7 +349,7 @@ public class JobBoardApi {
         htmlEntities.put("&pound;", "£");
         htmlEntities.put("&yen;", "¥");
         htmlEntities.put("&cent;", "¢");
-        
+
         // First handle nested entities (like &amp;amp;) by applying multiple passes
         String result = text;
         String prevResult;
@@ -353,7 +359,7 @@ public class JobBoardApi {
                 result = result.replace(entry.getKey(), entry.getValue());
             }
         } while (!result.equals(prevResult));
-        
+
         // Handle numeric entities (like &#123;)
         java.util.regex.Pattern numericPattern = java.util.regex.Pattern.compile("&#(\\d+);");
         java.util.regex.Matcher numericMatcher = numericPattern.matcher(result);
@@ -372,7 +378,7 @@ public class JobBoardApi {
         }
         numericMatcher.appendTail(numericBuilder);
         result = numericBuilder.toString();
-        
+
         // Handle hexadecimal entities (like &#x1F600;)
         java.util.regex.Pattern hexPattern = java.util.regex.Pattern.compile("&#[xX]([0-9a-fA-F]+);");
         java.util.regex.Matcher hexMatcher = hexPattern.matcher(result);
@@ -390,15 +396,15 @@ public class JobBoardApi {
         }
         hexMatcher.appendTail(hexBuilder);
         result = hexBuilder.toString();
-        
+
         // Log a message if we detect any remaining HTML entities
         if (result.matches(".*&[a-zA-Z0-9#]+;.*")) {
             System.out.println("Warning: Possible unhandled HTML entity in: " + result);
         }
-        
+
         return result;
     }
-    
+
     /**
      * makes a request to the api and returns the response.
      * @param url url to make the request to
@@ -435,7 +441,8 @@ public class JobBoardApi {
      */
     public static void main(String[] args) {
         JobBoardApi api = new JobBoardApi();
-        List<JobRecord> results = api.getJobBoard("python", 5, "austria", "devops & sysadmin");
+        JobBoardApiResult apiResults = api.getJobBoard("python", 5, "austria", "devops & sysadmin");
+        List<JobRecord> results = apiResults.getJobs();
         System.out.println("Job Records: " + results.size());
         for (JobRecord job : results) {
             System.out.println("Job Title: " + job.jobTitle());

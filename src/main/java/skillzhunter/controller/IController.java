@@ -52,10 +52,14 @@ public interface IController {
      * @param jobRecord The JobRecord object to add
      */
     void job2SavedList(JobRecord jobRecord);
+    /** used when the another part of the program needs to alert the user */
+    void sendAlert(String alert);
+
+
 
     /**
      * Check if a job is already in the saved jobs list.
-     * 
+     *
      * @param jobRecord The job record to check
      * @return true if the job is already saved, false otherwise
      */
@@ -72,7 +76,7 @@ public interface IController {
      * @param filePath The path to the CSV file
      */
     void path2CSV(String filePath);
-    
+
     /**
      * Exports job records to a file in the specified format.
      * @param jobs The list of JobRecord objects to export

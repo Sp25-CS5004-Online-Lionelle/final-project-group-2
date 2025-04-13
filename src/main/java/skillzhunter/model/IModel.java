@@ -1,7 +1,9 @@
 package skillzhunter.model;
 import java.util.List;
+import skillzhunter.controller.IController;
 
 public interface IModel {
+    void setController(IController controller);
     /**
      * Add a new job.
      * @param job JobRecord instance to add
@@ -24,7 +26,7 @@ public interface IModel {
      * @return true if removed, false otherwise
      */
     boolean removeJob(int id);
-    
+
     /**
      * Update a job's comments and rating.
      * @param id Job ID
@@ -41,7 +43,7 @@ public interface IModel {
      * @return A list of JobRecord objects representing the search results.
      */
     List<JobRecord> searchJobs(String query, Integer numberOfResults, String location, String industry);
-    
+
     /**
      * Gets locations to be used in the search in a list.
      * @return location list
@@ -66,4 +68,5 @@ public interface IModel {
      * @param filePath Path to the output file
      */
     void exportSavedJobs(List<JobRecord> jobs, String formatStr, String filePath);
+    void sendAlert(String alert);
 }
