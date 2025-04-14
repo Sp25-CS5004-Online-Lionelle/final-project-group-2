@@ -18,6 +18,7 @@ import skillzhunter.model.JobRecord;
  * Dialog for displaying saved job details with Edit/Delete/Close options.
  * This is used specifically when opening a job from the Saved Jobs tab.
  * Uses JobActionHelper for consistent job management across the application.
+ * Includes dynamic sizing based on content length.
  */
 public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
     
@@ -64,6 +65,9 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
         // Create and add button panel
         JPanel buttonPanel = createButtonPanel(dialog, job, controller, parent);
         dialog.add(buttonPanel, BorderLayout.SOUTH);
+        
+        // Calculate and set appropriate dialog size based on content
+        calculateAndSetDialogSize(dialog, job);
         
         // Set dialog properties and display
         configureDialogProperties(dialog, parent);
@@ -208,7 +212,7 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
      * @param parent The parent component
      */
     private static void configureDialogProperties(JDialog dialog, Component parent) {
-        dialog.setSize(450, 450);
+        // Note: We don't set size here anymore since it's calculated dynamically
         dialog.setLocationRelativeTo(parent);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setVisible(true);

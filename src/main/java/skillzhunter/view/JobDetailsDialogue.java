@@ -10,6 +10,7 @@ import skillzhunter.controller.IController;
 /**
  * Dialog for displaying job details with the option to save the job.
  * This is used specifically when opening a job from the Find Jobs tab.
+ * Includes dynamic sizing based on content length.
  */
 public class JobDetailsDialogue extends BaseJobDetailsDialogue {
 
@@ -74,8 +75,10 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
         JPanel buttonPanel = createButtonPanel(dialog, parent, job, controller);
         dialog.add(buttonPanel, BorderLayout.SOUTH);
         
-        // Set dialog properties
-        dialog.setSize(450, 580);
+        // Calculate and set appropriate dialog size based on content
+        calculateAndSetDialogSize(dialog, job);
+        
+        // Set dialog properties (location and close operation)
         dialog.setLocationRelativeTo(parent);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setVisible(true);

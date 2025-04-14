@@ -8,17 +8,27 @@ import skillzhunter.model.JobRecord;
 /**
  * Abstract base class for job detail dialogs.
  * Contains common UI elements and behavior shared by different job detail dialog types.
- * Static utility methods for creating job detail dialog components.
+ * Provides dynamic sizing based on content, particularly for job titles.
  */
 public abstract class BaseJobDetailsDialogue {
     
-    /** Width of the logo.*/
+    /** Default logo width */
     protected static final int LOGO_WIDTH = 64;
-    /** Height of the logo.*/
+    /** Default logo height */
     protected static final int LOGO_HEIGHT = 64;
+    /** Default dialog width */
+    protected static final int DEFAULT_DIALOG_WIDTH = 450;
+    /** Default dialog height */
+    protected static final int DEFAULT_DIALOG_HEIGHT = 580;
+    /** Minimum width for dialogs */
+    protected static final int MIN_DIALOG_WIDTH = 450;
+    /** Extra width per character for long titles */
+    protected static final double CHAR_WIDTH_FACTOR = 6.0;
+    /** Maximum dialog width as percentage of screen width */
+    protected static final double MAX_WIDTH_SCREEN_PERCENT = 0.75;
 
     /**
-     * Creates a dialog with job details.
+     * Creates a dialog with job details, sized appropriately for content.
      * 
      * @param parent The parent component
      * @param job The job record from the controller
@@ -141,6 +151,41 @@ public abstract class BaseJobDetailsDialogue {
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         
         return mainPanel;
+    }
+    
+    /**
+     * Calculates appropriate dialog dimensions based on content.
+     * Adjusts dialog width based on job title length.
+     * 
+     * @param dialog The dialog to configure
+     * @param job The job record containing the title
+     */
+    protected static void calculateAndSetDialogSize(JDialog dialog, JobRecord job) {
+        // Start with default dimensions
+        int width = DEFAULT_DIALOG_WIDTH;
+        int height = DEFAULT_DIALOG_HEIGHT;
+        
+        // Adjust width based on job title length
+        if (job.jobTitle() != null) {
+            int titleLength = job.jobTitle().length();
+            // Add extra width for longer titles
+            if (titleLength > 30) {
+                // Calculate dynamic width based on title length
+                width = MIN_DIALOG_WIDTH + (int)((titleLength - 30) * CHAR_WIDTH_FACTOR);
+                
+                // Get screen size to ensure we don't exceed reasonable width
+                Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+                int maxWidth = (int)(screenSize.width * MAX_WIDTH_SCREEN_PERCENT);
+                
+                // Cap width at max percentage of screen width
+                if (width > maxWidth) {
+                    width = maxWidth;
+                }
+            }
+        }
+        
+        // Set dialog size
+        dialog.setSize(width, height);
     }
     
     /**
