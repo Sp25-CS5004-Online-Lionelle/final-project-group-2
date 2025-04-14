@@ -249,11 +249,6 @@ public class MainView extends JFrame implements IView {
     }
 
     @Override
-    public void addFeatures(IController controller) {
-        // Not needed for this implementation
-    } 
-
-    @Override
     public void run() {
         setVisible(true);
         

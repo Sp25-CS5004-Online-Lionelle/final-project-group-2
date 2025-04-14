@@ -160,7 +160,9 @@ public final class DataFormatter {
         
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             
-            writer.write("id,url,jobSlug,jobTitle,companyName,companyLogo,jobIndustry,jobType,jobGeo,jobLevel,jobExcerpt,jobDescription,pubDate,annualSalaryMin,annualSalaryMax,salaryCurrency,rating,comments");
+            writer.write("id,url,jobSlug,jobTitle,companyName,companyLogo,"
+            + "jobIndustry,jobType,jobGeo,jobLevel,jobExcerpt,jobDescription,pubDate," 
+            + "annualSalaryMin,annualSalaryMax,salaryCurrency,rating,comments");
             writer.newLine();
 
             for (JobRecord job : jobs) {
@@ -215,12 +217,16 @@ public final class DataFormatter {
     }
 
 private static String stripHTML(String html) {
-    if (html == null) return "";
+    if (html == null) {
+        return "";
+    }
     return html.replaceAll("<[^>]*>", "").replaceAll("\\s+", " ").trim();
 }
 
 private static String extractFirstSentence(String text) {
-    if (text == null || text.isEmpty()) return "";
+    if (text == null || text.isEmpty()) {
+        return "";
+    }
     int endPos = -1;
     for (String endMark : new String[]{".", "!", "?"}) {
         int pos = text.indexOf(endMark);
@@ -228,12 +234,16 @@ private static String extractFirstSentence(String text) {
             endPos = pos + 1;
         }
     }
-    if (endPos > 0) return text.substring(0, endPos).trim();
+    if (endPos > 0) {
+        return text.substring(0, endPos).trim();
+    }
     return text.length() > 100 ? text.substring(0, 97) + "..." : text;
 }
 
 private static String escapeCSV(String value) {
-    if (value == null) return "\"\"";
+    if (value == null) {
+        return "\"\"";
+    }
     return "\"" + value.replace("\"", "\"\"") + "\"";
 }
 

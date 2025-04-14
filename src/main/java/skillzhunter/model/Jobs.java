@@ -15,23 +15,23 @@ import skillzhunter.model.net.JobBoardApi;
 import skillzhunter.model.net.JobBoardApiResult;
 
 public class Jobs implements IModel {
-    /** map for storing industries and their slugs. */
+    /** Map for storing industries and their slugs. */
     private static final Map<String, String> INDUSTRY_MAP = JobBoardApi.loadCsvData(
         Paths.get("data", "industries.csv").toString(), "industry", "slug");
 
-    /** map for storing locations and their slugs. */
+    /** Map for storing locations and their slugs. */
     private static final Map<String, String> LOCATION_MAP = JobBoardApi.loadCsvData(
         Paths.get("data", "locations.csv").toString(), "location", "slug");
-    /** used for identifying the connected controller */
+    /** Used for identifying the connected controller. */
     private IController controller;
 
     /** Job List. */
     private final List<JobRecord> jobList;
 
-    /** used to track number of times the joblist is accessed*/
+    /** Used to track number of times the joblist is accessed.*/
     private int runs = 0;
 
-    /** Jobs Api */
+    /** Object representing the Jobs Api.*/
     private final JobBoardApi api = new JobBoardApi();
 
     /**
@@ -63,7 +63,8 @@ public class Jobs implements IModel {
     // CRUD functionality
 
     /**
-     *
+     * Used to identify the controller attached to the model.
+     * @param controller the attached controller
      */
     public void setController(IController controller) {
       this.controller = controller;
@@ -279,7 +280,7 @@ public class Jobs implements IModel {
     }
 
     /**
-     * Used to send alerts to other parts of the program
+     * Used to send alerts to other parts of the program.
      * @param alert
      */
     @Override

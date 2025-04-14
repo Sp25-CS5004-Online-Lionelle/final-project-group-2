@@ -1,7 +1,5 @@
 package skillzhunter.view;
 
-
-import skillzhunter.controller.IController;
 public interface IView {
 /**
  * Runs the view.
@@ -9,10 +7,6 @@ public interface IView {
  * It should be called after the view has been set up and configured.
  */
 void run();
-/**
- * This method is used to set the controller for the view.
- * @param controller The controller to be set for the view.
- */
 
 /**
  * This method is used when an alert from another part
@@ -20,6 +14,4 @@ void run();
  * @param message The message the user needs to see.
  */
 void notifyUser(String message);
-
-void addFeatures(IController controller);
 }

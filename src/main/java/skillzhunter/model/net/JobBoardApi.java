@@ -37,6 +37,7 @@ public class JobBoardApi {
     private static final Map<String, String> LOCATION_MAP = JobBoardApi.loadCsvData(
     Paths.get("data", "locations.csv").toString(), "location", "slug");
 
+    /** Message to send as an error, defaults to empty.*/
     private String errorMessage = null;
 
     /** empty contructor.*/
