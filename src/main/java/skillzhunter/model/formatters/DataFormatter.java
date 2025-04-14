@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Collection;
@@ -12,6 +13,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
@@ -227,7 +229,7 @@ public final class DataFormatter {
         if (html == null) {
             return "";
         }
-        return html.replaceAll("<[^>]*>", "").replaceAll("\\s+", " ").trim();
+        return html.replaceAll("<[^>]*>", "").replaceAll("\s+", " ").trim();
     }
 
     /**
@@ -396,5 +398,27 @@ public final class DataFormatter {
         bean.setComments(job.comments() != null ? replaceHtmlEntities(job.comments()) : job.comments());
         
         return bean.toRecord();
+    }
+
+    /**
+     * Read the data from an InputStream in the specified format.
+     *
+     * @param in the input stream to read from
+     * @param csv the format to read the data in
+     * @return a list of JobRecord objects
+     */
+    public static List<JobRecord> read(InputStream in, Formats csv) {
+        if (csv == Formats.CSV) {
+            try {
+                CsvMapper csvMapper = new CsvMapper();
+                CsvSchema schema = csvMapper.schemaFor(JobRecord.class).withHeader();
+                MappingIterator<JobRecord> iterator = csvMapper.readerFor(JobRecord.class).with(schema).readValues(in);
+                return iterator.readAll(); // Returns a List<JobRecord>
+            } catch (Exception e) {
+                throw new RuntimeException("Error reading data from InputStream", e);
+            }
+        } else {
+            throw new UnsupportedOperationException("Format not supported: " + csv);
+        }
     }
 }
