@@ -22,6 +22,7 @@ public class Jobs implements IModel {
     /** Map for storing locations and their slugs. */
     private static final Map<String, String> LOCATION_MAP = JobBoardApi.loadCsvData(
         Paths.get("data", "locations.csv").toString(), "location", "slug");
+    
     /** Used for identifying the connected controller. */
     private IController controller;
 
@@ -32,14 +33,25 @@ public class Jobs implements IModel {
     private int runs = 0;
 
     /** Object representing the Jobs Api.*/
-    private final JobBoardApi api = new JobBoardApi();
+    private final JobBoardApi api;
 
     /**
      * Constructor for Jobs class.
-     * Initializes the job list.
+     * Initializes the job list and API.
      */
     public Jobs() {
         this.jobList = new ArrayList<>();
+        this.api = createJobBoardApi();
+    }
+
+    /**
+     * Creates a JobBoardApi instance.
+     * This method exists to allow test classes to override it and provide a mock API.
+     * 
+     * @return A JobBoardApi instance
+     */
+    protected JobBoardApi createJobBoardApi() {
+        return new JobBoardApi();
     }
 
     /**
