@@ -1,7 +1,9 @@
 package skillzhunter.model;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -40,7 +42,14 @@ public class Jobs implements IModel {
      */
     public Jobs() {
         this.jobList = new ArrayList<>();
-    }
+        loadJobsFromCsv("SavedJobs.csv");  // Load jobs from CSV when the application starts
+
+        // Add a shutdown hook to save the jobs to CSV on shutdown
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            saveJobsToCsv("SavedJobs.csv");
+            System.out.println("Jobs saved to SavedJobs.csv on shutdown.");
+        }));
+    };
 
     /**
      * Gets the industries to be used in the search in a list.
@@ -255,6 +264,21 @@ public class Jobs implements IModel {
             throw new RuntimeException("Error writing to CSV file", e);
         }
     }
+
+    /**
+     * Loads job records from a CSV file and adds them to the job list.
+     * @param fileName Name of the CSV file to load from
+     */
+    private void loadJobsFromCsv(String fileName) {
+    try (InputStream in = new FileInputStream(fileName)) {
+        List<JobRecord> loadedJobs = DataFormatter.read(in, Formats.CSV);
+        this.jobList.clear();  // Clear existing list before loading
+        this.jobList.addAll(loadedJobs);  // Add loaded jobs
+        System.out.println("Loaded " + loadedJobs.size() + " jobs from CSV.");
+    } catch (IOException e) {
+        System.err.println("Error loading jobs from CSV file: " + e.getMessage());
+    }
+}
 
     /**
      * Exports the saved jobs to a specified format and file path.
