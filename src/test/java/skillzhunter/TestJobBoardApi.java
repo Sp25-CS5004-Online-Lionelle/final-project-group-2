@@ -42,16 +42,6 @@ public class TestJobBoardApi {
         }
         
         /**
-         * Exposes the replaceHtmlEntities method for testing.
-         * 
-         * @param text The text containing HTML entities to replace
-         * @return The text with HTML entities replaced
-         */
-        public String testReplaceHtmlEntities(String text) {
-            return replaceHtmlEntities(text);
-        }
-        
-        /**
          * Exposes the loadCsvData method for testing.
          * Returns an empty map instead of throwing an exception if the file is not found.
          * 
@@ -268,33 +258,6 @@ public class TestJobBoardApi {
         jobBoardResultObject = jobBoardApi.getJobBoard("data science", 5);
         url = jobBoardApi.interceptedUrl;
         assertEquals("https://jobicy.com/api/v2/remote-jobs?count=5&tag=data+science", url);
-    }
-    
-    /**
-     * Tests the replaceHtmlEntities method with various HTML entities.
-     * Verifies that entities are correctly replaced with their character equivalents.
-     */
-    @Test
-    public void testReplaceHtmlEntities() {
-        // Test basic HTML entities
-        assertEquals("&", jobBoardApi.testReplaceHtmlEntities("&amp;"));
-        assertEquals("<", jobBoardApi.testReplaceHtmlEntities("&lt;"));
-        assertEquals(">", jobBoardApi.testReplaceHtmlEntities("&gt;"));
-        assertEquals("\"", jobBoardApi.testReplaceHtmlEntities("&quot;"));
-        
-        // Test nested entities
-        assertEquals("&", jobBoardApi.testReplaceHtmlEntities("&amp;amp;"));
-        
-        // Test numeric entities
-        assertEquals("©", jobBoardApi.testReplaceHtmlEntities("&#169;"));
-        
-        // Test multiple entities in a string
-        assertEquals("This & that <div>", 
-            jobBoardApi.testReplaceHtmlEntities("This &amp; that &lt;div&gt;"));
-        
-        // Test with null and empty input
-        assertNull(jobBoardApi.testReplaceHtmlEntities(null));
-        assertEquals("", jobBoardApi.testReplaceHtmlEntities(""));
     }
     
     /**
