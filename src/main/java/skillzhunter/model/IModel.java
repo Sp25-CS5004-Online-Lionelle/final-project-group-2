@@ -3,6 +3,10 @@ import java.util.List;
 import skillzhunter.controller.IController;
 
 public interface IModel {
+    /**
+     * Sets the controller that called the model.
+     * @param controller controller that called the model.
+     */
     void setController(IController controller);
     /**
      * Add a new job.
@@ -68,5 +72,10 @@ public interface IModel {
      * @param filePath Path to the output file
      */
     void exportSavedJobs(List<JobRecord> jobs, String formatStr, String filePath);
+
+    /**
+     * Used to send an alert to another part of the program.
+     * @param alert alert to send
+     */
     void sendAlert(String alert);
 }

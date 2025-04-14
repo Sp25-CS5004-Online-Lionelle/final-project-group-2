@@ -33,7 +33,7 @@ public interface IController {
     List<String> getIndustries();
 
     /**
-     * Make an API call to get jobs
+     * Make an API call to get jobs.
      * @param query The search query
      * @param numberOfResults The number of results to return
      * @param location The location to filter by
@@ -55,8 +55,8 @@ public interface IController {
 
     void job2SavedList(JobRecord jobRecord);
     
-    /** used when the another part of
-     * the program needs to alert the user
+    /**Used when the another part of
+     * the program needs to alert the user.
      * @param alert the alert message to be sent
      **/
     void sendAlert(String alert);

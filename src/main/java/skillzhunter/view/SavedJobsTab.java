@@ -200,7 +200,9 @@ public class SavedJobsTab extends JobView {
     private void handleExportAction(JComboBox<String> formatDropdown) {
         // Get the selected format from the dropdown
         String selectedFormat = (String) formatDropdown.getSelectedItem();
-        if (selectedFormat == null) return;
+        if (selectedFormat == null) { 
+            return; 
+        }
 
         // Get the list of saved jobs
         List<JobRecord> savedJobs = controller.getSavedJobs();
@@ -220,8 +222,9 @@ public class SavedJobsTab extends JobView {
 
         // Get the export file path from user
         String filePath = getExportFilePath(parentFrame, selectedFormat);
-        if (filePath == null) return;
-        
+        if (filePath == null) { 
+            return; 
+        }
         // Create clean version of jobs for export
         List<JobRecord> cleanedJobs = cleanJobRecordsForExport(savedJobs);
         
@@ -340,8 +343,8 @@ public class SavedJobsTab extends JobView {
             
             // Verify that the file was created
             File savedFile = new File(filePath);
-            System.out.println("File exists after save: " + savedFile.exists() + 
-                ", size: " + savedFile.length());
+            System.out.println("File exists after save: " + savedFile.exists()
+            + ", size: " + savedFile.length());
             
             // Extract just the filename from the path
             String fileName = savedFile.getName();
@@ -461,7 +464,9 @@ public class SavedJobsTab extends JobView {
      * @return The string with HTML tags removed
      */
     private String stripHTML(String html) {
-        if (html == null) return "";
+        if (html == null) { 
+            return ""; 
+        }
         return html.replaceAll("<[^>]*>", "").replaceAll("\\s+", " ").trim();
     }
     
@@ -472,7 +477,9 @@ public class SavedJobsTab extends JobView {
      * @return The first sentence or a truncated version if no end marker found
      */
     private String extractFirstSentence(String text) {
-        if (text == null || text.isEmpty()) return "";
+        if (text == null || text.isEmpty()) { 
+            return ""; 
+        }
         
         // Find the end of the first sentence
         int endPos = -1;

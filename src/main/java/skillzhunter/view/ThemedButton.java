@@ -11,21 +11,36 @@ import javax.swing.JButton;
  * A custom button class that automatically applies theme styling and hover effects.
  * This centralizes button styling logic across the application.
  * Supports multiple button types based on Bootstrap styling (primary, secondary, success, etc.)
+ * The ThemedButton maintains consistent styling based on the application's color theme
+ * and automatically handles visual feedback for user interactions like hovering.
+ * This helps ensure a uniform look and feel throughout the application.
  */
 public class ThemedButton extends JButton {
+    /** The color theme currently applied to this button. */
     private ColorTheme theme;
+    
+    /** Tracks whether the mouse is currently hovering over this button. */
     private boolean isHovering = false;
+    
+    /** The button's style type, determining its color scheme. */
     private ButtonType buttonType = ButtonType.PRIMARY; // Default to primary
     
     /**
-     * Button types based on Bootstrap styling
+     * Button types based on Bootstrap styling conventions.
+     * Each type corresponds to a different visual style and semantic meaning
      */
     public enum ButtonType {
+        /** PRIMARY - Main actions, the most important action on a page. */
         PRIMARY,
+        /** SECONDARY - Alternative or less important actions. */
         SECONDARY,
+        /** SUCCESS - Positive actions like saving or confirming. */
         SUCCESS,
+        /** DANGER - Destructive or potentially harmful actions. */
         DANGER,
+        /** WARNING - Actions that require caution. */
         WARNING,
+        /** INFO - Informational actions. */
         INFO
     }
     
@@ -33,7 +48,7 @@ public class ThemedButton extends JButton {
      * Creates a new themed button with the given text.
      * Uses PRIMARY button type by default.
      * 
-     * @param text The button text
+     * @param text The button text to display
      */
     public ThemedButton(String text) {
         this(text, ButtonType.PRIMARY);
@@ -42,8 +57,8 @@ public class ThemedButton extends JButton {
     /**
      * Creates a new themed button with the given text and button type.
      * 
-     * @param text The button text
-     * @param buttonType The button type (PRIMARY, SECONDARY, etc.)
+     * @param text The button text to display
+     * @param buttonType The button type that determines the visual style
      */
     public ThemedButton(String text, ButtonType buttonType) {
         super(text);
@@ -53,6 +68,9 @@ public class ThemedButton extends JButton {
     
     /**
      * Initializes button appearance and behavior.
+     * Sets default appearance properties, cursor type, and adds event listeners
+     * for hover effects. If no theme has been explicitly set, applies the default
+     * light theme.
      */
     private void initializeButton() {
         // Set default appearance
@@ -65,12 +83,22 @@ public class ThemedButton extends JButton {
         
         // Add hover effect
         addMouseListener(new MouseAdapter() {
+            /**
+             * Updates button state when mouse enters the button area.
+             * 
+             * @param e the MouseEvent containing event information
+             */
             @Override
             public void mouseEntered(MouseEvent e) {
                 isHovering = true;
                 updateButtonColors();
             }
             
+            /**
+             * Updates button state when mouse exits the button area.
+             * 
+             * @param e the MouseEvent containing event information
+             */
             @Override
             public void mouseExited(MouseEvent e) {
                 isHovering = false;
@@ -86,8 +114,9 @@ public class ThemedButton extends JButton {
     
     /**
      * Applies the specified color theme to the button.
+     * Updates the button's appearance to match the new theme.
      * 
-     * @param theme The ColorTheme to apply
+     * @param theme The ColorTheme to apply to this button
      */
     public void applyTheme(ColorTheme theme) {
         this.theme = theme;
@@ -95,9 +124,9 @@ public class ThemedButton extends JButton {
     }
     
     /**
-     * Sets the button type (PRIMARY, SECONDARY, etc.)
+     * Sets the button type (PRIMARY, SECONDARY, etc.) and updates the appearance.
      * 
-     * @param buttonType The new button type
+     * @param buttonType The new button type to apply
      */
     public void setButtonType(ButtonType buttonType) {
         this.buttonType = buttonType;
@@ -107,7 +136,7 @@ public class ThemedButton extends JButton {
     /**
      * Gets the current button type.
      * 
-     * @return The current ButtonType
+     * @return The current ButtonType used by this button
      */
     public ButtonType getButtonType() {
         return buttonType;
@@ -115,10 +144,17 @@ public class ThemedButton extends JButton {
     
     /**
      * Updates button colors based on current theme, button type, and hover state.
+     * This method handles the visual presentation logic for different combinations
+     * of button types, themes, and interaction states.
+     * <p>
+     * Different button types use different color pairs from the theme, and the
+     * hover state determines which variant of the color is used. Text color is
+     * also adjusted based on the background color to ensure readability.
      */
     private void updateButtonColors() {
-        if (theme == null) return;
-        
+        if (theme == null) {
+            return;
+        }
         Color normalColor;
         Color hoverColor;
         
@@ -170,7 +206,7 @@ public class ThemedButton extends JButton {
     }
     
     /**
-     * Gets the current theme.
+     * Gets the current theme applied to this button.
      * 
      * @return The current ColorTheme
      */
