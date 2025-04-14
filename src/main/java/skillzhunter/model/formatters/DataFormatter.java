@@ -18,6 +18,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import skillzhunter.model.JobRecord;
+import skillzhunter.model.JobBean;
 
 /**
  * A class to format the data in different ways.
@@ -216,36 +217,184 @@ public final class DataFormatter {
         }
     }
 
-private static String stripHTML(String html) {
-    if (html == null) {
-        return "";
-    }
-    return html.replaceAll("<[^>]*>", "").replaceAll("\\s+", " ").trim();
-}
-
-private static String extractFirstSentence(String text) {
-    if (text == null || text.isEmpty()) {
-        return "";
-    }
-    int endPos = -1;
-    for (String endMark : new String[]{".", "!", "?"}) {
-        int pos = text.indexOf(endMark);
-        if (pos >= 0 && (endPos == -1 || pos < endPos)) {
-            endPos = pos + 1;
+    /**
+     * Strips HTML tags from a string.
+     * 
+     * @param html The string possibly containing HTML tags
+     * @return The string with HTML tags removed
+     */
+    public static String stripHTML(String html) {
+        if (html == null) {
+            return "";
         }
+        return html.replaceAll("<[^>]*>", "").replaceAll("\\s+", " ").trim();
     }
-    if (endPos > 0) {
-        return text.substring(0, endPos).trim();
+
+    /**
+     * Extracts the first sentence from a text string.
+     * 
+     * @param text The text to extract from
+     * @return The first sentence or a truncated version if no end marker found
+     */
+    public static String extractFirstSentence(String text) {
+        if (text == null || text.isEmpty()) {
+            return "";
+        }
+        int endPos = -1;
+        for (String endMark : new String[]{".", "!", "?"}) {
+            int pos = text.indexOf(endMark);
+            if (pos >= 0 && (endPos == -1 || pos < endPos)) {
+                endPos = pos + 1;
+            }
+        }
+        if (endPos > 0) {
+            return text.substring(0, endPos).trim();
+        }
+        return text.length() > 100 ? text.substring(0, 97) + "..." : text;
     }
-    return text.length() > 100 ? text.substring(0, 97) + "..." : text;
-}
 
-private static String escapeCSV(String value) {
-    if (value == null) {
-        return "\"\"";
+    /**
+     * Escapes special characters for CSV format.
+     * 
+     * @param value The value to escape
+     * @return The escaped value
+     */
+    public static String escapeCSV(String value) {
+        if (value == null) {
+            return "\"\"";
+        }
+        return "\"" + value.replace("\"", "\"\"") + "\"";
     }
-    return "\"" + value.replace("\"", "\"\"") + "\"";
-}
 
+    /**
+     * Replaces common HTML special characters in a string with more comprehensive handling.
+     * This method is for text content processing, especially for job descriptions and excerpts.
+     *
+     * @param text Text with potential HTML special characters
+     * @return Text with replaced HTML special characters
+     */
+    public static String replaceHtmlEntities(String text) {
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
 
+        // Create a more comprehensive map of HTML entities and their replacements
+        java.util.Map<String, String> htmlEntities = new java.util.HashMap<>();
+        htmlEntities.put("&amp;", "&");
+        htmlEntities.put("&lt;", "<");
+        htmlEntities.put("&gt;", ">");
+        htmlEntities.put("&quot;", "\"");
+        htmlEntities.put("&#39;", "'");
+        htmlEntities.put("&apos;", "'");
+        htmlEntities.put("&nbsp;", " ");
+        htmlEntities.put("&ndash;", "–");
+        htmlEntities.put("&mdash;", "—");
+        htmlEntities.put("&lsquo;", "'");
+        htmlEntities.put("&rsquo;", "'");
+        htmlEntities.put("&ldquo;", "\"");
+        htmlEntities.put("&rdquo;", "\"");
+        htmlEntities.put("&bull;", "•");
+        htmlEntities.put("&copy;", "©");
+        htmlEntities.put("&reg;", "®");
+        htmlEntities.put("&trade;", "™");
+        htmlEntities.put("&euro;", "€");
+        htmlEntities.put("&pound;", "£");
+        htmlEntities.put("&yen;", "¥");
+        htmlEntities.put("&cent;", "¢");
+
+        // First handle nested entities (like &amp;amp;) by applying multiple passes
+        String result = text;
+        String prevResult;
+        do {
+            prevResult = result;
+            for (java.util.Map.Entry<String, String> entry : htmlEntities.entrySet()) {
+                result = result.replace(entry.getKey(), entry.getValue());
+            }
+        } while (!result.equals(prevResult));
+
+        // Handle numeric entities (like &#123;)
+        java.util.regex.Pattern numericPattern = java.util.regex.Pattern.compile("&#(\\d+);");
+        java.util.regex.Matcher numericMatcher = numericPattern.matcher(result);
+        StringBuilder numericBuilder = new StringBuilder();
+        while (numericMatcher.find()) {
+            try {
+                String numStr = numericMatcher.group(1);
+                int code = Integer.parseInt(numStr);
+                numericMatcher.appendReplacement(numericBuilder, String.valueOf((char) code));
+            } catch (NumberFormatException e) {
+                numericMatcher.appendReplacement(numericBuilder, numericMatcher.group(0));
+            } catch (IllegalArgumentException e) {
+                // In case of invalid replacement or any other issues
+                numericMatcher.appendReplacement(numericBuilder, numericMatcher.group(0));
+            }
+        }
+        numericMatcher.appendTail(numericBuilder);
+        result = numericBuilder.toString();
+
+        // Handle hexadecimal entities (like &#x1F600;)
+        java.util.regex.Pattern hexPattern = java.util.regex.Pattern.compile("&#[xX]([0-9a-fA-F]+);");
+        java.util.regex.Matcher hexMatcher = hexPattern.matcher(result);
+        StringBuilder hexBuilder = new StringBuilder();
+        while (hexMatcher.find()) {
+            try {
+                String hex = hexMatcher.group(1);
+                int code = Integer.parseInt(hex, 16);
+                String replacement = String.valueOf(Character.toChars(code));
+                // Need to quote the replacement to avoid special character issues
+                hexMatcher.appendReplacement(hexBuilder, java.util.regex.Matcher.quoteReplacement(replacement));
+            } catch (Exception e) {
+                hexMatcher.appendReplacement(hexBuilder, hexMatcher.group(0));
+            }
+        }
+        hexMatcher.appendTail(hexBuilder);
+        result = hexBuilder.toString();
+
+        // Log a message if we detect any remaining HTML entities
+        if (result.matches(".*&[a-zA-Z0-9#]+;.*")) {
+            System.out.println("Warning: Possible unhandled HTML entity in: " + result);
+        }
+
+        return result;
+    }
+
+    /**
+     * Process all HTML content in a JobRecord, removing entities and cleaning text.
+     * This method can be used to clean up job data before displaying or saving.
+     * 
+     * @param job The JobRecord to process
+     * @return A new JobRecord with HTML entities replaced and content cleaned
+     */
+    public static JobRecord processJobHtml(JobRecord job) {
+        if (job == null) {
+            return null;
+        }
+        
+        // Create a new JobBean and clean all HTML content
+        JobBean bean = new JobBean();
+        
+        // Copy values, cleaning HTML where needed
+        bean.setId(job.id());
+        bean.setUrl(job.url());
+        bean.setJobSlug(job.jobSlug());
+        bean.setJobTitle(job.jobTitle() != null ? replaceHtmlEntities(job.jobTitle()) : job.jobTitle());
+        bean.setCompanyName(job.companyName() != null ? replaceHtmlEntities(job.companyName()) : job.companyName());
+        bean.setCompanyLogo(job.companyLogo());
+        bean.setJobIndustry(job.jobIndustry());
+        bean.setJobType(job.jobType());
+        bean.setJobGeo(job.jobGeo() != null ? replaceHtmlEntities(job.jobGeo()) : job.jobGeo());
+        bean.setJobLevel(job.jobLevel() != null ? replaceHtmlEntities(job.jobLevel()) : job.jobLevel());
+        
+        // These fields often contain more HTML
+        bean.setJobExcerpt(job.jobExcerpt() != null ? replaceHtmlEntities(job.jobExcerpt()) : job.jobExcerpt());
+        bean.setJobDescription(job.jobDescription() != null ? replaceHtmlEntities(job.jobDescription()) : job.jobDescription());
+        
+        bean.setPubDate(job.pubDate());
+        bean.setAnnualSalaryMin(job.annualSalaryMin());
+        bean.setAnnualSalaryMax(job.annualSalaryMax());
+        bean.setSalaryCurrency(job.salaryCurrency());
+        bean.setRating(job.rating());
+        bean.setComments(job.comments() != null ? replaceHtmlEntities(job.comments()) : job.comments());
+        
+        return bean.toRecord();
+    }
 }
