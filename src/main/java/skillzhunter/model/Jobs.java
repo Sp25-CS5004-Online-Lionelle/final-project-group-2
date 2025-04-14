@@ -85,37 +85,40 @@ public class Jobs implements IModel {
      */
     @Override
     public void addJob(JobRecord job) {
+        // Process any HTML entities in the job data
+        JobRecord cleanedJob = DataFormatter.processJobHtml(job);
+        
         JobBean jobBean = new JobBean();
         // Set fields in the same order as JobRecord
-        jobBean.setId(job.id());
-        jobBean.setUrl(job.url());
-        jobBean.setJobSlug(job.jobSlug());
-        jobBean.setJobTitle(job.jobTitle() != null && !job.jobTitle().isBlank() ? job.jobTitle() : "");
-        jobBean.setCompanyName(job.companyName() != null && !job.companyName().isBlank() ? job.companyName() : "");
-        jobBean.setCompanyLogo(job.companyLogo());
+        jobBean.setId(cleanedJob.id());
+        jobBean.setUrl(cleanedJob.url());
+        jobBean.setJobSlug(cleanedJob.jobSlug());
+        jobBean.setJobTitle(cleanedJob.jobTitle() != null && !cleanedJob.jobTitle().isBlank() ? cleanedJob.jobTitle() : "");
+        jobBean.setCompanyName(cleanedJob.companyName() != null && !cleanedJob.companyName().isBlank() ? cleanedJob.companyName() : "");
+        jobBean.setCompanyLogo(cleanedJob.companyLogo());
 
-        jobBean.setJobIndustry(job.jobIndustry() != null
-                            && job.jobIndustry().stream().noneMatch(String::isBlank)
-                            ? job.jobIndustry() : new ArrayList<>());
-        jobBean.setJobType(job.jobType() != null
-                        && job.jobType().stream().noneMatch(String::isBlank)
-                        ? job.jobType() : new ArrayList<>());
+        jobBean.setJobIndustry(cleanedJob.jobIndustry() != null
+                            && cleanedJob.jobIndustry().stream().noneMatch(String::isBlank)
+                            ? cleanedJob.jobIndustry() : new ArrayList<>());
+        jobBean.setJobType(cleanedJob.jobType() != null
+                        && cleanedJob.jobType().stream().noneMatch(String::isBlank)
+                        ? cleanedJob.jobType() : new ArrayList<>());
 
-        jobBean.setJobGeo(job.jobGeo()
-                        != null && !job.jobGeo().isBlank() ? job.jobGeo() : "");
-        jobBean.setJobLevel(job.jobLevel() != null && !job.jobLevel().isBlank() ? job.jobLevel() : "");
-        jobBean.setJobExcerpt(job.jobExcerpt());
-        jobBean.setJobDescription(job.jobDescription());
-        jobBean.setPubDate(job.pubDate() != null && !job.pubDate().isBlank() ? job.pubDate() : "");
-        jobBean.setAnnualSalaryMin(job.annualSalaryMin());
-        jobBean.setAnnualSalaryMax(job.annualSalaryMax());
-        jobBean.setSalaryCurrency(job.salaryCurrency() != null
-                                && !job.salaryCurrency().isBlank()
-                                ? job.salaryCurrency() : "");
-        jobBean.setRating(job.rating());
-        jobBean.setComments(job.comments() != null
-                            && !job.comments().isBlank()
-                            ? job.comments() : "No comments provided");
+        jobBean.setJobGeo(cleanedJob.jobGeo()
+                        != null && !cleanedJob.jobGeo().isBlank() ? cleanedJob.jobGeo() : "");
+        jobBean.setJobLevel(cleanedJob.jobLevel() != null && !cleanedJob.jobLevel().isBlank() ? cleanedJob.jobLevel() : "");
+        jobBean.setJobExcerpt(cleanedJob.jobExcerpt());
+        jobBean.setJobDescription(cleanedJob.jobDescription());
+        jobBean.setPubDate(cleanedJob.pubDate() != null && !cleanedJob.pubDate().isBlank() ? cleanedJob.pubDate() : "");
+        jobBean.setAnnualSalaryMin(cleanedJob.annualSalaryMin());
+        jobBean.setAnnualSalaryMax(cleanedJob.annualSalaryMax());
+        jobBean.setSalaryCurrency(cleanedJob.salaryCurrency() != null
+                                && !cleanedJob.salaryCurrency().isBlank()
+                                ? cleanedJob.salaryCurrency() : "");
+        jobBean.setRating(cleanedJob.rating());
+        jobBean.setComments(cleanedJob.comments() != null
+                            && !cleanedJob.comments().isBlank()
+                            ? cleanedJob.comments() : "No comments provided");
         
         jobList.add(jobBean.toRecord());
     }
@@ -170,6 +173,9 @@ public class Jobs implements IModel {
         // Debug output to verify values
         System.out.println("Updating job " + id + " with rating: " + rating + " and comments: " + comments);
         
+        // Process HTML entities in the comments
+        String cleanedComments = DataFormatter.replaceHtmlEntities(comments);
+        
         for (JobRecord job : jobList) {
             if (job.id() == id) {
                 // Create JobBean and set all fields in the same order as JobRecord
@@ -193,7 +199,7 @@ public class Jobs implements IModel {
                 
                 // Update comments and rating
                 jobBean.setRating(rating);
-                jobBean.setComments(comments);
+                jobBean.setComments(cleanedComments);
                 
                 // Debug output to verify bean values before conversion
                 System.out.println("Job bean rating set to: " + jobBean.getRating());
@@ -230,6 +236,7 @@ public class Jobs implements IModel {
         if (result.hasError()) {
             sendAlert(result.getErrorMessage());
         }
+
 
         // Process HTML entities in each job record before returning
         List<JobRecord> processedJobs = new ArrayList<>();

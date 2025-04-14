@@ -229,7 +229,7 @@ public final class DataFormatter {
         if (html == null) {
             return "";
         }
-        return html.replaceAll("<[^>]*>", "").replaceAll("\s+", " ").trim();
+        return html.replaceAll("<[^>]*>", "").replaceAll("\\s+", " ").trim();
     }
 
     /**
