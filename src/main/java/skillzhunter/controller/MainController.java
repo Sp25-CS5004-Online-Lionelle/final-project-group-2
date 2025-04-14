@@ -168,6 +168,7 @@ public class MainController implements IController {
      * @param savedJobs List of JobRecord objects to set
      * @return List of JobRecord objects
      */
+    @Override
     public List<JobRecord> setSavedJobs(List<JobRecord> savedJobs) {
         for (JobRecord job : savedJobs) {
             model.addJob(job);
@@ -208,6 +209,7 @@ public class MainController implements IController {
      * @param jobRecord The JobRecord object to add
      * @return true if the job was added successfully, false if it was already in the list
      */
+    @Override
     public boolean tryAddJobToSavedList(JobRecord jobRecord) {
         // Check if the job is already in the list
         if (isJobAlreadySaved(jobRecord)) {
@@ -305,6 +307,7 @@ public class MainController implements IController {
      * @param rating The rating to set
      * @return The updated JobRecord
      */
+    @Override
     public JobRecord getUpdateJob(int id, String comments, int rating) {
         // Call model to update the job
         model.updateJob(id, comments, rating);
@@ -328,6 +331,7 @@ public class MainController implements IController {
      * 
      * @param alert The alert message
      */
+    @Override
     public void sendAlert(String alert) {
         if (this.view != null) {
             this.view.notifyUser(alert);
