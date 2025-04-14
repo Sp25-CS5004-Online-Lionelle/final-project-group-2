@@ -222,7 +222,13 @@ public class Jobs implements IModel {
             sendAlert(result.getErrorMessage());
         }
 
-        return result.getJobs();
+        // Process HTML entities in each job record before returning
+        List<JobRecord> processedJobs = new ArrayList<>();
+        for (JobRecord job : result.getJobs()) {
+            processedJobs.add(DataFormatter.processJobHtml(job));
+        }
+
+        return processedJobs;
     }
 
     /**
