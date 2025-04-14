@@ -161,32 +161,32 @@ public class ThemedButton extends JButton {
         // Select the appropriate colors based on button type
         switch (buttonType) {
             case PRIMARY:
-                normalColor = theme.buttonNormal;
-                hoverColor = theme.buttonHover;
+                normalColor = theme.getButtonNormal();
+                hoverColor = theme.getButtonHover();
                 break;
             case SECONDARY:
-                normalColor = theme.secondaryButtonNormal;
-                hoverColor = theme.secondaryButtonHover;
+                normalColor = theme.getSecondaryButtonNormal();
+                hoverColor = theme.getSecondaryButtonHover();
                 break;
             case SUCCESS:
-                normalColor = theme.successButtonNormal;
-                hoverColor = theme.successButtonHover;
+                normalColor = theme.getSuccessButtonNormal();
+                hoverColor = theme.getSuccessButtonHover();
                 break;
             case DANGER:
-                normalColor = theme.dangerButtonNormal;
-                hoverColor = theme.dangerButtonHover;
+                normalColor = theme.getDangerButtonNormal();
+                hoverColor = theme.getDangerButtonHover();
                 break;
             case WARNING:
-                normalColor = theme.warningButtonNormal;
-                hoverColor = theme.warningButtonHover;
+                normalColor = theme.getWarningButtonNormal();
+                hoverColor = theme.getWarningButtonHover();
                 break;
             case INFO:
-                normalColor = theme.infoButtonNormal;
-                hoverColor = theme.infoButtonHover;
+                normalColor = theme.getInfoButtonNormal();
+                hoverColor = theme.getInfoButtonHover();
                 break;
             default:
-                normalColor = theme.buttonNormal;
-                hoverColor = theme.buttonHover;
+                normalColor = theme.getButtonNormal();
+                hoverColor = theme.getButtonHover();
         }
         
         // Apply the appropriate color based on hover state
@@ -201,7 +201,7 @@ public class ThemedButton extends JButton {
             setForeground(Color.BLACK);
         } else {
             // For all other buttons, use white text
-            setForeground(theme.buttonForeground);
+            setForeground(theme.getButtonForeground());
         }
     }
     

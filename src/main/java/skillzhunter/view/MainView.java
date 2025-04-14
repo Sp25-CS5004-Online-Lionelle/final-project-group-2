@@ -208,8 +208,8 @@ public class MainView extends JFrame implements IView {
      */
     private void applyTheme(ColorTheme theme) {
         // Apply theme to main frame components
-        getContentPane().setBackground(theme.background);
-        mainPane.setBackground(theme.background);
+        getContentPane().setBackground(theme.getBackground());
+        mainPane.setBackground(theme.getBackground());
         
         // Apply theme to custom menu
         if (customMenuBar != null) {

@@ -59,8 +59,6 @@ public class FindJobTab extends JobView {
     private final ImageIcon openIcon;
     /** save icon. */
     private final ImageIcon saveIcon;
-    /** info icon. */
-    private final ImageIcon infoIcon;
     /** warning icon. */
     private final ImageIcon warningIcon;
     /** Salary range viz. */
@@ -87,7 +85,6 @@ public class FindJobTab extends JobView {
         // Use IconLoader to load icons
         this.openIcon = IconLoader.loadIcon("images/open.png");
         this.saveIcon = IconLoader.loadIcon("images/saveIcon.png");
-        this.infoIcon = IconLoader.loadIcon("images/info.png");
         this.warningIcon = IconLoader.loadIcon("images/warning.png");
         
         super.initView();
@@ -340,8 +337,8 @@ public class FindJobTab extends JobView {
         }
         
         if (showVisualizationCheckbox != null) {
-            showVisualizationCheckbox.setBackground(theme.background);
-            showVisualizationCheckbox.setForeground(theme.labelForeground);
+            showVisualizationCheckbox.setBackground(theme.getBackground());
+            showVisualizationCheckbox.setForeground(theme.getLabelForeground());
         }
     }
 
@@ -360,7 +357,7 @@ public class FindJobTab extends JobView {
         
         // Use correct theme foreground color for labels
         java.awt.Color color = (theme == ColorTheme.DARK)
-                ? ColorTheme.DARK.labelForeground : ColorTheme.LIGHT.labelForeground;
+                ? ColorTheme.DARK.getLabelForeground() : ColorTheme.LIGHT.getLabelForeground();
                 
         industryLabel.setForeground(color);
         locationLabel.setForeground(color);
@@ -405,13 +402,12 @@ public class FindJobTab extends JobView {
         // Check if job is already saved using controller's method
         if (controller.isJobAlreadySaved(selectedJob)) {
             JOptionPane.showMessageDialog(this,
-                    "This job is already saved.",
-                    "Job Already Saved",
-                    JOptionPane.INFORMATION_MESSAGE,
-                    infoIcon);
+                "This job is already saved.",
+                "Job Already Saved",
+                JOptionPane.WARNING_MESSAGE,
+                warningIcon);
             return;
         }
-        
         // Add the job to saved jobs
         controller.job2SavedList(selectedJob);
         
@@ -454,3 +450,4 @@ public class FindJobTab extends JobView {
         updateVisualizationIfNeeded(jobsList);
     }
 }
+
