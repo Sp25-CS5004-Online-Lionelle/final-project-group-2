@@ -140,6 +140,9 @@ public class JobBoardApi {
      * @return List of job records matching the criteria.
      */
     public JobBoardApiResult getJobBoard(String query, Integer numberOfResults, String location, String industry) {
+        // Reset error message at the start of each call
+        errorMessage = null;
+        
         // getting slug for request, if it breaks we default
         if (location != null) {
             location = LOCATION_MAP.get(location.toLowerCase().trim());
@@ -150,25 +153,46 @@ public class JobBoardApi {
         Boolean locationPassed = location != null && !location.isEmpty()
                                  && !location.equalsIgnoreCase("anywhere");
 
-
         Boolean industryPassed = industry != null && !industry.isEmpty()
                                 && !industry.equalsIgnoreCase("all")
                                 && !industry.equalsIgnoreCase("any");
 
-        //defualting and slugggin query
-        if (query == null || query.isEmpty()
-                          || query.equalsIgnoreCase("any")
-                          || query.equalsIgnoreCase("all")
-                          || query.equalsIgnoreCase("all jobs")
-                          || query.equalsIgnoreCase("all job")) {
-            System.out.println("No query passed, using default values.");
-            errorMessage = "Search query was empty or generic, defaulted to showing first 10 available jobs.";
+        // Check if query is generic
+        boolean isQueryGeneric = query == null || query.isEmpty()
+                              || query.equalsIgnoreCase("any")
+                              || query.equalsIgnoreCase("all")
+                              || query.equalsIgnoreCase("all jobs")
+                              || query.equalsIgnoreCase("all job");
+                              
+        // Check if location is generic
+        boolean isLocationGeneric = location == null || location.isEmpty()
+                                 || location.equalsIgnoreCase("any")
+                                 || location.equalsIgnoreCase("all")
+                                 || location.equalsIgnoreCase("anywhere");
+                                 
+        // Check if industry is generic
+        boolean isIndustryGeneric = industry == null || industry.isEmpty()
+                                 || industry.equalsIgnoreCase("all")
+                                 || industry.equalsIgnoreCase("any");
+        
+        // Only set error message if ALL parameters are generic
+        if (isQueryGeneric && isLocationGeneric && isIndustryGeneric) {
+            System.out.println("All generic search parameters, using default values.");
+            errorMessage = "All search parameters were generic, showing " + 
+                          (numberOfResults != null ? numberOfResults : 5) + " available jobs.";
+        }
+        
+        // Set default query if needed, regardless of error message
+        if (isQueryGeneric) {
             query = "all";
         }
+
         if (numberOfResults == null || numberOfResults < 1) {
             numberOfResults = 5;
         }
-        query = query.replaceAll(" ", "+").toLowerCase();
+        if (query != null) {
+            query = query.replaceAll(" ", "+").toLowerCase();
+        }
 
         // building url
         String url;
@@ -188,220 +212,6 @@ public class JobBoardApi {
     
         List<JobRecord> jobs = this.searchApi(url);
         return new JobBoardApiResult(jobs, errorMessage);
-
-    }
-
-    /**
-     * Process job records to replace HTML special characters with improved debugging.
-     *
-     * @param jobs List of job records from API
-     * @return List of job records with decoded HTML special characters
-     */
-    private List<JobRecord> processJobRecords(List<JobRecord> jobs) {
-        System.out.println("Processing " + jobs.size() + " job records to replace HTML entities");
-
-        List<JobRecord> processedJobs = jobs.stream().map(job -> {
-            // Create a new JobBean and copy all values
-            JobBean bean = new JobBean();
-            bean.setId(job.id());
-            bean.setUrl(job.url());
-            bean.setJobSlug(job.jobSlug());
-
-            // Process and log the job title
-            String originalTitle = job.jobTitle();
-            String processedTitle = replaceHtmlEntities(originalTitle);
-            if (!originalTitle.equals(processedTitle)) {
-                System.out.println("Replaced HTML entities in job title: '"
-                                    + originalTitle
-                                    + "' -> '"
-                                    + processedTitle
-                                    + "'");
-            }
-            bean.setJobTitle(processedTitle);
-
-            // Process and log company name
-            String originalCompanyName = job.companyName();
-            String processedCompanyName = replaceHtmlEntities(originalCompanyName);
-            if (!originalCompanyName.equals(processedCompanyName)) {
-                System.out.println("Replaced HTML entities in company name: '"
-                                    + originalCompanyName
-                                    + "' -> '" + processedCompanyName
-                                    + "'");
-            }
-            bean.setCompanyName(processedCompanyName);
-
-            bean.setCompanyLogo(job.companyLogo());
-
-            // Replace HTML special characters in industry list with improved debugging
-            if (job.jobIndustry() != null) {
-                List<String> cleanedIndustries = job.jobIndustry().stream()
-                    .map(industry -> {
-                        String processed = replaceHtmlEntities(industry);
-                        if (!industry.equals(processed)) {
-                            System.out.println("Replaced HTML entities in industry: '"
-                                                + industry + "' -> '" + processed + "'");
-                        }
-                        return processed;
-                    })
-                    .collect(Collectors.toList());
-                bean.setJobIndustry(cleanedIndustries);
-            } else {
-                bean.setJobIndustry(job.jobIndustry());
-            }
-
-            // Replace HTML special characters in job type list with improved debugging
-            if (job.jobType() != null) {
-                List<String> cleanedTypes = job.jobType().stream()
-                    .map(type -> {
-                        String processed = replaceHtmlEntities(type);
-                        if (!type.equals(processed)) {
-                            System.out.println("Replaced HTML entities in job type: '"
-                                                + type + "' -> '" + processed + "'");
-                        }
-                        return processed;
-                    })
-                    .collect(Collectors.toList());
-                bean.setJobType(cleanedTypes);
-            } else {
-                bean.setJobType(job.jobType());
-            }
-
-            // Process and log job geo
-            String originalGeo = job.jobGeo();
-            String processedGeo = replaceHtmlEntities(originalGeo);
-            if (originalGeo != null && !originalGeo.equals(processedGeo)) {
-                System.out.println("Replaced HTML entities in job geo: '"
-                                    + originalGeo + "' -> '" + processedGeo + "'");
-            }
-            bean.setJobGeo(processedGeo);
-
-            // Process and log job level
-            String originalLevel = job.jobLevel();
-            String processedLevel = replaceHtmlEntities(originalLevel);
-            if (originalLevel != null && !originalLevel.equals(processedLevel)) {
-                System.out.println("Replaced HTML entities in job level: '"
-                                    + originalLevel + "' -> '" + processedLevel + "'");
-            }
-            bean.setJobLevel(processedLevel);
-
-            // Process and log job excerpt
-            String originalExcerpt = job.jobExcerpt();
-            String processedExcerpt = replaceHtmlEntities(originalExcerpt);
-            if (originalExcerpt != null && !originalExcerpt.equals(processedExcerpt)) {
-                System.out.println("Replaced HTML entities in job excerpt");
-            }
-            bean.setJobExcerpt(processedExcerpt);
-
-            // Process job description - this can be long so don't log the whole thing
-            String originalDescription = job.jobDescription();
-            String processedDescription = replaceHtmlEntities(originalDescription);
-            if (originalDescription != null && !originalDescription.equals(processedDescription)) {
-                System.out.println("Replaced HTML entities in job description for job: " + processedTitle);
-            }
-            bean.setJobDescription(processedDescription);
-
-            bean.setPubDate(job.pubDate());
-            bean.setAnnualSalaryMin(job.annualSalaryMin());
-            bean.setAnnualSalaryMax(job.annualSalaryMax());
-            bean.setSalaryCurrency(job.salaryCurrency());
-            bean.setRating(job.rating());
-            bean.setComments(job.comments());
-
-            return bean.toRecord();
-        }).collect(Collectors.toList());
-
-        System.out.println("Processed " + processedJobs.size() + " job records");
-        return processedJobs;
-    }
-
-    /**
-     * Replaces common HTML special characters in a string with more comprehensive handling.
-     *
-     * @param text Text with potential HTML special characters
-     * @return Text with replaced HTML special characters
-     */
-    public static String replaceHtmlEntities(String text) {
-        if (text == null || text.isEmpty()) {
-            return text;
-        }
-
-        // Create a more comprehensive map of HTML entities and their replacements
-        java.util.Map<String, String> htmlEntities = new java.util.HashMap<>();
-        htmlEntities.put("&amp;", "&");
-        htmlEntities.put("&lt;", "<");
-        htmlEntities.put("&gt;", ">");
-        htmlEntities.put("&quot;", "\"");
-        htmlEntities.put("&#39;", "'");
-        htmlEntities.put("&apos;", "'");
-        htmlEntities.put("&nbsp;", " ");
-        htmlEntities.put("&ndash;", "–");
-        htmlEntities.put("&mdash;", "—");
-        htmlEntities.put("&lsquo;", "'");
-        htmlEntities.put("&rsquo;", "'");
-        htmlEntities.put("&ldquo;", "\"");
-        htmlEntities.put("&rdquo;", "\"");
-        htmlEntities.put("&bull;", "•");
-        htmlEntities.put("&copy;", "©");
-        htmlEntities.put("&reg;", "®");
-        htmlEntities.put("&trade;", "™");
-        htmlEntities.put("&euro;", "€");
-        htmlEntities.put("&pound;", "£");
-        htmlEntities.put("&yen;", "¥");
-        htmlEntities.put("&cent;", "¢");
-
-        // First handle nested entities (like &amp;amp;) by applying multiple passes
-        String result = text;
-        String prevResult;
-        do {
-            prevResult = result;
-            for (java.util.Map.Entry<String, String> entry : htmlEntities.entrySet()) {
-                result = result.replace(entry.getKey(), entry.getValue());
-            }
-        } while (!result.equals(prevResult));
-
-        // Handle numeric entities (like &#123;)
-        java.util.regex.Pattern numericPattern = java.util.regex.Pattern.compile("&#(\\d+);");
-        java.util.regex.Matcher numericMatcher = numericPattern.matcher(result);
-        StringBuilder numericBuilder = new StringBuilder();
-        while (numericMatcher.find()) {
-            try {
-                String numStr = numericMatcher.group(1);
-                int code = Integer.parseInt(numStr);
-                numericMatcher.appendReplacement(numericBuilder, String.valueOf((char) code));
-            } catch (NumberFormatException e) {
-                numericMatcher.appendReplacement(numericBuilder, numericMatcher.group(0));
-            } catch (IllegalArgumentException e) {
-                // In case of invalid replacement or any other issues
-                numericMatcher.appendReplacement(numericBuilder, numericMatcher.group(0));
-            }
-        }
-        numericMatcher.appendTail(numericBuilder);
-        result = numericBuilder.toString();
-
-        // Handle hexadecimal entities (like &#x1F600;)
-        java.util.regex.Pattern hexPattern = java.util.regex.Pattern.compile("&#[xX]([0-9a-fA-F]+);");
-        java.util.regex.Matcher hexMatcher = hexPattern.matcher(result);
-        StringBuilder hexBuilder = new StringBuilder();
-        while (hexMatcher.find()) {
-            try {
-                String hex = hexMatcher.group(1);
-                int code = Integer.parseInt(hex, 16);
-                String replacement = String.valueOf(Character.toChars(code));
-                // Need to quote the replacement to avoid special character issues
-                hexMatcher.appendReplacement(hexBuilder, java.util.regex.Matcher.quoteReplacement(replacement));
-            } catch (Exception e) {
-                hexMatcher.appendReplacement(hexBuilder, hexMatcher.group(0));
-            }
-        }
-        hexMatcher.appendTail(hexBuilder);
-        result = hexBuilder.toString();
-
-        // Log a message if we detect any remaining HTML entities
-        if (result.matches(".*&[a-zA-Z0-9#]+;.*")) {
-            System.out.println("Warning: Possible unhandled HTML entity in: " + result);
-        }
-
-        return result;
     }
 
     /**
