@@ -107,6 +107,8 @@ public class ColorTheme {
      * Constructor for ColorTheme.
      */
     private ColorTheme (
+            //make the thing taking in hashmap or enum - 1 - static and final - only used by colortheme and not anywhere else
+            //do whatever it is thats easiest to make adjustments (probably helpers is easiest to make adjustments but try several options and see)
             // Button colors
             Color buttonNormal, Color buttonHover,
             Color secondaryButtonNormal, Color secondaryButtonHover,

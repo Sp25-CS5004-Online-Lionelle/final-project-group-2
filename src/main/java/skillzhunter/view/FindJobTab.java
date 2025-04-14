@@ -30,7 +30,6 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
 import skillzhunter.controller.IController;
-import skillzhunter.controller.MainController;
 import skillzhunter.model.JobRecord;
 
 /**
@@ -403,37 +402,21 @@ public class FindJobTab extends JobView {
         int modelIdx = jobsTable.convertRowIndexToModel(viewIdx);
         JobRecord selectedJob = jobsList.get(modelIdx);
         
-        // Check if job is already saved using MainController's method
-        if (controller instanceof MainController mainController) {
-            if (mainController.isJobAlreadySaved(selectedJob)) {
-                JOptionPane.showMessageDialog(this,
-                        "This job is already saved.",
-                        "Job Already Saved",
-                        JOptionPane.INFORMATION_MESSAGE,
-                        infoIcon);
-                return;
-            }
-            
-            // Add the job to saved jobs
-            controller.job2SavedList(selectedJob);
-            
-            // Set default rating and comments
-            mainController.getUpdateJob(selectedJob.id(), "No comments provided", 0);
-        } else {
-            // Fallback to basic check if not using MainController
-            List<JobRecord> savedJobs = controller.getSavedJobs();
-            if (savedJobs != null && savedJobs.stream().anyMatch(job -> job.id() == selectedJob.id())) {
-                JOptionPane.showMessageDialog(this,
-                        "This job is already saved.",
-                        "Job Already Saved",
-                        JOptionPane.INFORMATION_MESSAGE,
-                        infoIcon);
-                return;
-            }
-            
-            // Add the job to saved jobs
-            controller.job2SavedList(selectedJob);
+        // Check if job is already saved using controller's method
+        if (controller.isJobAlreadySaved(selectedJob)) {
+            JOptionPane.showMessageDialog(this,
+                    "This job is already saved.",
+                    "Job Already Saved",
+                    JOptionPane.INFORMATION_MESSAGE,
+                    infoIcon);
+            return;
         }
+        
+        // Add the job to saved jobs
+        controller.job2SavedList(selectedJob);
+        
+        // Set default rating and comments
+        controller.getUpdateJob(selectedJob.id(), "No comments provided", 0);
         
         // Show success message
         JOptionPane.showMessageDialog(this,

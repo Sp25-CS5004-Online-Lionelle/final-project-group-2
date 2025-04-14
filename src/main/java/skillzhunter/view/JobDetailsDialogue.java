@@ -6,7 +6,6 @@ import java.util.List;
 
 import skillzhunter.model.JobRecord;
 import skillzhunter.controller.IController;
-import skillzhunter.controller.MainController;
 
 /**
  * Dialog for displaying job details with the option to save the job.
@@ -224,9 +223,7 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
         controller.job2SavedList(job);
         
         // Then update the job with the rating and comments through the controller
-        if (controller instanceof MainController cont) {
-            cont.getUpdateJob(job.id(), commentText, newRating);
-        }
+        controller.getUpdateJob(job.id(), commentText, newRating);
         
         // Show success message
         JOptionPane.showMessageDialog(
