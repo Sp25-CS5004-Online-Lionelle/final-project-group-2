@@ -4,7 +4,6 @@ import java.awt.Component;
 import javax.swing.*;
 
 import skillzhunter.controller.IController;
-import skillzhunter.controller.MainController;
 import skillzhunter.model.JobRecord;
 
 /**
@@ -52,12 +51,9 @@ public final class JobActionHelper {
     public static void saveJob(JobRecord job, String comments, int rating, 
                                IController controller, Component parent) {
         controller.job2SavedList(job);
-
-        if (controller instanceof MainController cont) {
-            cont.getUpdateJob(job.id(), 
-                comments != null && !comments.isEmpty() ? comments : "No comments provided", 
-                rating);
-        }
+        controller.getUpdateJob(job.id(), 
+            comments != null && !comments.isEmpty() ? comments : "No comments provided", 
+            rating);
 
         if (parent != null) {
             JOptionPane.showMessageDialog(parent,
@@ -107,8 +103,8 @@ public final class JobActionHelper {
             EDIT_ICON
         );
 
-        if (result == JOptionPane.OK_OPTION && controller instanceof MainController mainController) {
-            JobRecord updatedJob = mainController.getUpdateJob(
+        if (result == JOptionPane.OK_OPTION) {
+            JobRecord updatedJob = controller.getUpdateJob(
                 job.id(),
                 commentsArea.getText(),
                 starRating.getRating()

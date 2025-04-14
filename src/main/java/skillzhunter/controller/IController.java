@@ -52,10 +52,10 @@ public interface IController {
      * Add a job to the saved jobs list.
      * @param jobRecord The JobRecord object to add
      */
-
     void job2SavedList(JobRecord jobRecord);
     
-    /**Used when the another part of
+    /**
+     * Used when the another part of
      * the program needs to alert the user.
      * @param alert the alert message to be sent
      **/
@@ -94,4 +94,30 @@ public interface IController {
      * @return The saved jobs tab
      */
     SavedJobsTab getSavedJobsTab();
+    
+    /**
+     * Try to add a job to the saved jobs list, checking for duplicates.
+     * 
+     * @param jobRecord The JobRecord object to add
+     * @return true if the job was added successfully, false if it was already in the list
+     */
+    boolean tryAddJobToSavedList(JobRecord jobRecord);
+    
+    /**
+     * Updates a job with new comments and rating.
+     * 
+     * @param id The ID of the job to update
+     * @param comments The comments to set
+     * @param rating The rating to set
+     * @return The updated JobRecord
+     */
+    JobRecord getUpdateJob(int id, String comments, int rating);
+    
+    /**
+     * Sets the saved jobs.
+     * 
+     * @param savedJobs List of JobRecord objects to set
+     * @return List of JobRecord objects
+     */
+    List<JobRecord> setSavedJobs(List<JobRecord> savedJobs);
 }
