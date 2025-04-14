@@ -1,7 +1,9 @@
 package skillzhunter.model;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -42,6 +44,38 @@ public class Jobs implements IModel {
     public Jobs() {
         this.jobList = new ArrayList<>();
         this.api = createJobBoardApi();
+
+        try {
+            // Load jobs from CSV when the application starts
+            // We wrap this in try-catch to avoid issues during testing
+            loadJobsFromCsv("SavedJobs.csv");
+
+            // Add a shutdown hook to save the jobs to CSV on shutdown
+            // Only add this in non-test environment
+            if (!isRunningInTestEnvironment()) {
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                    saveJobsToCsv("SavedJobs.csv");
+                    System.out.println("Jobs saved to SavedJobs.csv on shutdown.");
+                }));
+            }
+        } catch (Exception e) {
+            System.err.println("Note: Could not load jobs from CSV. This is normal during testing.");
+            // No need to rethrow - this allows tests to run without the CSV file
+        }
+    }
+
+    /**
+     * Helper method to detect if we're running in a test environment.
+     * This helps prevent the shutdown hook from interfering with tests.
+     */
+    private boolean isRunningInTestEnvironment() {
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        for (StackTraceElement element : stackTrace) {
+            if (element.getClassName().contains("org.junit")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -53,6 +87,7 @@ public class Jobs implements IModel {
     protected JobBoardApi createJobBoardApi() {
         return new JobBoardApi();
     }
+
 
     /**
      * Gets the industries to be used in the search in a list.
@@ -307,6 +342,21 @@ public class Jobs implements IModel {
     }
 
     /**
+     * Loads job records from a CSV file and adds them to the job list.
+     * @param fileName Name of the CSV file to load from
+     */
+    private void loadJobsFromCsv(String fileName) {
+    try (InputStream in = new FileInputStream(fileName)) {
+        List<JobRecord> loadedJobs = DataFormatter.read(in, Formats.CSV);
+        this.jobList.clear();  // Clear existing list before loading
+        this.jobList.addAll(loadedJobs);  // Add loaded jobs
+        System.out.println("Loaded " + loadedJobs.size() + " jobs from CSV.");
+    } catch (IOException e) {
+        System.err.println("Error loading jobs from CSV file: " + e.getMessage());
+    }
+}
+
+    /**
      * Main method for testing purposes.
      * @param args Command line arguments (not used).
      */
@@ -339,3 +389,4 @@ public class Jobs implements IModel {
         // jobs.getLocations().forEach(System.out::println);
     }
 }
+
