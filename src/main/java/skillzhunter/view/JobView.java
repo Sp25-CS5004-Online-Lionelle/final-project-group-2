@@ -117,16 +117,16 @@ public abstract class JobView extends JPanel {
         this.theme = theme;
         
         // Apply to the panel itself
-        setBackground(theme.background);
+        setBackground(theme.getBackground());
         
         // Apply to main panel
         if (mainPanel != null) {
-            mainPanel.setBackground(theme.background);
+            mainPanel.setBackground(theme.getBackground());
             
             // Apply theme to inner panels
             for (int i = 0; i < mainPanel.getComponentCount(); i++) {
                 if (mainPanel.getComponent(i) instanceof JPanel) {
-                    mainPanel.getComponent(i).setBackground(theme.background);
+                    mainPanel.getComponent(i).setBackground(theme.getBackground());
                 }
             }
         }
@@ -142,13 +142,13 @@ public abstract class JobView extends JPanel {
 
         // Apply to table
         if (jobsTable != null) {
-            jobsTable.setBackground(theme.fieldBackground);
-            jobsTable.setForeground(theme.fieldForeground);
-            jobsTable.setBorder(BorderFactory.createLineBorder(theme.buttonNormal));
+            jobsTable.setBackground(theme.getFieldBackground());
+            jobsTable.setForeground(theme.getFieldForeground());
+            jobsTable.setBorder(BorderFactory.createLineBorder(theme.getButtonNormal()));
             
             if (jobsTable.getTableHeader() != null) {
-                jobsTable.getTableHeader().setBackground(theme.fieldBackground);
-                jobsTable.getTableHeader().setForeground(theme.foreground);
+                jobsTable.getTableHeader().setBackground(theme.getFieldBackground());
+                jobsTable.getTableHeader().setForeground(theme.getForeground());
             }
             
             // Call the table's applyTheme method

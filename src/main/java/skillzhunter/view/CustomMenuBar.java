@@ -136,15 +136,15 @@ public class CustomMenuBar extends JPanel {
      */
     public void applyTheme(ColorTheme theme) {
         // Apply theme to menu panel
-        setBackground(theme.background);
+        setBackground(theme.getBackground());
         
         // Update line color based on theme
         if (theme == ColorTheme.DARK) {
             // In dark mode, use the teal color from the dark theme
-            lineColor = theme.buttonNormal;
+            lineColor = theme.getButtonNormal();
         } else {
             // In light mode, use the blue color from the light theme
-            lineColor = theme.buttonNormal;
+            lineColor = theme.getButtonNormal();
         }
         
         // Update settings icon based on theme using IconLoader
@@ -162,17 +162,17 @@ public class CustomMenuBar extends JPanel {
         
         // Theme popup menus - this is system-wide and will affect all popups
         UIManager.put("PopupMenu.background", theme == ColorTheme.DARK
-            ? theme.menuBarBackgroundDark : theme.menuBarBackgroundLight);
+            ? theme.getMenuBarBackgroundDark() : theme.getMenuBarBackgroundLight());
         UIManager.put("PopupMenu.foreground", theme == ColorTheme.DARK
-            ? theme.menuBarForegroundDark : theme.menuBarForegroundLight);
+            ? theme.getMenuBarForegroundDark() : theme.getMenuBarForegroundLight());
         UIManager.put("MenuItem.background", theme == ColorTheme.DARK
-            ? theme.menuBarBackgroundDark : theme.menuBarBackgroundLight);
+            ? theme.getMenuBarBackgroundDark() : theme.getMenuBarBackgroundLight());
         UIManager.put("MenuItem.foreground", theme == ColorTheme.DARK
-            ? theme.menuBarForegroundDark : theme.menuBarForegroundLight);
+            ? theme.getMenuBarForegroundDark() : theme.getMenuBarForegroundLight());
         UIManager.put("Menu.background", theme == ColorTheme.DARK 
-            ? theme.menuBarBackgroundDark : theme.menuBarBackgroundLight);
+            ? theme.getMenuBarBackgroundDark() : theme.getMenuBarBackgroundLight());
         UIManager.put("Menu.foreground", theme == ColorTheme.DARK
-            ? theme.menuBarForegroundDark : theme.menuBarForegroundLight);
+            ? theme.getMenuBarForegroundDark() : theme.getMenuBarForegroundLight());
         
         // Repaint to show the updated line color
         repaint();

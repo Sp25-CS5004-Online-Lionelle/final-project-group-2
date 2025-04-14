@@ -90,11 +90,11 @@ public class TabStyleManager {
         
         if (isMacOS) {
             tabPaneBackground = (theme == ColorTheme.DARK)
-                                ? theme.macTabPaneBgDark : theme.macTabPaneBgLight;
+                                ? theme.getMacTabPaneBgDark() : theme.getMacTabPaneBgLight();
         } else {
             tabPaneBackground = (theme == ColorTheme.DARK)
-                                ? theme.winTabPaneBgDark 
-                                : theme.winTabPaneBgLight;
+                                ? theme.getWinTabPaneBgDark() 
+                                : theme.getWinTabPaneBgLight();
         }
         
         // Apply background color to tabbedPane
@@ -119,38 +119,38 @@ public class TabStyleManager {
             // macOS coloring
             if (theme == ColorTheme.DARK) {
                 if (isSelected) {
-                    bg = theme.macSelectedBgDark;
-                    fg = theme.macSelectedFgDark;
+                    bg = theme.getMacSelectedBgDark();
+                    fg = theme.getMacSelectedFgDark();
                 } else {
-                    bg = theme.macUnselectedBgDark;
-                    fg = theme.macUnselectedFgDark;
+                    bg = theme.getMacUnselectedBgDark();
+                    fg = theme.getMacUnselectedFgDark();
                 }
             } else {
                 if (isSelected) {
-                    bg = theme.macSelectedBgLight;
-                    fg = theme.macSelectedFgLight; 
+                    bg = theme.getMacSelectedBgLight();
+                    fg = theme.getMacSelectedFgLight(); 
                 } else {
-                    bg = theme.macUnselectedBgLight;
-                    fg = theme.macUnselectedFgLight;
+                    bg = theme.getMacUnselectedBgLight();
+                    fg = theme.getMacUnselectedFgLight();
                 }
             }
         } else {
             // Windows/Linux coloring
             if (theme == ColorTheme.DARK) {
                 if (isSelected) {
-                    bg = theme.winSelectedBgDark;
-                    fg = theme.winSelectedFgDark;
+                    bg = theme.getWinSelectedBgDark();
+                    fg = theme.getWinSelectedFgDark();
                 } else {
-                    bg = theme.winUnselectedBgDark;
-                    fg = theme.winUnselectedFgDark;
+                    bg = theme.getWinUnselectedBgDark();
+                    fg = theme.getWinUnselectedFgDark();
                 }
             } else {
                 if (isSelected) {
-                    bg = theme.winSelectedBgLight;
-                    fg = theme.winSelectedFgLight;
+                    bg = theme.getWinSelectedBgLight();
+                    fg = theme.getWinSelectedFgLight();
                 } else {
-                    bg = theme.winUnselectedBgLight;
-                    fg = theme.winUnselectedFgLight;
+                    bg = theme.getWinUnselectedBgLight();
+                    fg = theme.getWinUnselectedFgLight();
                 }
             }
         }

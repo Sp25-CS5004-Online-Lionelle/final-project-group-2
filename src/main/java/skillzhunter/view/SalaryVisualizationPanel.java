@@ -118,7 +118,7 @@ public class SalaryVisualizationPanel extends JPanel {
      */
     public void applyTheme(ColorTheme theme) {
         this.theme = theme;
-        setBackground(theme.fieldBackground);
+        setBackground(theme.getFieldBackground());
         repaint();
     }
     
@@ -373,3 +373,4 @@ public class SalaryVisualizationPanel extends JPanel {
         return str.substring(0, maxLength - 3) + "...";
     }
 }
+
