@@ -7,17 +7,6 @@ import java.util.List;
  */
 public interface IModel {
     /**
-     * Interface for an alert listener that can receive alerts from the model.
-     */
-    interface AlertListener {
-        /**
-         * Called when the model needs to send an alert.
-         * @param alertMessage The alert message
-         */
-        void onAlert(String alertMessage);
-    }
-    
-    /**
      * Sets the alert listener for this model.
      * @param listener The alert listener
      */
@@ -87,11 +76,20 @@ public interface IModel {
 
     /**
      * Exports the saved jobs to the specified format and file path.
+     * This handles all formats, including CSV (which uses exportCustomCSV internally).
+     * 
      * @param jobs List of job records to export
      * @param formatStr Format string (e.g., "CSV", "JSON")
      * @param filePath Path to the output file
      */
     void exportSavedJobs(List<JobRecord> jobs, String formatStr, String filePath);
+    
+    /**
+     * Cleans a job record by processing HTML entities.
+     * @param job The job to clean
+     * @return A cleaned job record
+     */
+    JobRecord cleanJob(JobRecord job);
 
     /**
      * Sends an alert message.
