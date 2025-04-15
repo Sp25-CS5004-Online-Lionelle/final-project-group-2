@@ -26,9 +26,6 @@ public final class JobActionHelper {
     /** Success icon for confirmation dialogs, loaded from resources. */
     private static final ImageIcon SUCCESS_ICON = IconLoader.loadIcon("images/success.png");
 
-    /** Information icon for informational dialogs, loaded from resources. */
-    private static final ImageIcon INFO_ICON = IconLoader.loadIcon("images/info.png");
-
     /**
      * Private constructor to prevent instantiation of this utility class.
      * 
