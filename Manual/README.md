@@ -1,3 +1,5 @@
 # Manual 
+Job Hunter Manual 
 
-You will update this manual and add any files here that you need for an 'application' manual for your program. Make sure to include screenshots of various features. 
+The job hunter app is an application designed to allow users to easily find and save employment opportunities in an easy-to-use graphical user interface. This document is the user manual associated with the application with the aim of guiding user explaining how to use the application. The components of this application can split between two over-arching goals: Finding a and Saving a Job. 
+
