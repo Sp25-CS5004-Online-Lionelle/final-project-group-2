@@ -7,14 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import skillzhunter.model.AlertListener;
 import skillzhunter.model.IModel;
-import skillzhunter.model.IModel.AlertListener;
 import skillzhunter.model.JobRecord;
-import skillzhunter.model.Jobs;
-import skillzhunter.model.formatters.DataFormatter;
 import skillzhunter.view.IView;
-import skillzhunter.view.MainView;
-import skillzhunter.view.SavedJobsTab;
 
 public class MainController implements IController, AlertListener {
 
@@ -22,27 +18,15 @@ public class MainController implements IController, AlertListener {
     private IModel model;
     /** View. */
     private IView view;
-    /** Saved jobs tab. */
-    private SavedJobsTab savedJobsTab;
     /** List of alert observers. */
     private final List<AlertObserver> alertObservers = new ArrayList<>();
 
     /**
      * Constructor for MainController.
-     * Initializes the model and view.
+     * Creates a controller without model or view.
      */
     public MainController() {
-        // Model
-        model = new Jobs();
-        
-        // Register this controller as the model's alert listener
-        model.setAlertListener(this);
-        
-        // Saved jobs tab initialized with actual saved jobs list
-        savedJobsTab = new SavedJobsTab(this, model.getJobRecords());
-
-        // View - create after model and controller are properly linked
-        view = new MainView(this);
+        // Empty constructor, model and view are set later through setter methods
     }
 
     /**
@@ -66,6 +50,38 @@ public class MainController implements IController, AlertListener {
     }
 
     /**
+     * Sets the model for this controller.
+     * Also registers this controller as the model's alert listener.
+     * 
+     * @param model The model to set
+     */
+    @Override
+    public void setModel(IModel model) {
+        this.model = model;
+        
+        // Register this controller as the model's alert listener
+        if (model != null) {
+            model.setAlertListener(this);
+        }
+    }
+    
+    /**
+     * Sets the view for this controller.
+     * Also gives the view a reference to this controller.
+     * 
+     * @param view The view to set
+     */
+    @Override
+    public void setView(IView view) {
+        this.view = view;
+        
+        // Give view a reference to this controller
+        if (view != null) {
+            view.setController(this);
+        }
+    }
+
+    /**
      * Returns the view.
      * 
      * @return The view
@@ -76,33 +92,12 @@ public class MainController implements IController, AlertListener {
     }
 
     /**
-     * Sets the view and updates the saved jobs tab.
-     * 
-     * @param view The view to set
-     */
-    public void setView(IView view) {
-        this.view = view;
-    }
-
-    /**
      * Returns the model.
      * @return IModel
      */
     @Override
     public IModel getModel() {
         return model;
-    }
-
-    /**
-     * Sets the model and updates the saved jobs tab.
-     * 
-     * @param model The model to set
-     */
-    public void setModel(IModel model) {
-        this.model = model;
-        // Register this controller as the model's alert listener
-        model.setAlertListener(this);
-        savedJobsTab.updateJobsList(model.getJobRecords());
     }
     
     /**
@@ -111,6 +106,9 @@ public class MainController implements IController, AlertListener {
      */
     @Override
     public List<String> getLocations() {
+        if (model == null) {
+            return Collections.emptyList();
+        }
         return capitalizeItems(model.getLocations(), Collections.emptyMap());
     }
 
@@ -120,6 +118,9 @@ public class MainController implements IController, AlertListener {
      */
     @Override
     public List<String> getIndustries() {
+        if (model == null) {
+            return Collections.emptyList();
+        }
         Map<String, String> specialCases = new HashMap<>();
         specialCases.put("hr", "HR");
         return capitalizeItems(model.getIndustries(), specialCases);
@@ -174,6 +175,9 @@ public class MainController implements IController, AlertListener {
      */
     @Override
     public List<JobRecord> getApiCall(String query, Integer numberOfResults, String location, String industry) {
+        if (model == null) {
+            return Collections.emptyList();
+        }
         return model.searchJobs(query, numberOfResults, location, industry);
     }
 
@@ -184,6 +188,9 @@ public class MainController implements IController, AlertListener {
      */
     @Override
     public List<JobRecord> getSavedJobs() {
+        if (model == null) {
+            return Collections.emptyList();
+        }
         return model.getJobRecords();
     }
 
@@ -195,12 +202,15 @@ public class MainController implements IController, AlertListener {
      */
     @Override
     public List<JobRecord> setSavedJobs(List<JobRecord> savedJobs) {
+        if (model == null || savedJobs == null) {
+            return Collections.emptyList();
+        }
+        
         for (JobRecord job : savedJobs) {
             model.addJob(job);
         }
-        List<JobRecord> savedJobsList = model.getJobRecords();
-        savedJobsTab.updateJobsList(savedJobsList);
-        return savedJobsList;
+        
+        return model.getJobRecords();
     }
 
     /**
@@ -211,6 +221,10 @@ public class MainController implements IController, AlertListener {
      */
     @Override
     public boolean isJobAlreadySaved(JobRecord jobRecord) {
+        if (model == null || jobRecord == null) {
+            return false;
+        }
+        
         List<JobRecord> savedJobs = getSavedJobs();
         
         // Check if the job is already in the list
@@ -225,6 +239,10 @@ public class MainController implements IController, AlertListener {
      */
     @Override
     public void jobToSavedList(JobRecord jobRecord) {
+        if (model == null || jobRecord == null) {
+            return;
+        }
+        
         model.addJob(jobRecord);
     }
     
@@ -236,6 +254,10 @@ public class MainController implements IController, AlertListener {
      */
     @Override
     public boolean tryAddJobToSavedList(JobRecord jobRecord) {
+        if (model == null || jobRecord == null) {
+            return false;
+        }
+        
         // Check if the job is already in the list
         if (isJobAlreadySaved(jobRecord)) {
             return false;
@@ -253,75 +275,54 @@ public class MainController implements IController, AlertListener {
      */
     @Override
     public void removeJobFromList(int index) {
+        if (model == null) {
+            return;
+        }
+        
         model.removeJob(index);
     }
 
     /**
-     * Saves the job records to a CSV file using a custom CSV writer
-     * that properly handles collections and HTML content.
+     * Saves the job records to a CSV file.
      * 
      * @param filePath The file path to save the CSV file
      */
     @Override
     public void pathToCSV(String filePath) {
-        // Get all job records
-        List<JobRecord> jobs = model.getJobRecords();
-
-        // Make sure the parent directory exists
-        File file = new File(filePath);
-        File parentDir = file.getParentFile();
-        if (parentDir != null && !parentDir.exists()) {
-            boolean dirCreated = parentDir.mkdirs();
-            if (!dirCreated) {
-                System.err.println("Failed to create directory: " + parentDir.getAbsolutePath());
-            }
+        if (model == null || filePath == null || filePath.isEmpty()) {
+            return;
         }
-
-        // Get from DataFormatter the custom CSV writer
-        System.out.println("Saving to: " + file.getAbsolutePath());
-        DataFormatter.exportCustomCSV(jobs, filePath);
+        
+        // Use the model's method to save to CSV
+        model.saveJobsToCsv(filePath);
     }
     
     /**
      * Exports the saved jobs to a specified format and file path.
+     * This uses the model's exportSavedJobs method which handles all formats.
+     * 
      * @param jobs The list of JobRecord objects to export
      * @param formatStr The format string (e.g., "csv", "json")
      * @param filePath The file path to save the exported file
      */
     @Override
     public void exportToFileType(List<JobRecord> jobs, String formatStr, String filePath) {
+        if (model == null || jobs == null || formatStr == null || filePath == null) {
+            return;
+        }
+        
         // Make sure the parent directory exists
         File file = new File(filePath);
         File parentDir = file.getParentFile();
         if (parentDir != null && !parentDir.exists()) {
-            boolean dirCreated = parentDir.mkdirs();
-            if (!dirCreated) {
+            boolean created = parentDir.mkdirs();
+            if (!created) {
                 System.err.println("Failed to create directory: " + parentDir.getAbsolutePath());
             }
         }
 
-        System.out.println("Exporting " + jobs.size() + " jobs to " + formatStr + ": " + file.getAbsolutePath());
-        
-        if ("CSV".equalsIgnoreCase(formatStr)) {
-            // Use the static method in DataFormatter
-            DataFormatter.exportCustomCSV(jobs, filePath);
-        } else {
-            // Use the model's export for other formats
-            model.exportSavedJobs(jobs, formatStr, filePath);
-        }
-        
-        // Verify the file was created
-        File savedFile = new File(filePath);
-        System.out.println("File exists after export: " + savedFile.exists() + ", size: " + savedFile.length());
-    }
-
-    /**
-     * Gets the saved jobs tab.
-     * @return The saved jobs tab
-     */
-    @Override
-    public SavedJobsTab getSavedJobsTab() {
-        return savedJobsTab;
+        // Use the model's method to export jobs in the specified format
+        model.exportSavedJobs(jobs, formatStr, filePath);
     }
     
     /**
@@ -334,11 +335,12 @@ public class MainController implements IController, AlertListener {
      */
     @Override
     public JobRecord getUpdateJob(int id, String comments, int rating) {
+        if (model == null) {
+            return null;
+        }
+        
         // Call model to update the job
         model.updateJob(id, comments, rating);
-        
-        // Update the view with the latest data
-        savedJobsTab.updateJobsList(model.getJobRecords());
         
         // Return the updated job record so the view can use it
         for (JobRecord job : model.getJobRecords()) {
@@ -355,11 +357,12 @@ public class MainController implements IController, AlertListener {
      * Handles alert messages from the model and forwards them to observers.
      * This is the implementation of the AlertListener interface.
      * 
-     * @param alertMessage The alert message
+     * @param message The alert message
      */
     @Override
-    public void onAlert(String alertMessage) {
-        sendAlert(alertMessage);
+    public void onAlert(String message) {
+        // Forward the alert to all registered observers
+        sendAlert(message);
     }
 
     /**
@@ -387,22 +390,17 @@ public class MainController implements IController, AlertListener {
 
     /**
      * Clean job record and sanitize html for view.
+     * Uses the model's cleanJob method to process the job record.
+     * 
      * @param job Job record to clean
      * @return Cleaned job record
      */
     @Override
     public JobRecord cleanJobRecord(JobRecord job){
-        JobRecord cleanJobRecord = DataFormatter.processJobHtml(job);
-        return cleanJobRecord;
-    }
-    
-    /**
-     * Main method for testing purposes.
-     * @param args Command line arguments (not used).
-     */
-    public static void main(String[] args) {
-        MainController mainController = new MainController();
-        IView mainView = mainController.getView();
-        mainView.run();
+        if (model == null || job == null) {
+            return null;
+        }
+        
+        return model.cleanJob(job);
     }
 }

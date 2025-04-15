@@ -342,20 +342,17 @@ public class Jobs implements IModel {
 
     /**
      * Exports the saved jobs to a specified format and file path.
+     * Handles all formats, including CSV (which uses exportCustomCSV internally).
+     * 
      * @param jobs List of JobRecord objects to export
      * @param formatStr Format string (e.g., "CSV", "JSON")
      * @param filePath Path to the output file
      */
     @Override
     public void exportSavedJobs(List<JobRecord> jobs, String formatStr, String filePath) {
-        // Check if the format is valid
-        Formats format = Formats.containsValues(formatStr);
-        if (format == null) {
-            throw new IllegalArgumentException("Unsupported format: " + formatStr);
+        if (jobs == null || formatStr == null || filePath == null) {
+            throw new IllegalArgumentException("Jobs, format, and file path must not be null");
         }
-
-        // Debug information before export
-        System.out.println("Exporting " + jobs.size() + " jobs to " + formatStr + ": " + filePath);
         
         // Ensure the parent directory exists
         File file = new File(filePath);
@@ -365,16 +362,43 @@ public class Jobs implements IModel {
             System.out.println("Created directory structure: " + created);
         }
         
-        // Export the jobs to the specified file
-        try (OutputStream out = new FileOutputStream(filePath)) {
-            // DataFormatter now handles escaping correctly for each format
-            DataFormatter.write(jobs, format, out);
-            System.out.println("Export completed successfully to " + filePath);
+        System.out.println("Exporting " + jobs.size() + " jobs to " + formatStr + ": " + filePath);
+        
+        // Handle CSV format internally using the custom CSV exporter
+        if ("CSV".equalsIgnoreCase(formatStr)) {
+            DataFormatter.exportCustomCSV(jobs, filePath);
+            return;
+        }
+        
+        // For other formats, use the standard export mechanism
+        try {
+            // Check if the format is valid
+            Formats format = Formats.containsValues(formatStr);
+            if (format == null) {
+                throw new IllegalArgumentException("Unsupported format: " + formatStr);
+            }
+            
+            // Export the jobs to the specified file
+            try (OutputStream out = new FileOutputStream(filePath)) {
+                // DataFormatter now handles escaping correctly for each format
+                DataFormatter.write(jobs, format, out);
+                System.out.println("Export completed successfully to " + filePath);
+            }
         } catch (IOException e) {
             System.err.println("Failed to export jobs: " + e.getMessage());
-            // e.printStackTrace();
             throw new RuntimeException("Failed to export jobs: " + e.getMessage(), e);
         }
+    }
+    
+    /**
+     * Cleans a job record by processing HTML entities.
+     * 
+     * @param job The job to clean
+     * @return A cleaned job record
+     */
+    @Override
+    public JobRecord cleanJob(JobRecord job) {
+        return DataFormatter.processJobHtml(job);
     }
 
     /**
@@ -414,5 +438,68 @@ public class Jobs implements IModel {
         } catch (IOException e) {
             System.err.println("Error loading jobs from CSV file: " + e.getMessage());
         }
+    }
+    
+    /**
+     * Cleans HTML entities from job industry strings.
+     * This can be called to fix the jobIndustry field of existing jobs.
+     */
+    public void cleanJobIndustries() {
+        for (int i = 0; i < jobList.size(); i++) {
+            JobRecord job = jobList.get(i);
+            
+            // Skip if jobIndustry is null
+            if (job.jobIndustry() == null) {
+                continue;
+            }
+            
+            // Check if any industry contains "&amp;"
+            boolean needsCleaning = false;
+            for (String industry : job.jobIndustry()) {
+                if (industry != null && industry.contains("&amp;")) {
+                    needsCleaning = true;
+                    break;
+                }
+            }
+            
+            // Only process job if it needs cleaning
+            if (needsCleaning) {
+                System.out.println("Cleaning job industry for job: " + job.id() + " - " + job.jobTitle());
+                
+                // Create a new list with cleaned industry names
+                List<String> cleanedIndustries = new ArrayList<>();
+                for (String industry : job.jobIndustry()) {
+                    String cleaned = DataFormatter.replaceHtmlEntities(industry);
+                    cleanedIndustries.add(cleaned);
+                    System.out.println("  Original: '" + industry + "' → Cleaned: '" + cleaned + "'");
+                }
+                
+                // Create a new job record with the cleaned industry list
+                JobBean jobBean = new JobBean();
+                jobBean.setId(job.id());
+                jobBean.setUrl(job.url());
+                jobBean.setJobSlug(job.jobSlug());
+                jobBean.setJobTitle(job.jobTitle());
+                jobBean.setCompanyName(job.companyName());
+                jobBean.setCompanyLogo(job.companyLogo());
+                jobBean.setJobIndustry(cleanedIndustries);
+                jobBean.setJobType(job.jobType());
+                jobBean.setJobGeo(job.jobGeo());
+                jobBean.setJobLevel(job.jobLevel());
+                jobBean.setJobExcerpt(job.jobExcerpt());
+                jobBean.setJobDescription(job.jobDescription());
+                jobBean.setPubDate(job.pubDate());
+                jobBean.setAnnualSalaryMin(job.annualSalaryMin());
+                jobBean.setAnnualSalaryMax(job.annualSalaryMax());
+                jobBean.setSalaryCurrency(job.salaryCurrency());
+                jobBean.setRating(job.rating());
+                jobBean.setComments(job.comments());
+                
+                // Replace the job in the list
+                jobList.set(i, jobBean.toRecord());
+            }
+        }
+        
+        System.out.println("Finished cleaning job industries");
     }
 }

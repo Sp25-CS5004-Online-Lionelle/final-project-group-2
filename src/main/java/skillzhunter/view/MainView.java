@@ -20,8 +20,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+import skillzhunter.controller.AlertObserver;
 import skillzhunter.controller.IController;
-import skillzhunter.controller.IController.AlertObserver;
 
 public class MainView extends JFrame implements IView, AlertObserver {
     /** Main Pane. */
@@ -29,30 +29,23 @@ public class MainView extends JFrame implements IView, AlertObserver {
     /** Find Job Tab. */
     private JobView findJobTab;
     /** Saved Job Tab. */
-    private JobView savedJobTab; // Removed final modifier
+    private JobView savedJobTab;
     /** Tabbed Pane. */
     private JTabbedPane tabbedPane;
     /** Tab Style Manager. */
     private TabStyleManager tabStyleManager;
     /** Controller. */
-    private final IController controller;
+    private IController controller;
     /** Custom Menu Bar. */
     private CustomMenuBar customMenuBar;
     /** Theme. */
     private ColorTheme theme;
 
     /**
-     * Creates main view and pane for model.
-     * 
-     * @param controller The controller instance
+     * Creates main view with initial setup but without controller connection.
      */
-    public MainView(IController controller) {
+    public MainView() {
         super("Skillz Hunter App");
-        this.controller = controller;
-        
-        // Register view as alert observer with the controller
-        controller.registerAlertObserver(this);
-        
         this.setLocation(200, 200);
         
         // Change from EXIT_ON_CLOSE to DO_NOTHING_ON_CLOSE
@@ -70,11 +63,32 @@ public class MainView extends JFrame implements IView, AlertObserver {
         // Set default theme (light mode) early
         theme = ColorTheme.LIGHT;
 
+        // Initialize minimal UI components that don't need controller
+        mainPane.setLayout(new BorderLayout());
+        add(mainPane, BorderLayout.CENTER);
+        
+        // Create custom menu bar (doesn't need controller yet)
+        createCustomMenu();
+    }
+
+    /**
+     * Sets the controller for this view and completes initialization.
+     * This must be called before using the view.
+     * 
+     * @param controller The controller to set
+     */
+    @Override
+    public void setController(IController controller) {
+        this.controller = controller;
+        
+        // Register as alert observer
+        controller.registerAlertObserver(this);
+        
         try {
-            // First get the saved jobs tab from the controller (already created)
-            savedJobTab = controller.getSavedJobsTab();
-            
-            // Create find jobs tab
+            // Now we can initialize controller-dependent components
+            // Create tabs using clean dependency injection pattern
+            // The concrete classes are created here in the view layer
+            savedJobTab = new SavedJobsTab(controller, controller.getSavedJobs());
             findJobTab = new FindJobTab(controller);
             
             // Building tabbed pane
@@ -82,14 +96,13 @@ public class MainView extends JFrame implements IView, AlertObserver {
             
             // Adds tabs to main view
             mainPane.add(tabbedPane);
-            add(mainPane, BorderLayout.CENTER);
             
             // Create tab style manager
             String[] tabNames = {"Find Jobs", "Saved Jobs"};
             tabStyleManager = new TabStyleManager(tabbedPane, tabNames);
             
-            // Create custom menu
-            createCustomMenu();
+            // Map menu events now that we have controller
+            mapMenuEvents();
             
             // Apply the theme after everything is set up
             applyTheme(theme);
@@ -101,6 +114,7 @@ public class MainView extends JFrame implements IView, AlertObserver {
             
             pack();
             setupExitKeyAction();
+            
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, 
@@ -108,6 +122,17 @@ public class MainView extends JFrame implements IView, AlertObserver {
                 "Initialization Error",
                 JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    /**
+     * Implementation of AlertObserver interface.
+     * Receives alerts from the controller and displays them to the user.
+     * 
+     * @param message The alert message to display
+     */
+    @Override
+    public void onAlert(String message) {
+        notifyUser(message);
     }
 
     /**
@@ -175,15 +200,17 @@ public class MainView extends JFrame implements IView, AlertObserver {
         
         // Add the custom menu to the top of the frame
         getContentPane().add(customMenuBar, BorderLayout.NORTH);
-        
-        // Map menu events
-        mapMenuEvents();
     }
 
     /**
      * Maps action listeners to menu items.
+     * This needs to be called after controller is set.
      */
     private void mapMenuEvents() {
+        if (controller == null || customMenuBar == null) {
+            return;
+        }
+        
         // Exit Functionality
         customMenuBar.getExitItem().addActionListener(exitEvent -> {
             exitHelper();
@@ -246,17 +273,6 @@ public class MainView extends JFrame implements IView, AlertObserver {
     }
 
     /**
-     * Implementation of AlertObserver interface.
-     * Receives alerts from the controller and displays them to the user.
-     * 
-     * @param alertMessage The alert message to display
-     */
-    @Override
-    public void onAlert(String alertMessage) {
-        notifyUser(alertMessage);
-    }
-
-    /**
      * Notifies the user with a message dialog.
      * 
      * @param message The message to display
@@ -276,6 +292,11 @@ public class MainView extends JFrame implements IView, AlertObserver {
      */
     @Override
     public void run() {
+        if (controller == null) {
+            System.err.println("Error: Controller must be set before running the view");
+            return;
+        }
+        
         setVisible(true);
         
         // Apply theme once more after becoming visible
@@ -288,6 +309,11 @@ public class MainView extends JFrame implements IView, AlertObserver {
      * Exits the application with a confirmation dialog.
      */
     public void exitHelper() {
+        if (controller == null) {
+            System.exit(0);
+            return;
+        }
+        
         int result = JOptionPane.showConfirmDialog(
                     tabbedPane,
                     "Your jobs will be auto-saved to SavedJobs.csv.\nAre you sure you want to exit?",
