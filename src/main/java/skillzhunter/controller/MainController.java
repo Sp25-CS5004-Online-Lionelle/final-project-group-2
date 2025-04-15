@@ -56,7 +56,7 @@ public class MainController implements IController {
      * 
      * @param view The view to set
      */
-    protected void setView(IView view) {
+    public void setView(IView view) {
         this.view = view;
     }
 
@@ -74,7 +74,7 @@ public class MainController implements IController {
      * 
      * @param model The model to set
      */
-    protected void setModel(IModel model) {
+    public void setModel(IModel model) {
         this.model = model;
         model.setController(this);  // Make sure to set controller on new model
         savedJobsTab.updateJobsList(model.getJobRecords());

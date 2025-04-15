@@ -66,6 +66,7 @@ public class Jobs implements IModel {
      * Used to identify the controller attached to the model.
      * @param controller the attached controller
      */
+    @Override
     public void setController(IController controller) {
       this.controller = controller;
     }
