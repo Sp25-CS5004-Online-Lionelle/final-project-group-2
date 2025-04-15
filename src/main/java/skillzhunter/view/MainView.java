@@ -46,7 +46,7 @@ public class MainView extends JFrame implements IView {
      * @param controller The controller instance
      */
     public MainView(IController controller) {
-        super("Jobz Hunter App");
+        super("Skillz Hunter App");
         this.controller = controller;
         this.setLocation(200, 200);
         
