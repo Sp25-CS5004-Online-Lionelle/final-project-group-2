@@ -21,8 +21,9 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import skillzhunter.controller.IController;
+import skillzhunter.controller.IController.AlertObserver;
 
-public class MainView extends JFrame implements IView {
+public class MainView extends JFrame implements IView, AlertObserver {
     /** Main Pane. */
     private final JPanel mainPane = new JPanel();
     /** Find Job Tab. */
@@ -48,6 +49,10 @@ public class MainView extends JFrame implements IView {
     public MainView(IController controller) {
         super("Skillz Hunter App");
         this.controller = controller;
+        
+        // Register view as alert observer with the controller
+        controller.registerAlertObserver(this);
+        
         this.setLocation(200, 200);
         
         // Change from EXIT_ON_CLOSE to DO_NOTHING_ON_CLOSE
@@ -141,18 +146,20 @@ public class MainView extends JFrame implements IView {
         pane.addTab("Find Jobs", findJobTab);
         pane.addTab("Saved Jobs", savedJobTab);
         
-        // Add change listener to update the selected tab
+        // Add change listener to update only the Saved Jobs tab when selected
         pane.addChangeListener(e -> {
             // Get the selected tab
             int selectedIndex = pane.getSelectedIndex();
             if (selectedIndex >= 0) {
+                String tabName = pane.getTitleAt(selectedIndex);
                 Component selectedComponent = pane.getComponentAt(selectedIndex);
                 
-                // If it's a JobView, update its job list
-                if (selectedComponent instanceof JobView) {
+                // Only update the Saved Jobs tab with the latest saved jobs
+                if ("Saved Jobs".equals(tabName) && selectedComponent instanceof JobView) {
                     JobView jobView = (JobView) selectedComponent;
                     jobView.updateJobsList(controller.getSavedJobs());
                 }
+                // Don't update Find Jobs tab when switching to it
             }
         });
         
@@ -239,10 +246,22 @@ public class MainView extends JFrame implements IView {
     }
 
     /**
+     * Implementation of AlertObserver interface.
+     * Receives alerts from the controller and displays them to the user.
+     * 
+     * @param alertMessage The alert message to display
+     */
+    @Override
+    public void onAlert(String alertMessage) {
+        notifyUser(alertMessage);
+    }
+
+    /**
      * Notifies the user with a message dialog.
      * 
      * @param message The message to display
      */
+    @Override
     public void notifyUser(String message) {
         ImageIcon warningIcon = IconLoader.loadIcon("images/warning.png");
         JOptionPane.showMessageDialog(this,
@@ -278,6 +297,8 @@ public class MainView extends JFrame implements IView {
                     IconLoader.loadIcon("images/warning.png")
                 );
                 if (result == JOptionPane.YES_OPTION) {
+                    // Unregister as an alert observer before exiting
+                    controller.unregisterAlertObserver(this);
                     System.exit(0);
                 }
     }

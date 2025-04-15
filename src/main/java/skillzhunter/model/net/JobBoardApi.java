@@ -47,13 +47,14 @@ public class JobBoardApi {
     
 
     /**
-     * loads csv data into a map.
+     * Loads csv data into a map.
+     * Decodes HTML entities in the key and value before storing them.
      * @param filePath path to the csv file
      * @param key column name for the key
      * @param value column name for the value
      * @return map of key-value pairs from the csv file
      */
-    public static  Map<String, String>  loadCsvData(String filePath, String key, String value) {
+    public static Map<String, String> loadCsvData(String filePath, String key, String value) {
         CsvMapper csvMapper = new CsvMapper();
         CsvSchema schema = CsvSchema.emptySchema().withHeader();
         Map<String, String> myMap = new HashMap<>();
@@ -65,11 +66,23 @@ public class JobBoardApi {
 
             while (it.hasNext()) {
                 Map<String, String> row = it.next();
-                String industry = row.get(key).toLowerCase().trim();
-                String slug = row.get(value).trim();
-                myMap.put(industry, slug);
+                
+                // Decode HTML entities in the key value before storing
+                String rawKey = row.get(key);
+                String decodedKey = (rawKey != null) ? 
+                    skillzhunter.model.formatters.DataFormatter.replaceHtmlEntities(rawKey.toLowerCase().trim()) :
+                    null;
+                    
+                // Decode HTML entities in the value before storing    
+                String rawValue = row.get(value);
+                String decodedValue = (rawValue != null) ?
+                    skillzhunter.model.formatters.DataFormatter.replaceHtmlEntities(rawValue.trim()) :
+                    null;
+                    
+                if (decodedKey != null && decodedValue != null) {
+                    myMap.put(decodedKey, decodedValue);
+                }
             }
-
         } catch (IOException e) {
             throw new RuntimeException("Error reading CSV file: " + filePath, e);
             // e.printStackTrace();
@@ -238,12 +251,15 @@ public class JobBoardApi {
 
             String jsonResponse = responseBody.string();
             ResponseRecord jobResponse = OBJECT_MAPPER.readValue(jsonResponse, ResponseRecord.class);
-            return jobResponse.jobs();
-
+            // Clean HTML entities in each job record right after receiving them
+            return jobResponse.jobs().stream()
+                .map(job -> skillzhunter.model.formatters.DataFormatter.processJobHtml(job))
+                .collect(Collectors.toList());
         } catch (IOException e) {
             return Collections.emptyList();
         }
     }
+
     /**
      * main method for testing.
      * @param args command line arguments

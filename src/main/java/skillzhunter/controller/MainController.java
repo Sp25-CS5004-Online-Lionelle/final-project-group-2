@@ -1,12 +1,14 @@
 package skillzhunter.controller;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import skillzhunter.model.IModel;
+import skillzhunter.model.IModel.AlertListener;
 import skillzhunter.model.JobRecord;
 import skillzhunter.model.Jobs;
 import skillzhunter.model.formatters.DataFormatter;
@@ -14,7 +16,7 @@ import skillzhunter.view.IView;
 import skillzhunter.view.MainView;
 import skillzhunter.view.SavedJobsTab;
 
-public class MainController implements IController {
+public class MainController implements IController, AlertListener {
 
     /** Model. */
     private IModel model;
@@ -22,6 +24,8 @@ public class MainController implements IController {
     private IView view;
     /** Saved jobs tab. */
     private SavedJobsTab savedJobsTab;
+    /** List of alert observers. */
+    private final List<AlertObserver> alertObservers = new ArrayList<>();
 
     /**
      * Constructor for MainController.
@@ -31,14 +35,34 @@ public class MainController implements IController {
         // Model
         model = new Jobs();
         
-        // Set the controller on the model first
-        model.setController(this);
-
+        // Register this controller as the model's alert listener
+        model.setAlertListener(this);
+        
         // Saved jobs tab initialized with actual saved jobs list
         savedJobsTab = new SavedJobsTab(this, model.getJobRecords());
 
         // View - create after model and controller are properly linked
         view = new MainView(this);
+    }
+
+    /**
+     * Registers an alert observer with this controller.
+     * @param observer The alert observer to register
+     */
+    @Override
+    public void registerAlertObserver(AlertObserver observer) {
+        if (observer != null && !alertObservers.contains(observer)) {
+            alertObservers.add(observer);
+        }
+    }
+    
+    /**
+     * Unregisters an alert observer from this controller.
+     * @param observer The alert observer to unregister
+     */
+    @Override
+    public void unregisterAlertObserver(AlertObserver observer) {
+        alertObservers.remove(observer);
     }
 
     /**
@@ -76,7 +100,8 @@ public class MainController implements IController {
      */
     public void setModel(IModel model) {
         this.model = model;
-        model.setController(this);  // Make sure to set controller on new model
+        // Register this controller as the model's alert listener
+        model.setAlertListener(this);
         savedJobsTab.updateJobsList(model.getJobRecords());
     }
     
@@ -317,7 +342,7 @@ public class MainController implements IController {
         
         // Return the updated job record so the view can use it
         for (JobRecord job : model.getJobRecords()) {
-            if (job.id() == id) { // FIXED: Compare with parameter id instead of job.id()
+            if (job.id() == id) {
                 return job;
             }
         }
@@ -327,17 +352,36 @@ public class MainController implements IController {
     }
 
     /**
-     * Sends an alert to the view.
+     * Handles alert messages from the model and forwards them to observers.
+     * This is the implementation of the AlertListener interface.
+     * 
+     * @param alertMessage The alert message
+     */
+    @Override
+    public void onAlert(String alertMessage) {
+        sendAlert(alertMessage);
+    }
+
+    /**
+     * Sends an alert to all registered alert observers.
      * 
      * @param alert The alert message
      */
     @Override
     public void sendAlert(String alert) {
-        if (this.view != null) {
-            this.view.notifyUser(alert);
+        System.out.println("Controller alerting: " + alert);
+        
+        // Make a copy of the list in case an observer removes itself during notification
+        List<AlertObserver> observers = new ArrayList<>(alertObservers);
+        
+        if (!observers.isEmpty()) {
+            // Notify all registered observers
+            for (AlertObserver observer : observers) {
+                observer.onAlert(alert);
+            }
         } else {
-            // Fallback if view is not yet initialized
-            System.err.println("Alert (view not initialized): " + alert);
+            // Fallback if no observers are registered
+            System.err.println("No alert observers registered: " + alert);
         }
     }
 
@@ -351,6 +395,7 @@ public class MainController implements IController {
         JobRecord cleanJobRecord = DataFormatter.processJobHtml(job);
         return cleanJobRecord;
     }
+    
     /**
      * Main method for testing purposes.
      * @param args Command line arguments (not used).
@@ -361,4 +406,3 @@ public class MainController implements IController {
         mainView.run();
     }
 }
-

@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import skillzhunter.controller.IController;
 import skillzhunter.model.formatters.DataFormatter;
 import skillzhunter.model.formatters.Formats;
 import skillzhunter.model.net.JobBoardApi;
@@ -26,8 +25,8 @@ public class Jobs implements IModel {
     private static final Map<String, String> LOCATION_MAP = JobBoardApi.loadCsvData(
         Paths.get("data", "locations.csv").toString(), "location", "slug");
     
-    /** Used for identifying the connected controller. */
-    private IController controller;
+    /** Alert listener for this model. */
+    private AlertListener alertListener;
 
     /** Job List. */
     private final List<JobRecord> jobList;
@@ -41,6 +40,12 @@ public class Jobs implements IModel {
     /** Standard path for saved jobs file */
     private static final String DEFAULT_SAVED_JOBS_PATH = "data/SavedJobs.csv";
 
+    /** Flag to indicate if running in test mode */
+    private boolean isTestMode = false;
+    
+    /** Flag to indicate if this is an initial search on startup */
+    private boolean isInitialSearch = true;
+
     /**
      * Constructor for Jobs class.
      * Initializes the job list and API.
@@ -49,14 +54,16 @@ public class Jobs implements IModel {
         this.jobList = new ArrayList<>();
         this.api = createJobBoardApi();
 
-        try {
-            // Load jobs from CSV when the application starts
-            // We wrap this in try-catch to avoid issues during testing
-            loadJobsFromCsv(DEFAULT_SAVED_JOBS_PATH);
+        // Check if running in test environment
+        isTestMode = isRunningInTestEnvironment();
 
-            // Add a shutdown hook to save the jobs to CSV on shutdown
-            // Only add this in non-test environment
-            if (!isRunningInTestEnvironment()) {
+        try {
+            // Only load from CSV in non-test environment or if file exists
+            File savedJobsFile = new File(DEFAULT_SAVED_JOBS_PATH);
+            if (!isTestMode && savedJobsFile.exists()) {
+                loadJobsFromCsv(DEFAULT_SAVED_JOBS_PATH);
+                
+                // Add a shutdown hook to save the jobs to CSV on shutdown
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                     System.out.println("Application is shutting down. Saving jobs to " + DEFAULT_SAVED_JOBS_PATH);
                     saveJobsToCsv(DEFAULT_SAVED_JOBS_PATH);
@@ -64,9 +71,18 @@ public class Jobs implements IModel {
                 }));
             }
         } catch (Exception e) {
-            System.err.println("Note: Could not load jobs from CSV. This is normal during testing.");
-            // No need to rethrow - this allows tests to run without the CSV file
+            System.err.println("Note: Could not load jobs from CSV: " + e.getMessage());
+            // No need to rethrow - we can start with an empty list
         }
+    }
+    
+    /**
+     * Sets the alert listener for this model.
+     * @param listener The alert listener
+     */
+    @Override
+    public void setAlertListener(AlertListener listener) {
+        this.alertListener = listener;
     }
 
     /**
@@ -76,7 +92,10 @@ public class Jobs implements IModel {
     private boolean isRunningInTestEnvironment() {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         for (StackTraceElement element : stackTrace) {
-            if (element.getClassName().contains("org.junit")) {
+            String className = element.getClassName();
+            if (className.contains("org.junit") || 
+                className.contains("Test") ||
+                className.contains("test")) {
                 return true;
             }
         }
@@ -110,17 +129,6 @@ public class Jobs implements IModel {
     @Override
     public List<String> getLocations() {
         return LOCATION_MAP.keySet().stream().sorted().toList();
-    }
-
-    // CRUD functionality
-
-    /**
-     * Used to identify the controller attached to the model.
-     * @param controller the attached controller
-     */
-    @Override
-    public void setController(IController controller) {
-      this.controller = controller;
     }
 
     /**
@@ -270,12 +278,20 @@ public class Jobs implements IModel {
      */
     @Override
     public List<JobRecord> searchJobs(String query, Integer numberOfResults, String location, String industry) {
+        // Check if this is a generic default search
+        boolean isGenericSearch = "any".equals(query) && 
+                                 ("any".equals(location) || location == null) && 
+                                 ("any".equals(industry) || industry == null);
+        
         JobBoardApiResult result = api.getJobBoard(query, numberOfResults, location, industry);
 
-        // If there's an error message, send alert
-        if (result.hasError()) {
+        // If there's an error message and this is not an initial generic search, send alert
+        if (result.hasError() && !(isInitialSearch && isGenericSearch)) {
             sendAlert(result.getErrorMessage());
         }
+        
+        // After first search, set initial search flag to false
+        isInitialSearch = false;
 
         // Process HTML entities in each job record before returning
         List<JobRecord> processedJobs = new ArrayList<>();
@@ -362,12 +378,21 @@ public class Jobs implements IModel {
     }
 
     /**
-     * Used to send alerts to other parts of the program.
-     * @param alert
+     * Sends an alert message to the registered alert listener.
+     * 
+     * @param alertMessage The alert message to send
      */
     @Override
-    public void sendAlert(String alert) {
-        controller.sendAlert(alert);
+    public void sendAlert(String alertMessage) {
+        System.out.println("Model alert: " + alertMessage);
+        
+        // If an alert listener is registered, notify it
+        if (alertListener != null) {
+            alertListener.onAlert(alertMessage);
+        } else {
+            // Fallback if no listener is registered
+            System.err.println("No alert listener registered with model: " + alertMessage);
+        }
     }
 
     /**
@@ -375,6 +400,12 @@ public class Jobs implements IModel {
      * @param fileName Name of the CSV file to load from
      */
     private void loadJobsFromCsv(String fileName) {
+        File csvFile = new File(fileName);
+        if (!csvFile.exists()) {
+            System.err.println("CSV file does not exist: " + fileName);
+            return;
+        }
+        
         try (InputStream in = new FileInputStream(fileName)) {
             List<JobRecord> loadedJobs = DataFormatter.read(in, Formats.CSV);
             this.jobList.clear();  // Clear existing list before loading
@@ -383,38 +414,5 @@ public class Jobs implements IModel {
         } catch (IOException e) {
             System.err.println("Error loading jobs from CSV file: " + e.getMessage());
         }
-    }
-
-    /**
-     * Main method for testing purposes.
-     * @param args Command line arguments (not used).
-     */
-    public static void main(String[] args) {
-        // Jobs jobs = new Jobs();
-        // // Test adding, updating, removing jobs
-        // JobRecord job = new JobRecord(1, "https://example.com/job", "slug",
-        // "Python Developer & Data Scientist", "Company A", "logo",
-        // Arrays.asList("Tech"), Arrays.asList("Full-time"), "NYC", "Senior",
-        // "Job excerpt", "Job description", "2025-03-30", 60000,
-        // 80000, "USD", 4, "Great job");
-        // System.out.println("Adding job" + job);
-        // jobs.addJob(job);
-
-        // // Search job by title
-        // JobRecord searchedJob = jobs.getJobRecord("Python Developer");
-        // System.out.println("Searched job: " + searchedJob);
-        // System.out.println(searchedJob);
-
-        // // Export test
-        // jobs.exportSavedJobs(jobs.getJobRecords(), "CSV", "test_jobs.csv");
-        // jobs.exportSavedJobs(jobs.getJobRecords(), "JSON", "test_jobs.json");
-        // jobs.exportSavedJobs(jobs.getJobRecords(), "XML", "test_jobs.xml");
-
-        // // Remove job
-        // System.out.println("Removing job with ID 1");
-        // jobs.removeJob(1);
-
-        // jobs.getIndustries().forEach(System.out::println);
-        // jobs.getLocations().forEach(System.out::println);
     }
 }

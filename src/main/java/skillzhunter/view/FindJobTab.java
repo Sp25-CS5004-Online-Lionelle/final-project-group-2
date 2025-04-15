@@ -427,16 +427,19 @@ public class FindJobTab extends JobView {
     
     /**
      * Updates the job list and visualization if needed.
+     * This method ensures we don't override search results with saved jobs.
      * @param jobsList The list of jobs to update
      */
     @Override
     public void updateJobsList(List<JobRecord> jobsList) {
-        if (searchResults != null && !searchResults.isEmpty()) {
-            super.setJobsList(searchResults);
-            updateVisualizationIfNeeded(searchResults);
-        } else {
+        // Only update if we don't have search results yet
+        if (searchResults == null || searchResults.isEmpty()) {
             super.updateJobsList(jobsList);
             updateVisualizationIfNeeded(jobsList);
+        } else {
+            // Otherwise maintain our search results
+            super.updateJobsList(searchResults);
+            updateVisualizationIfNeeded(searchResults);
         }
     }
     
