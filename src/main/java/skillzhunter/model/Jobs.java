@@ -439,69 +439,6 @@ public class Jobs implements IModel {
             System.err.println("Error loading jobs from CSV file: " + e.getMessage());
         }
     }
-    
-    /**
-     * Cleans HTML entities from job industry strings.
-     * This can be called to fix the jobIndustry field of existing jobs.
-     */
-    public void cleanJobIndustries() {
-        for (int i = 0; i < jobList.size(); i++) {
-            JobRecord job = jobList.get(i);
-            
-            // Skip if jobIndustry is null
-            if (job.jobIndustry() == null) {
-                continue;
-            }
-            
-            // Check if any industry contains "&amp;"
-            boolean needsCleaning = false;
-            for (String industry : job.jobIndustry()) {
-                if (industry != null && industry.contains("&amp;")) {
-                    needsCleaning = true;
-                    break;
-                }
-            }
-            
-            // Only process job if it needs cleaning
-            if (needsCleaning) {
-                System.out.println("Cleaning job industry for job: " + job.id() + " - " + job.jobTitle());
-                
-                // Create a new list with cleaned industry names
-                List<String> cleanedIndustries = new ArrayList<>();
-                for (String industry : job.jobIndustry()) {
-                    String cleaned = DataFormatter.replaceHtmlEntities(industry);
-                    cleanedIndustries.add(cleaned);
-                    System.out.println("  Original: '" + industry + "' → Cleaned: '" + cleaned + "'");
-                }
-                
-                // Create a new job record with the cleaned industry list
-                JobBean jobBean = new JobBean();
-                jobBean.setId(job.id());
-                jobBean.setUrl(job.url());
-                jobBean.setJobSlug(job.jobSlug());
-                jobBean.setJobTitle(job.jobTitle());
-                jobBean.setCompanyName(job.companyName());
-                jobBean.setCompanyLogo(job.companyLogo());
-                jobBean.setJobIndustry(cleanedIndustries);
-                jobBean.setJobType(job.jobType());
-                jobBean.setJobGeo(job.jobGeo());
-                jobBean.setJobLevel(job.jobLevel());
-                jobBean.setJobExcerpt(job.jobExcerpt());
-                jobBean.setJobDescription(job.jobDescription());
-                jobBean.setPubDate(job.pubDate());
-                jobBean.setAnnualSalaryMin(job.annualSalaryMin());
-                jobBean.setAnnualSalaryMax(job.annualSalaryMax());
-                jobBean.setSalaryCurrency(job.salaryCurrency());
-                jobBean.setRating(job.rating());
-                jobBean.setComments(job.comments());
-                
-                // Replace the job in the list
-                jobList.set(i, jobBean.toRecord());
-            }
-        }
-        
-        System.out.println("Finished cleaning job industries");
-    }
 
     @Override
     public List<String> capitalizeItems(List<String> items, Map<String, String> specialCases) {
