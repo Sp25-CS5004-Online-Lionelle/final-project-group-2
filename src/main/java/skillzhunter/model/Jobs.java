@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -112,25 +114,32 @@ public class Jobs implements IModel {
         return new JobBoardApi();
     }
 
-
     /**
-     * Gets the industries to be used in the search in a list.
-     * @return Map of industries based on keys and is sorted to a list.
+     * Gets the industries to be used in the search in a list, with proper capitalization.
+     * This method uses HR as a special case.
+     * @return List of industries properly capitalized and sorted.
      */
     @Override
     public List<String> getIndustries() {
-        return INDUSTRY_MAP.keySet().stream().sorted().toList();
+        Map<String, String> specialCases = new HashMap<>();
+        specialCases.put("hr", "HR");
+        
+        List<String> industries = INDUSTRY_MAP.keySet().stream().sorted().toList();
+        return capitalizeItems(industries, specialCases);
     }
 
     /**
-     * Gets locations to be used in the search in a list.
-     * @return location list
+     * Gets locations to be used in the search in a list, with proper capitalization.
+     * This method uses USA as a special case.
+     * @return List of locations properly capitalized and sorted.
      */
     @Override
     public List<String> getLocations() {
-        return LOCATION_MAP.keySet().stream().sorted().toList();
+        Map<String, String> specialCases = new HashMap<>();
+        specialCases.put("usa", "USA");
+        List<String> locations = LOCATION_MAP.keySet().stream().sorted().toList();
+        return capitalizeItems(locations, specialCases);
     }
-
     /**
      * Add a new job.
      * @param job JobRecord instance to add
@@ -438,69 +447,6 @@ public class Jobs implements IModel {
         } catch (IOException e) {
             System.err.println("Error loading jobs from CSV file: " + e.getMessage());
         }
-    }
-    
-    /**
-     * Cleans HTML entities from job industry strings.
-     * This can be called to fix the jobIndustry field of existing jobs.
-     */
-    public void cleanJobIndustries() {
-        for (int i = 0; i < jobList.size(); i++) {
-            JobRecord job = jobList.get(i);
-            
-            // Skip if jobIndustry is null
-            if (job.jobIndustry() == null) {
-                continue;
-            }
-            
-            // Check if any industry contains "&amp;"
-            boolean needsCleaning = false;
-            for (String industry : job.jobIndustry()) {
-                if (industry != null && industry.contains("&amp;")) {
-                    needsCleaning = true;
-                    break;
-                }
-            }
-            
-            // Only process job if it needs cleaning
-            if (needsCleaning) {
-                System.out.println("Cleaning job industry for job: " + job.id() + " - " + job.jobTitle());
-                
-                // Create a new list with cleaned industry names
-                List<String> cleanedIndustries = new ArrayList<>();
-                for (String industry : job.jobIndustry()) {
-                    String cleaned = DataFormatter.replaceHtmlEntities(industry);
-                    cleanedIndustries.add(cleaned);
-                    System.out.println("  Original: '" + industry + "' → Cleaned: '" + cleaned + "'");
-                }
-                
-                // Create a new job record with the cleaned industry list
-                JobBean jobBean = new JobBean();
-                jobBean.setId(job.id());
-                jobBean.setUrl(job.url());
-                jobBean.setJobSlug(job.jobSlug());
-                jobBean.setJobTitle(job.jobTitle());
-                jobBean.setCompanyName(job.companyName());
-                jobBean.setCompanyLogo(job.companyLogo());
-                jobBean.setJobIndustry(cleanedIndustries);
-                jobBean.setJobType(job.jobType());
-                jobBean.setJobGeo(job.jobGeo());
-                jobBean.setJobLevel(job.jobLevel());
-                jobBean.setJobExcerpt(job.jobExcerpt());
-                jobBean.setJobDescription(job.jobDescription());
-                jobBean.setPubDate(job.pubDate());
-                jobBean.setAnnualSalaryMin(job.annualSalaryMin());
-                jobBean.setAnnualSalaryMax(job.annualSalaryMax());
-                jobBean.setSalaryCurrency(job.salaryCurrency());
-                jobBean.setRating(job.rating());
-                jobBean.setComments(job.comments());
-                
-                // Replace the job in the list
-                jobList.set(i, jobBean.toRecord());
-            }
-        }
-        
-        System.out.println("Finished cleaning job industries");
     }
 
     @Override

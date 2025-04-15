@@ -101,7 +101,7 @@ public class MainController implements IController, AlertListener {
     }
     
     /**
-     * Gets the locations from the API and capitalizes them appropriately.
+     * Gets the locations from the model.
      * @return List<String> of locations
      */
     @Override
@@ -109,11 +109,11 @@ public class MainController implements IController, AlertListener {
         if (model == null) {
             return Collections.emptyList();
         }
-        return model.capitalizeItems(model.getLocations(), Collections.emptyMap());
+        return model.getLocations();
     }
 
     /**
-     * Gets the industries from the API and capitalizes them appropriately.
+     * Gets the industries from the model.
      * @return List<String> of industries
      */
     @Override
@@ -121,9 +121,7 @@ public class MainController implements IController, AlertListener {
         if (model == null) {
             return Collections.emptyList();
         }
-        Map<String, String> specialCases = new HashMap<>();
-        specialCases.put("hr", "HR");
-        return model.capitalizeItems(model.getIndustries(), specialCases);
+        return model.getIndustries();
     }
 
     /**
