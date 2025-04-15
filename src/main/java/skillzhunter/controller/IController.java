@@ -12,15 +12,16 @@ import skillzhunter.view.SavedJobsTab;
  */
 public interface IController {
     /**
-     * Interface for an alert observer that receives notifications from the controller.
+     * Sets the model for this controller.
+     * @param model The model to set
      */
-    interface AlertObserver {
-        /**
-         * Called when an alert needs to be shown.
-         * @param alertMessage The alert message to show
-         */
-        void onAlert(String alertMessage);
-    }
+    void setModel(IModel model);
+    
+    /**
+     * Sets the view for this controller.
+     * @param view The view to set
+     */
+    void setView(IView view);
     
     /**
      * Registers an alert observer with this controller.
