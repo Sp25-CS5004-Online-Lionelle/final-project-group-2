@@ -1,8 +1,11 @@
 package skillzhunter;
 
+import skillzhunter.controller.IController;
 import skillzhunter.controller.MainController;
 import skillzhunter.model.IModel;
+import skillzhunter.model.Jobs;
 import skillzhunter.view.IView;
+import skillzhunter.view.MainView;
 
 
 public final class SkillsHunterApp {
@@ -11,18 +14,21 @@ public final class SkillsHunterApp {
         // empty
     }
 
-    //Removing anything to do with console - will add back in if we decide to use it but currently uneccessary
-
     /**
      * Main method to run the application.
      * @param args command line arguments (ignored)
      */
     public static void main(String[] args) {
-        MainController mainController = new MainController();
-        //create model and set based off of input file in data if there is a database otherwise
-        IModel model = mainController.getModel();
-        IView mainView = mainController.getView();
-        mainView.run();
+        // Create MVC components
+        IModel model = new Jobs();
+        IController controller = new MainController();
+        IView view = new MainView();
+        
+        // Connect components using dependency injection
+        controller.setModel(model);
+        controller.setView(view);
+        
+        // Start the application
+        view.run();
     }
-
 }
