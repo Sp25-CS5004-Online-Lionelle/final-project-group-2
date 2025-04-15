@@ -1,81 +1,102 @@
 package skillzhunter.model;
-import java.util.List;
-import skillzhunter.controller.IController;
 
+import java.util.List;
+
+/**
+ * Interface for the model in the MVC architecture.
+ */
 public interface IModel {
     /**
-     * Sets the controller that called the model.
-     * @param controller controller that called the model.
+     * Interface for an alert listener that can receive alerts from the model.
      */
-    void setController(IController controller);
+    interface AlertListener {
+        /**
+         * Called when the model needs to send an alert.
+         * @param alertMessage The alert message
+         */
+        void onAlert(String alertMessage);
+    }
+    
     /**
-     * Add a new job.
-     * @param job JobRecord instance to add
+     * Sets the alert listener for this model.
+     * @param listener The alert listener
      */
-    void addJob(JobRecord job);
+    void setAlertListener(AlertListener listener);
+    
     /**
-     * Retrieve a single job record by title.
-     * @param jobTitle Job title
-     * @return JobRecord if found, otherwise null
+     * Gets the industries to be used in the search.
+     * @return List of industries
      */
-    JobRecord getJobRecord(String jobTitle);
-    /**
-     * Retrieve all job records.
-     * @return List of JobRecords
-     */
-    List<JobRecord> getJobRecords();
-    /**
-     * Remove a job by ID.
-     * @param id Job ID to remove
-     * @return true if removed, false otherwise
-     */
-    boolean removeJob(int id);
+    List<String> getIndustries();
 
     /**
-     * Update a job's comments and rating.
-     * @param id Job ID
-     * @param comments Comments to update
-     * @param rating Rating to update
-     */
-    void updateJob(int id, String comments, int rating);
-     /**
-     * Searches for jobs based on the given parameters.
-     * @param query The search query (e.g., job title, keywords).
-     * @param numberOfResults The maximum number of results to return.
-     * @param location The location to search for jobs in.
-     * @param industry The industry to filter jobs by.
-     * @return A list of JobRecord objects representing the search results.
-     */
-    List<JobRecord> searchJobs(String query, Integer numberOfResults, String location, String industry);
-
-    /**
-     * Gets locations to be used in the search in a list.
-     * @return location list
+     * Gets locations to be used in the search.
+     * @return List of locations
      */
     List<String> getLocations();
 
     /**
-     * Gets the industries to be used in the search in a list.
-     * @return Map of industries based on keys and is sorted to a list.
+     * Adds a job to the model.
+     * @param job Job record to add
      */
-    List<String> getIndustries();
+    void addJob(JobRecord job);
+
     /**
-     * Saves the job records (saved jobs) in the jobList to a CSV file.
+     * Gets a job record by title.
+     * @param jobTitle Title of the job to get
+     * @return The job record with the specified title
+     */
+    JobRecord getJobRecord(String jobTitle);
+
+    /**
+     * Gets all job records.
+     * @return List of all job records
+     */
+    List<JobRecord> getJobRecords();
+
+    /**
+     * Removes a job from the model.
+     * @param id ID of the job to remove
+     * @return true if the job was removed, false otherwise
+     */
+    boolean removeJob(int id);
+
+    /**
+     * Updates a job in the model.
+     * @param id ID of the job to update
+     * @param comments New comments for the job
+     * @param rating New rating for the job
+     */
+    void updateJob(int id, String comments, int rating);
+
+    /**
+     * Searches for jobs based on the given parameters.
+     * @param query The search query
+     * @param numberOfResults The maximum number of results to return
+     * @param location The location to search for jobs in
+     * @param industry The industry to filter jobs by
+     * @return List of job records matching the search criteria
+     */
+    List<JobRecord> searchJobs(String query, Integer numberOfResults, String location, String industry);
+
+    /**
+     * Saves the jobs to a CSV file.
      * @param fileName Name of the CSV file to save to
      */
     void saveJobsToCsv(String fileName);
 
     /**
-     * Exports the saved jobs to a specified format and file path.
-     * @param jobs List of JobRecord objects to export
+     * Exports the saved jobs to the specified format and file path.
+     * @param jobs List of job records to export
      * @param formatStr Format string (e.g., "CSV", "JSON")
      * @param filePath Path to the output file
      */
     void exportSavedJobs(List<JobRecord> jobs, String formatStr, String filePath);
 
     /**
-     * Used to send an alert to another part of the program.
-     * @param alert alert to send
+     * Sends an alert message.
+     * This method notifies the registered alert listener.
+     * @param alertMessage The alert message to send
      */
-    void sendAlert(String alert);
+    void sendAlert(String alertMessage);
 }
