@@ -5,7 +5,6 @@ import java.util.List;
 import skillzhunter.model.IModel;
 import skillzhunter.model.JobRecord;
 import skillzhunter.view.IView;
-import skillzhunter.view.SavedJobsTab;
 
 /**
  * Interface for the controller in the MVC architecture.
@@ -58,12 +57,6 @@ public interface IController {
      * @return The view
      */
     IView getView();
-    
-    /**
-     * Gets the saved jobs tab.
-     * @return The saved jobs tab
-     */
-    SavedJobsTab getSavedJobsTab();
     
     /**
      * Gets the API call for job search.

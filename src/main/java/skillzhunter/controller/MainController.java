@@ -11,7 +11,6 @@ import skillzhunter.model.AlertListener;
 import skillzhunter.model.IModel;
 import skillzhunter.model.JobRecord;
 import skillzhunter.view.IView;
-import skillzhunter.view.SavedJobsTab;
 
 public class MainController implements IController, AlertListener {
 
@@ -19,8 +18,6 @@ public class MainController implements IController, AlertListener {
     private IModel model;
     /** View. */
     private IView view;
-    /** Saved jobs tab. */
-    private SavedJobsTab savedJobsTab;
     /** List of alert observers. */
     private final List<AlertObserver> alertObservers = new ArrayList<>();
 
@@ -65,11 +62,6 @@ public class MainController implements IController, AlertListener {
         // Register this controller as the model's alert listener
         if (model != null) {
             model.setAlertListener(this);
-        }
-        
-        // Initialize saved jobs tab with model data
-        if (model != null) {
-            savedJobsTab = new SavedJobsTab(this, model.getJobRecords());
         }
     }
     
@@ -218,12 +210,7 @@ public class MainController implements IController, AlertListener {
             model.addJob(job);
         }
         
-        List<JobRecord> savedJobsList = model.getJobRecords();
-        if (savedJobsTab != null) {
-            savedJobsTab.updateJobsList(savedJobsList);
-        }
-        
-        return savedJobsList;
+        return model.getJobRecords();
     }
 
     /**
@@ -324,17 +311,18 @@ public class MainController implements IController, AlertListener {
             return;
         }
         
+        // Make sure the parent directory exists
+        File file = new File(filePath);
+        File parentDir = file.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            boolean created = parentDir.mkdirs();
+            if (!created) {
+                System.err.println("Failed to create directory: " + parentDir.getAbsolutePath());
+            }
+        }
+
         // Use the model's method to export jobs in the specified format
         model.exportSavedJobs(jobs, formatStr, filePath);
-    }
-
-    /**
-     * Gets the saved jobs tab.
-     * @return The saved jobs tab
-     */
-    @Override
-    public SavedJobsTab getSavedJobsTab() {
-        return savedJobsTab;
     }
     
     /**
@@ -353,11 +341,6 @@ public class MainController implements IController, AlertListener {
         
         // Call model to update the job
         model.updateJob(id, comments, rating);
-        
-        // Update the view with the latest data
-        if (savedJobsTab != null) {
-            savedJobsTab.updateJobsList(model.getJobRecords());
-        }
         
         // Return the updated job record so the view can use it
         for (JobRecord job : model.getJobRecords()) {

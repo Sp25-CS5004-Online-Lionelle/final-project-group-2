@@ -86,7 +86,9 @@ public class MainView extends JFrame implements IView, AlertObserver {
         
         try {
             // Now we can initialize controller-dependent components
-            savedJobTab = controller.getSavedJobsTab();
+            // Create tabs using clean dependency injection pattern
+            // The concrete classes are created here in the view layer
+            savedJobTab = new SavedJobsTab(controller, controller.getSavedJobs());
             findJobTab = new FindJobTab(controller);
             
             // Building tabbed pane
