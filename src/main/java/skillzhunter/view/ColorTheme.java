@@ -58,6 +58,10 @@ public class ColorTheme {
         colors.put("buttonForeground", Color.WHITE);                  // Button foreground: White text
         colors.put("labelForeground", Color.BLACK);                  // Label foreground: Black
         
+        // Title and tagline text colors
+        colors.put("titleTextColor", Color.BLACK);                  // Title text color for light mode
+        colors.put("taglineTextColor", Color.BLACK);                // Tagline text color for light mode
+        
         // Menu bar colors - ORIGINAL VALUES FROM LIGHT THEME
         colors.put("menuBarBackgroundLight", Color.WHITE);                // Menu bar background - Light theme
         colors.put("menuBarForegroundLight", Color.BLACK);                // Menu bar foreground - Light theme
@@ -124,6 +128,10 @@ public class ColorTheme {
         colors.put("fieldForeground", new Color(240, 240, 240));   // Field foreground: Light gray text
         colors.put("buttonForeground", Color.WHITE);                // Button foreground: White text
         colors.put("labelForeground", Color.WHITE);                // Label foreground: White
+        
+        // Title and tagline text colors
+        colors.put("titleTextColor", Color.WHITE);                  // Title text color for dark mode
+        colors.put("taglineTextColor", Color.WHITE);                // Tagline text color for dark mode
         
         // Menu bar colors - ORIGINAL VALUES FROM DARK THEME
         colors.put("menuBarBackgroundLight", Color.WHITE);                // Menu bar background - Light theme
@@ -262,6 +270,16 @@ public class ColorTheme {
     /** Gets the label color. */
     public Color getLabelForeground() {
         return getColor("labelForeground");
+    }
+    
+    /** Gets the title text color. */
+    public Color getTitleTextColor() {
+        return getColor("titleTextColor");
+    }
+    
+    /** Gets the tagline text color. */
+    public Color getTaglineTextColor() {
+        return getColor("taglineTextColor");
     }
     
     /** Gets the menu bar background for light theme. */

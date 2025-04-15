@@ -4,15 +4,21 @@ import java.awt.FlowLayout;
 import java.awt.Cursor;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.BorderLayout;
+import java.awt.Font;
+import java.awt.Dimension;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.UIManager;
+import javax.swing.SwingConstants;
 
 /**
  * Custom menu bar implementation that provides consistent styling across platforms.
@@ -33,13 +39,19 @@ public class CustomMenuBar extends JPanel {
     private Color lineColor = new Color(0, 183, 195); // Teal color matching the button normal from DARK theme
     /** Thickness of the bottom line. */
     private int lineThickness = 2; // Thickness of the bottom line in pixels
+    /** Title label showing "Skillz Hunter" */
+    private JLabel titleLabel;
+    /** Tagline label showing the slogan */
+    private JLabel taglineLabel;
+    /** Width of the settings button area */
+    private static final int SETTINGS_WIDTH = 40;
     
     /**
      * Creates a new CustomMenuBar with standard menu options.
      */
     public CustomMenuBar() {
-        // Use LEFT alignment instead of RIGHT
-        setLayout(new FlowLayout(FlowLayout.LEFT));
+        // Use BorderLayout for component positioning
+        setLayout(new BorderLayout());
         
         // Set padding but leave bottom for the line
         setBorder(BorderFactory.createEmptyBorder(5, 10, 5 + lineThickness, 10));
@@ -53,8 +65,39 @@ public class CustomMenuBar extends JPanel {
         // Build menu structure
         buildMenuStructure();
         
-        // Add button to panel
-        add(settingsButton);
+        // Create a panel for the button to control its position on the left
+        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        leftPanel.setOpaque(false);
+        leftPanel.add(settingsButton);
+        
+        // Create a matching empty panel for the right to balance the layout
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        rightPanel.setOpaque(false);
+        // Add invisible component with same size as settings button for balance
+        rightPanel.add(Box.createRigidArea(new Dimension(SETTINGS_WIDTH, 24)));
+        
+        // Add the panels to the WEST and EAST positions
+        add(leftPanel, BorderLayout.WEST);
+        add(rightPanel, BorderLayout.EAST);
+        
+        // Create title panel for app name and tagline
+        JPanel titlePanel = new JPanel(new BorderLayout(0, 2));
+        titlePanel.setOpaque(false);
+        
+        // Create title label
+        titleLabel = new JLabel("Skillz Hunter", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Dialog", Font.BOLD, 18));
+        
+        // Create tagline label with smaller font
+        taglineLabel = new JLabel("Find your next career opportunity", SwingConstants.CENTER);
+        taglineLabel.setFont(new Font("Dialog", Font.ITALIC, 12));
+        
+        // Add labels to title panel
+        titlePanel.add(titleLabel, BorderLayout.NORTH);
+        titlePanel.add(taglineLabel, BorderLayout.SOUTH);
+        
+        // Add title panel to the center of the menu bar
+        add(titlePanel, BorderLayout.CENTER);
     }
     
     /**
@@ -67,6 +110,9 @@ public class CustomMenuBar extends JPanel {
         button.setContentAreaFilled(false);
         button.setFocusPainted(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        // Set fixed size for the button to ensure consistent spacing
+        button.setPreferredSize(new Dimension(SETTINGS_WIDTH, 24));
         
         // Set default icon using IconLoader
         ImageIcon icon = IconLoader.loadIcon("images/SettingsIcon.png", 24, 24);
@@ -138,17 +184,18 @@ public class CustomMenuBar extends JPanel {
         // Apply theme to menu panel
         setBackground(theme.getBackground());
         
-        // Update line color based on theme
-        if (theme == ColorTheme.DARK) {
-            // In dark mode, use the teal color from the dark theme
-            lineColor = theme.getButtonNormal();
-        } else {
-            // In light mode, use the blue color from the light theme
-            lineColor = theme.getButtonNormal();
-        }
+        // Update title and tagline colors based on theme
+        titleLabel.setForeground(theme.getTitleTextColor());
+        taglineLabel.setForeground(theme.getTaglineTextColor());
+        
+        // Update line color based on theme - using the button normal color
+        lineColor = theme.getButtonNormal();
         
         // Update settings icon based on theme using IconLoader
-        if (theme == ColorTheme.DARK) {
+        // Check background brightness to determine icon color
+        boolean isDarkTheme = isDarkColor(theme.getBackground());
+        
+        if (isDarkTheme) {
             ImageIcon whiteSettingsIcon = IconLoader.loadIcon("images/settingswhite.png", 24, 24);
             if (whiteSettingsIcon != null) {
                 settingsButton.setIcon(whiteSettingsIcon);
@@ -161,21 +208,35 @@ public class CustomMenuBar extends JPanel {
         }
         
         // Theme popup menus - this is system-wide and will affect all popups
-        UIManager.put("PopupMenu.background", theme == ColorTheme.DARK
-            ? theme.getMenuBarBackgroundDark() : theme.getMenuBarBackgroundLight());
-        UIManager.put("PopupMenu.foreground", theme == ColorTheme.DARK
-            ? theme.getMenuBarForegroundDark() : theme.getMenuBarForegroundLight());
-        UIManager.put("MenuItem.background", theme == ColorTheme.DARK
-            ? theme.getMenuBarBackgroundDark() : theme.getMenuBarBackgroundLight());
-        UIManager.put("MenuItem.foreground", theme == ColorTheme.DARK
-            ? theme.getMenuBarForegroundDark() : theme.getMenuBarForegroundLight());
-        UIManager.put("Menu.background", theme == ColorTheme.DARK 
-            ? theme.getMenuBarBackgroundDark() : theme.getMenuBarBackgroundLight());
-        UIManager.put("Menu.foreground", theme == ColorTheme.DARK
-            ? theme.getMenuBarForegroundDark() : theme.getMenuBarForegroundLight());
+        Color menuBgColor = isDarkTheme ? theme.getMenuBarBackgroundDark() : theme.getMenuBarBackgroundLight();
+        Color menuFgColor = isDarkTheme ? theme.getMenuBarForegroundDark() : theme.getMenuBarForegroundLight();
+        
+        UIManager.put("PopupMenu.background", menuBgColor);
+        UIManager.put("PopupMenu.foreground", menuFgColor);
+        UIManager.put("MenuItem.background", menuBgColor);
+        UIManager.put("MenuItem.foreground", menuFgColor);
+        UIManager.put("Menu.background", menuBgColor);
+        UIManager.put("Menu.foreground", menuFgColor);
         
         // Repaint to show the updated line color
         repaint();
+    }
+    
+    /**
+     * Utility method to determine if a color is "dark" for theming decisions.
+     * Uses color brightness to make the determination.
+     *
+     * @param color The color to check
+     * @return true if the color is dark, false otherwise
+     */
+    private boolean isDarkColor(Color color) {
+        // Calculate brightness using common formula
+        double brightness = (0.299 * color.getRed() + 
+                            0.587 * color.getGreen() + 
+                            0.114 * color.getBlue()) / 255;
+                            
+        // If brightness is less than 0.5, consider it a dark color
+        return brightness < 0.5;
     }
     
     /**
