@@ -355,7 +355,7 @@ public class SavedJobsTab extends JobView {
     private void saveJobsToFile(JFrame parentFrame, List<JobRecord> jobs, String format, String filePath) {
         try {
             // Pass the cleaned jobs to the controller
-            controller.export2FileType(jobs, format, filePath);
+            controller.exportToFileType(jobs, format, filePath);
             
             // Verify that the file was created
             File savedFile = new File(filePath);
@@ -393,7 +393,7 @@ public class SavedJobsTab extends JobView {
     private void exportJobsToFile(JFrame parentFrame, List<JobRecord> jobs, String format, String filePath) {
         try {
             // Pass the cleaned jobs to the controller
-            controller.export2FileType(jobs, format, filePath);
+            controller.exportToFileType(jobs, format, filePath);
             
             // Show success message with export icon
             JOptionPane.showMessageDialog(parentFrame,

@@ -409,7 +409,7 @@ public class FindJobTab extends JobView {
             return;
         }
         // Add the job to saved jobs
-        controller.job2SavedList(selectedJob);
+        controller.jobToSavedList(selectedJob);
         
         // Set default rating and comments
         controller.getUpdateJob(selectedJob.id(), "No comments provided", 0);
