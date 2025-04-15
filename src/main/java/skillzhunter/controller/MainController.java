@@ -109,7 +109,7 @@ public class MainController implements IController, AlertListener {
         if (model == null) {
             return Collections.emptyList();
         }
-        return capitalizeItems(model.getLocations(), Collections.emptyMap());
+        return model.capitalizeItems(model.getLocations(), Collections.emptyMap());
     }
 
     /**
@@ -123,45 +123,7 @@ public class MainController implements IController, AlertListener {
         }
         Map<String, String> specialCases = new HashMap<>();
         specialCases.put("hr", "HR");
-        return capitalizeItems(model.getIndustries(), specialCases);
-    }
-
-    /**
-     * Capitalizes the items in the list.
-     * Handles multi-word strings and keeps in mind any special cases for capitalization.
-     * @param items List of strings to capitalize
-     * @param specialCases Map of special case words and their capitalization
-     * @return List of capitalized strings
-     */
-    private List<String> capitalizeItems(List<String> items, Map<String, String> specialCases) {
-        return items.stream()
-                .map(item -> {
-                    String[] words = item.split(" ");
-                    StringBuilder result = new StringBuilder();
-                    
-                    for (String word : words) {
-                        if (!word.isEmpty()) {
-                            String lowerWord = word.toLowerCase();
-                            String capitalizedWord = specialCases.getOrDefault(lowerWord, capitalizeWord(word));
-                            result.append(capitalizedWord).append(" ");
-                        }
-                    }
-                    
-                    return result.toString().trim();
-                })
-                .toList();
-    }
-
-    /**
-     * Capitalizes a single word.
-     * @param word The word to capitalize
-     * @return The capitalized word
-     */
-    private String capitalizeWord(String word) {
-        if (word.isEmpty()) {
-            return word;
-        }
-        return Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase();
+        return model.capitalizeItems(model.getIndustries(), specialCases);
     }
 
     /**

@@ -502,4 +502,36 @@ public class Jobs implements IModel {
         
         System.out.println("Finished cleaning job industries");
     }
+
+    @Override
+    public List<String> capitalizeItems(List<String> items, Map<String, String> specialCases) {
+        return items.stream()
+                .map(item -> {
+                    String[] words = item.split(" ");
+                    StringBuilder result = new StringBuilder();
+                    
+                    for (String word : words) {
+                        if (!word.isEmpty()) {
+                            String lowerWord = word.toLowerCase();
+                            String capitalizedWord = specialCases.getOrDefault(lowerWord, capitalizeWord(word));
+                            result.append(capitalizedWord).append(" ");
+                        }
+                    }
+                    
+                    return result.toString().trim();
+                })
+                .toList();
+    }
+
+    /**
+     * Helper method to capitalize a single word.
+     * @param word Word to capitalize
+     * @return Capitalized word
+     */
+    private String capitalizeWord(String word) {
+        if (word.isEmpty()) {
+            return word;
+        }
+        return Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase();
+    }
 }
