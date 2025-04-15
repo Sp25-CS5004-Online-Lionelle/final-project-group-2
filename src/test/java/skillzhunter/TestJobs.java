@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import skillzhunter.model.IModel.AlertListener;
+import skillzhunter.model.AlertListener;
 import skillzhunter.model.JobRecord;
 import skillzhunter.model.Jobs;
 import skillzhunter.model.net.JobBoardApi;
