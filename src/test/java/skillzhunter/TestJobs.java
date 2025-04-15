@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import skillzhunter.controller.IController;
+import skillzhunter.model.IModel.AlertListener;
 import skillzhunter.model.JobRecord;
 import skillzhunter.model.Jobs;
 import skillzhunter.model.net.JobBoardApi;
@@ -29,7 +30,7 @@ public class TestJobs {
     private JobRecord jobRecord1;
     private JobRecord jobRecord2;
     private JobRecord jobRecord3;
-    private IController mockController;
+    private AlertListener mockAlertListener;
     
     @TempDir
     static Path tempDir;
@@ -37,10 +38,6 @@ public class TestJobs {
     /**
      * Fake JobBoardApi implementation for testing.
      * This class returns controlled results instead of making real API calls.
-     * 
-     * Using a fake/mock API is important when testing classes that depend on 
-     * external services, like our Jobs class depends on JobBoardApi. This way our
-     * tests remain fast, reliable, and focused on testing just the Jobs class behavior.
      */
     class FakeJobBoardApi extends JobBoardApi {
         private List<JobRecord> results;
@@ -77,19 +74,33 @@ public class TestJobs {
     }
 
     /**
+     * Create a fresh Jobs instance for testing.
+     * This ensures we have a clean state for each test.
+     */
+    private Jobs createFreshJobsList() {
+        Jobs jobs = new Jobs() {
+            // Override to avoid loading from file in tests
+            @Override
+            protected JobBoardApi createJobBoardApi() {
+                return new FakeJobBoardApi(new ArrayList<>(), null);
+            }
+        };
+        jobs.setAlertListener(mockAlertListener);
+        return jobs;
+    }
+
+    /**
      * Sets up the test data for job records.
      * This method initializes three job records with various attributes.
      * The records are then added to the jobList for later use in tests.
      */
     @BeforeEach
     public void setUp() {
-        // Creates mock controller using Mockito but doesn't have real implementation.
-        // This mock will record method calls to verify them later.
-        mockController = mock(IController.class);
+        // Create a mock AlertListener using Mockito
+        mockAlertListener = mock(AlertListener.class);
         
-        // Create regular Jobs instance for most tests
-        jobList = new Jobs();
-        jobList.setController(mockController);
+        // Create a fresh Jobs instance for each test
+        jobList = createFreshJobsList();
         
         // Initialize test data
         jobRecord1 = new JobRecord(
@@ -203,7 +214,7 @@ public class TestJobs {
      */
     @Test
     public void testGetJobRecordsEmpty() {
-        Jobs emptyJobs = new Jobs();
+        Jobs emptyJobs = createFreshJobsList();
         List<JobRecord> allJobs = emptyJobs.getJobRecords();
         assertTrue(allJobs.isEmpty());
     }
@@ -419,10 +430,6 @@ public class TestJobs {
     
     /**
      * Test searching for jobs with a fake API.
-     * 
-     * Here we're testing the searchJobs method which depends on the JobBoardApi.
-     * Instead of using a real API that would make actual network calls, we use
-     * our fake implementation that returns controlled results.
      */
     @Test
     public void testSearchJobs() {
@@ -433,15 +440,13 @@ public class TestJobs {
         );
         
         // Create a Jobs instance that uses our fake API
-        // This is a technique called "dependency injection via subclassing"
-        // We override the createJobBoardApi method to return our fake API
         Jobs testableJobs = new Jobs() {
             @Override
             protected JobBoardApi createJobBoardApi() {
                 return fakeApi;
             }
         };
-        testableJobs.setController(mockController);
+        testableJobs.setAlertListener(mockAlertListener);
         
         // Perform the search
         List<JobRecord> results = testableJobs.searchJobs("python", 2, "New York", "Technology");
@@ -460,10 +465,6 @@ public class TestJobs {
     
     /**
      * Test searching for jobs with an error message.
-     * 
-     * In this test, we're checking how the Jobs class handles errors from the API.
-     * We configure our fake API to return an error message and verify that 
-     * the Jobs class properly forwards that error to the controller.
      */
     @Test
     public void testSearchJobsWithError() {
@@ -481,7 +482,7 @@ public class TestJobs {
                 return fakeApi;
             }
         };
-        testableJobs.setController(mockController);
+        testableJobs.setAlertListener(mockAlertListener);
         
         // Perform the search
         List<JobRecord> results = testableJobs.searchJobs("python", 2, "New York", "Technology");
@@ -489,10 +490,8 @@ public class TestJobs {
         // Verify the results are empty because of the error
         assertTrue(results.isEmpty());
         
-        // Verify the error message was sent to the controller
-        // This is where Mockito helps us - we can verify that sendAlert was called
-        // with the exact error message we set up
-        verify(mockController).sendAlert(errorMessage);
+        // Verify the error message was sent to the alert listener
+        verify(mockAlertListener).onAlert(errorMessage);
     }
     
     /**
@@ -568,9 +567,6 @@ public class TestJobs {
     
     /**
      * Test getting the list of available industries.
-     * 
-     * Based on the industries.csv data provided, we can now test for specific
-     * industries that we know should be in the list.
      */
     @Test
     public void testGetIndustries() {
@@ -589,9 +585,6 @@ public class TestJobs {
     
     /**
      * Test getting the list of available locations.
-     * 
-     * Based on the locations.csv data provided, we can now test for specific
-     * locations that we know should be in the list.
      */
     @Test
     public void testGetLocations() {
@@ -608,26 +601,19 @@ public class TestJobs {
     }
     
     /**
-     * Test sending an alert through the controller.
-     * 
-     * Here we use Mockito to verify that the controller's sendAlert method
-     * was called with the expected message.
+     * Test sending an alert through the alert listener.
      */
     @Test
     public void testSendAlert() {
         String alertMessage = "Test alert message";
         jobList.sendAlert(alertMessage);
         
-        // Verify the controller's sendAlert method was called with the correct message
-        // This is the power of Mockito - we can verify exactly how our mocked object was used
-        verify(mockController).sendAlert(alertMessage);
+        // Verify the alert listener's onAlert method was called with the correct message
+        verify(mockAlertListener).onAlert(alertMessage);
     }
     
     /**
-     * Test sending multiple alerts through the controller.
-     * 
-     * This test verifies that multiple alerts can be sent through the controller
-     * and that Mockito properly tracks all of them.
+     * Test sending multiple alerts through the alert listener.
      */
     @Test
     public void testMultipleAlerts() {
@@ -640,11 +626,172 @@ public class TestJobs {
         jobList.sendAlert(alert2);
         
         // Verify both alerts were sent
-        // Mockito keeps track of all method calls to our mock
-        verify(mockController).sendAlert(alert1);
-        verify(mockController).sendAlert(alert2);
+        verify(mockAlertListener).onAlert(alert1);
+        verify(mockAlertListener).onAlert(alert2);
         
-        // Verify exactly 2 calls were made to sendAlert
-        verify(mockController, times(2)).sendAlert(any());
+        // Verify exactly 2 calls were made to onAlert
+        verify(mockAlertListener, times(2)).onAlert(any());
+    }
+    /**
+     * Test that test mode is correctly detected.
+     * This is a bit meta - testing the test detection itself.
+     */
+    @Test
+    public void testTestModeDetection() {
+        // Create a Jobs instance that lets us inspect the test mode
+        class JobsWithTestModeAccess extends Jobs {
+            public boolean getTestModeStatus() {
+                // Use reflection to access the private isTestMode field
+                try {
+                    java.lang.reflect.Field field = Jobs.class.getDeclaredField("isTestMode");
+                    field.setAccessible(true);
+                    return (boolean) field.get(this);
+                } catch (Exception e) {
+                    fail("Reflection failed: " + e.getMessage());
+                    return false;
+                }
+            }
+        }
+        
+        JobsWithTestModeAccess jobsToTest = new JobsWithTestModeAccess();
+        
+        // We're running in a test, so it should detect that
+        assertTrue(jobsToTest.getTestModeStatus(), "Should detect we're running in a test");
+    }
+    
+    /**
+     * Test that file operations handle gracefully when files don't exist.
+     */
+    @Test
+    public void testFileOperationsWhenFileDoesntExist() {
+        // Create a temporary directory that definitely doesn't exist
+        Path nonExistentDirectory = tempDir.resolve("non-existent-directory");
+        Path nonExistentFile = nonExistentDirectory.resolve("non-existent-file.csv");
+        
+        // Try to save to a non-existent directory and file
+        try {
+            jobList.saveJobsToCsv(nonExistentFile.toString());
+            // If we get here, it means no exception was thrown
+            
+            // Verify the directory was created
+            assertTrue(nonExistentDirectory.toFile().exists(), 
+                      "Directory should be created if it doesn't exist");
+            
+            // Verify the file was created
+            assertTrue(nonExistentFile.toFile().exists(), 
+                      "File should be created if it doesn't exist");
+        } catch (Exception e) {
+            fail("Should not throw exception when saving to a non-existent file: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Test that a Jobs instance starts with an empty job list when created in test mode.
+     * This verifies the conditional file loading behavior.
+     */
+    @Test
+    public void testEmptyInitialStateInTestMode() {
+        // Create a fresh Jobs instance for testing
+        Jobs freshJobs = new Jobs();
+        
+        // It should start empty in test mode, even if there are saved jobs
+        List<JobRecord> initialJobs = freshJobs.getJobRecords();
+        assertTrue(initialJobs.isEmpty(), 
+                  "Jobs instance should start with empty list in test mode");
+    }
+    
+    /**
+     * Test that trying to load non-existent file is handled gracefully.
+     */
+    @Test
+    public void testLoadingNonExistentFile() {
+        // Create a Jobs instance that forces file loading
+        class JobsForceLoad extends Jobs {
+            public void forceLoadFromCsv(String path) {
+                // Call the private method using reflection
+                try {
+                    java.lang.reflect.Method method = Jobs.class.getDeclaredMethod("loadJobsFromCsv", String.class);
+                    method.setAccessible(true);
+                    method.invoke(this, path);
+                } catch (Exception e) {
+                    fail("Reflection failed: " + e.getMessage());
+                }
+            }
+        }
+        
+        JobsForceLoad jobsToTest = new JobsForceLoad();
+        
+        // Non-existent file path
+        String nonExistentFile = tempDir.resolve("does-not-exist.csv").toString();
+        
+        // This should not throw an exception
+        try {
+            jobsToTest.forceLoadFromCsv(nonExistentFile);
+            // If we get here, no exception was thrown, which is what we want
+            
+            // Verify the job list is still empty
+            assertTrue(jobsToTest.getJobRecords().isEmpty(), 
+                      "Job list should remain empty after trying to load non-existent file");
+        } catch (Exception e) {
+            fail("Loading non-existent file should not throw exception: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Test that export handles IOException gracefully by throwing a RuntimeException.
+     */
+    @Test
+    public void testExportHandlesIOException() {
+        // Create a path to a directory that we'll make read-only
+        Path readOnlyPath = tempDir.resolve("readonly");
+        File readOnlyDir = readOnlyPath.toFile();
+        
+        try {
+            // Create the directory
+            readOnlyDir.mkdir();
+            
+            // Make it read-only (this might not work on all platforms)
+            readOnlyDir.setReadOnly();
+            
+            // Try to export to a file in this directory - should fail with permission denied
+            Path invalidFile = readOnlyPath.resolve("cannot-write.csv");
+            
+            // This should throw a RuntimeException wrapping the IOException
+            Exception exception = assertThrows(RuntimeException.class, () -> {
+                jobList.exportSavedJobs(jobList.getJobRecords(), "CSV", invalidFile.toString());
+            });
+            
+            // Verify the exception message contains something related to file access
+            String exceptionMessage = exception.getMessage().toLowerCase();
+            assertTrue(
+                exceptionMessage.contains("fail") || 
+                exceptionMessage.contains("error") || 
+                exceptionMessage.contains("permission") ||
+                exceptionMessage.contains("access"),
+                "Exception should indicate file access problem");
+        } finally {
+            // Clean up - make the directory writable again so it can be deleted
+            readOnlyDir.setWritable(true);
+        }
+    }
+    
+    /**
+     * Test alert handling when no listener is registered.
+     */
+    @Test
+    public void testAlertWithNoListener() {
+        // Create a fresh Jobs instance without setting a listener
+        Jobs jobsWithoutListener = createFreshJobsList();
+        
+        // Remove the alert listener
+        jobsWithoutListener.setAlertListener(null);
+        
+        // This should not throw an exception
+        try {
+            jobsWithoutListener.sendAlert("Test alert with no listener");
+            // If we get here, no exception was thrown, which is what we want
+        } catch (Exception e) {
+            fail("Sending alert with no listener should not throw exception: " + e.getMessage());
+        }
     }
 }
