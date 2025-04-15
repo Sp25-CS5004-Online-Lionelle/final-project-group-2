@@ -22,8 +22,6 @@ public class MainController implements IController {
     private IView view;
     /** Saved jobs tab. */
     private SavedJobsTab savedJobsTab;
-    /** Standard path for saved jobs file */
-    private static final String DEFAULT_SAVED_JOBS_PATH = "data/SavedJobs.csv";
 
     /**
      * Constructor for MainController.
@@ -201,7 +199,7 @@ public class MainController implements IController {
      * @param jobRecord The JobRecord object to add
      */
     @Override
-    public void job2SavedList(JobRecord jobRecord) {
+    public void jobToSavedList(JobRecord jobRecord) {
         model.addJob(jobRecord);
     }
     
@@ -240,7 +238,7 @@ public class MainController implements IController {
      * @param filePath The file path to save the CSV file
      */
     @Override
-    public void path2CSV(String filePath) {
+    public void pathToCSV(String filePath) {
         // Get all job records
         List<JobRecord> jobs = model.getJobRecords();
 
@@ -266,7 +264,7 @@ public class MainController implements IController {
      * @param filePath The file path to save the exported file
      */
     @Override
-    public void export2FileType(List<JobRecord> jobs, String formatStr, String filePath) {
+    public void exportToFileType(List<JobRecord> jobs, String formatStr, String filePath) {
         // Make sure the parent directory exists
         File file = new File(filePath);
         File parentDir = file.getParentFile();
@@ -363,3 +361,4 @@ public class MainController implements IController {
         mainView.run();
     }
 }
+

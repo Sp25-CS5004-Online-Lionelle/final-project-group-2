@@ -52,7 +52,7 @@ public interface IController {
      * Add a job to the saved jobs list.
      * @param jobRecord The JobRecord object to add
      */
-    void job2SavedList(JobRecord jobRecord);
+    void jobToSavedList(JobRecord jobRecord);
     
     /**
      * Used when the another part of
@@ -79,7 +79,7 @@ public interface IController {
      * Writes the saved jobs to a CSV file.
      * @param filePath The path to the CSV file
      */
-    void path2CSV(String filePath);
+    void pathToCSV(String filePath);
 
     /**
      * Exports job records to a file in the specified format.
@@ -87,7 +87,7 @@ public interface IController {
      * @param formatStr The format string (e.g., "CSV", "JSON", "XML")
      * @param filePath The path to save the file to
      */
-    void export2FileType(List<JobRecord> jobs, String formatStr, String filePath);
+    void exportToFileType(List<JobRecord> jobs, String formatStr, String filePath);
 
     /**
      * Gets the saved jobs tab.

@@ -47,7 +47,7 @@ public final class JobActionHelper {
      */
     public static void saveJob(JobRecord job, String comments, int rating, 
                                IController controller, Component parent) {
-        controller.job2SavedList(job);
+        controller.jobToSavedList(job);
         controller.getUpdateJob(job.id(), 
             comments != null && !comments.isEmpty() ? comments : "No comments provided", 
             rating);

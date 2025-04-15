@@ -223,7 +223,7 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
         String commentText = commentsArea.getText().isEmpty() ? "No comments provided" : commentsArea.getText();
         
         // First, add the job to the model through the controller
-        controller.job2SavedList(job);
+        controller.jobToSavedList(job);
         
         // Then update the job with the rating and comments through the controller
         controller.getUpdateJob(job.id(), commentText, newRating);

@@ -201,7 +201,7 @@ public abstract class JobView extends JPanel {
      * @param record The job record to add
      */
     public void addJobRecord(JobRecord record) {
-        controller.job2SavedList(record); // Delegate to controller
+        controller.jobToSavedList(record); // Delegate to controller
     }
 
     // Remove a job record via controller (delegates to controller)
