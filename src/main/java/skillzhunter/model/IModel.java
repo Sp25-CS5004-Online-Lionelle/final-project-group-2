@@ -1,6 +1,7 @@
 package skillzhunter.model;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Interface for the model in the MVC architecture.
@@ -97,4 +98,12 @@ public interface IModel {
      * @param alertMessage The alert message to send
      */
     void sendAlert(String alertMessage);
+
+    /**
+     * Capitalizes a list of items with special case handling.
+     * @param items List of strings to capitalize
+     * @param specialCases Map of words with special capitalization rules
+     * @return Capitalized list of strings
+     */
+    List<String> capitalizeItems(List<String> items, Map<String, String> specialCases);
 }
