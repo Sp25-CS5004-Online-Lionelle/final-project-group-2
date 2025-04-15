@@ -120,4 +120,10 @@ public interface IController {
      * @return List of JobRecord objects
      */
     List<JobRecord> setSavedJobs(List<JobRecord> savedJobs);
+
+    /**
+     * Clean job record and sanitize html for view.
+     * @param args
+     */
+    public JobRecord cleanJobRecord(JobRecord job);
 }

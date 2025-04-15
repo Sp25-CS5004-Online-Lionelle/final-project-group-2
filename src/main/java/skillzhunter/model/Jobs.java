@@ -1,5 +1,6 @@
 package skillzhunter.model;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -37,6 +38,9 @@ public class Jobs implements IModel {
     /** Object representing the Jobs Api.*/
     private final JobBoardApi api;
 
+    /** Standard path for saved jobs file */
+    private static final String DEFAULT_SAVED_JOBS_PATH = "data/SavedJobs.csv";
+
     /**
      * Constructor for Jobs class.
      * Initializes the job list and API.
@@ -48,14 +52,15 @@ public class Jobs implements IModel {
         try {
             // Load jobs from CSV when the application starts
             // We wrap this in try-catch to avoid issues during testing
-            loadJobsFromCsv("SavedJobs.csv");
+            loadJobsFromCsv(DEFAULT_SAVED_JOBS_PATH);
 
             // Add a shutdown hook to save the jobs to CSV on shutdown
             // Only add this in non-test environment
             if (!isRunningInTestEnvironment()) {
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                    saveJobsToCsv("SavedJobs.csv");
-                    System.out.println("Jobs saved to SavedJobs.csv on shutdown.");
+                    System.out.println("Application is shutting down. Saving jobs to " + DEFAULT_SAVED_JOBS_PATH);
+                    saveJobsToCsv(DEFAULT_SAVED_JOBS_PATH);
+                    System.out.println("Jobs saved to " + DEFAULT_SAVED_JOBS_PATH + " on shutdown.");
                 }));
             }
         } catch (Exception e) {
@@ -124,40 +129,42 @@ public class Jobs implements IModel {
      */
     @Override
     public void addJob(JobRecord job) {
+        // Sanitize HTML before saving
+        JobRecord cleanJob = DataFormatter.processJobHtml(job);
+
         JobBean jobBean = new JobBean();
         // Set fields in the same order as JobRecord
-        jobBean.setId(job.id());
-        jobBean.setUrl(job.url());
-        jobBean.setJobSlug(job.jobSlug());
-        jobBean.setJobTitle(job.jobTitle() != null && !job.jobTitle().isBlank() ? job.jobTitle() : "");
-        jobBean.setCompanyName(job.companyName() != null && !job.companyName().isBlank() ? job.companyName() : "");
-        jobBean.setCompanyLogo(job.companyLogo());
+        jobBean.setId(cleanJob.id());
+        jobBean.setUrl(cleanJob.url());
+        jobBean.setJobSlug(cleanJob.jobSlug());
+        jobBean.setJobTitle(cleanJob.jobTitle() != null && !cleanJob.jobTitle().isBlank() ? cleanJob.jobTitle() : "");
+        jobBean.setCompanyName(cleanJob.companyName() != null && !cleanJob.companyName().isBlank() ? cleanJob.companyName() : "");
+        jobBean.setCompanyLogo(cleanJob.companyLogo());
 
-        jobBean.setJobIndustry(job.jobIndustry() != null
-                            && job.jobIndustry().stream().noneMatch(String::isBlank)
-                            ? job.jobIndustry() : new ArrayList<>());
-        jobBean.setJobType(job.jobType() != null
-                        && job.jobType().stream().noneMatch(String::isBlank)
-                        ? job.jobType() : new ArrayList<>());
+        jobBean.setJobIndustry(cleanJob.jobIndustry() != null
+                            && cleanJob.jobIndustry().stream().noneMatch(String::isBlank)
+                            ? cleanJob.jobIndustry() : new ArrayList<>());
+        jobBean.setJobType(cleanJob.jobType() != null
+                        && cleanJob.jobType().stream().noneMatch(String::isBlank)
+                        ? cleanJob.jobType() : new ArrayList<>());
 
-        jobBean.setJobGeo(job.jobGeo()
-                        != null && !job.jobGeo().isBlank() ? job.jobGeo() : "");
-        jobBean.setJobLevel(job.jobLevel() != null && !job.jobLevel().isBlank() ? job.jobLevel() : "");
-        jobBean.setJobExcerpt(job.jobExcerpt());
-        jobBean.setJobDescription(job.jobDescription());
-        jobBean.setPubDate(job.pubDate() != null && !job.pubDate().isBlank() ? job.pubDate() : "");
-        jobBean.setAnnualSalaryMin(job.annualSalaryMin());
-        jobBean.setAnnualSalaryMax(job.annualSalaryMax());
-        jobBean.setSalaryCurrency(job.salaryCurrency() != null
-                                && !job.salaryCurrency().isBlank()
-                                ? job.salaryCurrency() : "");
-        jobBean.setRating(job.rating());
-        jobBean.setComments(job.comments() != null
-                            && !job.comments().isBlank()
-                            ? job.comments() : "No comments provided");
-        
+        jobBean.setJobGeo(cleanJob.jobGeo() != null && !cleanJob.jobGeo().isBlank() ? cleanJob.jobGeo() : "");
+        jobBean.setJobLevel(cleanJob.jobLevel() != null && !cleanJob.jobLevel().isBlank() ? cleanJob.jobLevel() : "");
+        jobBean.setJobExcerpt(cleanJob.jobExcerpt());
+        jobBean.setJobDescription(cleanJob.jobDescription());
+        jobBean.setPubDate(cleanJob.pubDate() != null && !cleanJob.pubDate().isBlank() ? cleanJob.pubDate() : "");
+        jobBean.setAnnualSalaryMin(cleanJob.annualSalaryMin());
+        jobBean.setAnnualSalaryMax(cleanJob.annualSalaryMax());
+        jobBean.setSalaryCurrency(cleanJob.salaryCurrency() != null
+                                && !cleanJob.salaryCurrency().isBlank()
+                                ? cleanJob.salaryCurrency() : "");
+        jobBean.setRating(cleanJob.rating());
+        jobBean.setComments(cleanJob.comments() != null && !cleanJob.comments().isBlank()
+                            ? cleanJob.comments() : "No comments provided");
+
         jobList.add(jobBean.toRecord());
     }
+
 
     /**
      * Retrieve a single job record by title.
@@ -280,28 +287,41 @@ public class Jobs implements IModel {
     }
 
     /**
-     * Saves the job records (saved jobs) in the jobList to a CSV file.
-     * @param fileName Name of the CSV file to save to
+     * Saves the job records (saved jobs) in the jobList to a CSV file, ensuring data is sanitized before saving.
+     * @param filePath Name of the CSV file to save to
      */
     @Override
-    public void saveJobsToCsv(String fileName) {
+    public void saveJobsToCsv(String filePath) {
         // Debug information before export
-        System.out.println("Saving " + jobList.size() + " jobs to CSV: " + fileName);
-        for (JobRecord job : jobList) {
-            System.out.println("Job before export: " + job.jobTitle()
-                            + ", Rating: " + job.rating()
-                            + ", Comments: " + job.comments());
+        System.out.println("Saving " + jobList.size() + " jobs to CSV: " + filePath);
+        
+        // Ensure the parent directory exists
+        File file = new File(filePath);
+        File parentDir = file.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            boolean created = parentDir.mkdirs();
+            System.out.println("Created directory structure: " + created);
         }
         
-        try (OutputStream out = new FileOutputStream(fileName)) {
-            // Write to file - DataFormatter now handles escaping correctly
-            DataFormatter.write(jobList, Formats.CSV, out);
-            System.out.println("CSV export completed successfully");
-        } catch (IOException e) {
-            System.err.println("Error writing to CSV file: " + e.getMessage());
-            // e.printStackTrace();
-            throw new RuntimeException("Error writing to CSV file", e);
+        // Log jobs before sanitization for debugging
+        for (JobRecord job : jobList) {
+            // Print industry data to diagnose HTML entity issues
+            String industryStr = "null";
+            if (job.jobIndustry() != null && !job.jobIndustry().isEmpty()) {
+                industryStr = String.join(", ", job.jobIndustry());
+            }
+            
+            System.out.println("Job before export: " + job.jobTitle() 
+                            + ", Industry: " + industryStr
+                            + ", Rating: " + job.rating()
+                            + ", Comments: " + (job.comments() != null ? job.comments() : "null"));
         }
+
+        // Let DataFormatter handle the export with proper sanitization
+        // This avoids duplicate sanitizing logic and ensures consistent cleaning
+        DataFormatter.exportCustomCSV(new ArrayList<>(jobList), filePath);
+        
+        System.out.println("Jobs saved to CSV: " + filePath);
     }
 
     /**
@@ -321,11 +341,19 @@ public class Jobs implements IModel {
         // Debug information before export
         System.out.println("Exporting " + jobs.size() + " jobs to " + formatStr + ": " + filePath);
         
+        // Ensure the parent directory exists
+        File file = new File(filePath);
+        File parentDir = file.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            boolean created = parentDir.mkdirs();
+            System.out.println("Created directory structure: " + created);
+        }
+        
         // Export the jobs to the specified file
         try (OutputStream out = new FileOutputStream(filePath)) {
             // DataFormatter now handles escaping correctly for each format
             DataFormatter.write(jobs, format, out);
-            System.out.println("Export completed successfully");
+            System.out.println("Export completed successfully to " + filePath);
         } catch (IOException e) {
             System.err.println("Failed to export jobs: " + e.getMessage());
             // e.printStackTrace();
@@ -347,15 +375,15 @@ public class Jobs implements IModel {
      * @param fileName Name of the CSV file to load from
      */
     private void loadJobsFromCsv(String fileName) {
-    try (InputStream in = new FileInputStream(fileName)) {
-        List<JobRecord> loadedJobs = DataFormatter.read(in, Formats.CSV);
-        this.jobList.clear();  // Clear existing list before loading
-        this.jobList.addAll(loadedJobs);  // Add loaded jobs
-        System.out.println("Loaded " + loadedJobs.size() + " jobs from CSV.");
-    } catch (IOException e) {
-        System.err.println("Error loading jobs from CSV file: " + e.getMessage());
+        try (InputStream in = new FileInputStream(fileName)) {
+            List<JobRecord> loadedJobs = DataFormatter.read(in, Formats.CSV);
+            this.jobList.clear();  // Clear existing list before loading
+            this.jobList.addAll(loadedJobs);  // Add loaded jobs
+            System.out.println("Loaded " + loadedJobs.size() + " jobs from " + fileName);
+        } catch (IOException e) {
+            System.err.println("Error loading jobs from CSV file: " + e.getMessage());
+        }
     }
-}
 
     /**
      * Main method for testing purposes.
@@ -390,4 +418,3 @@ public class Jobs implements IModel {
         // jobs.getLocations().forEach(System.out::println);
     }
 }
-

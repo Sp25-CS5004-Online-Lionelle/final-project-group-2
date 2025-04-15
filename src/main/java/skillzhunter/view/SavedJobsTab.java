@@ -182,10 +182,16 @@ public class SavedJobsTab extends JobView {
         }
 
         // Create a File object pointing to the data directory in the application's root
+        // Use just the filename "SavedJobs.csv" which is passed into method with data directory
         String filePath = createDataDirectoryAndGetFilePath("SavedJobs.csv");
         
-        // Create a cleaned version of the jobs for export
-        List<JobRecord> cleanedJobs = cleanJobRecordsForExport(savedJobs);
+        //Create new list called cleanedJobs
+        List<JobRecord> cleanedJobs = new ArrayList<>();
+        // Create a cleaned version of the jobs by using controller cleanJobRecord
+        for(JobRecord job : savedJobs){
+            controller.cleanJobRecord(job);
+            cleanedJobs.add(job);
+        }
         
         // Save the jobs to file
         saveJobsToFile(parentFrame, cleanedJobs, "CSV", filePath);
@@ -225,8 +231,14 @@ public class SavedJobsTab extends JobView {
         if (filePath == null) { 
             return; 
         }
-        // Create clean version of jobs for export
-        List<JobRecord> cleanedJobs = cleanJobRecordsForExport(savedJobs);
+        
+        //Create new list called cleanedJobs
+        List<JobRecord> cleanedJobs = new ArrayList<>();
+        // Create a cleaned version of the jobs by using controller cleanJobRecord
+        for(JobRecord job : savedJobs){
+            controller.cleanJobRecord(job);
+            cleanedJobs.add(job);
+        }
         
         // Export the jobs to the selected format
         exportJobsToFile(parentFrame, cleanedJobs, selectedFormat, filePath);
@@ -297,13 +309,17 @@ public class SavedJobsTab extends JobView {
      * @return The absolute path to the file
      */
     private String createDataDirectoryAndGetFilePath(String fileName) {
+        // FIXED: Extract just the file name without any directory paths
+        String justFileName = new File(fileName).getName();
+        
         File dataDir = new File("data");
         if (!dataDir.exists()) {
             boolean created = dataDir.mkdirs();
             System.out.println("Created data directory: " + created);
         }
         
-        String filePath = new File(dataDir, fileName).getAbsolutePath();
+        // FIXED: Combine data directory with just the file name
+        String filePath = new File(dataDir, justFileName).getAbsolutePath();
         System.out.println("File path: " + filePath);
         
         return filePath;
@@ -394,113 +410,6 @@ public class SavedJobsTab extends JobView {
                 JOptionPane.ERROR_MESSAGE,
                 warningIcon);
         }
-    }
-
-    /**
-     * Creates a cleaned copy of job records for export.
-     * Removes HTML content and simplifies descriptions.
-     * 
-     * @param jobs The original job records
-     * @return A new list of cleaned job records
-     */
-    private List<JobRecord> cleanJobRecordsForExport(List<JobRecord> jobs) {
-        List<JobRecord> cleanedRecords = new ArrayList<>();
-        
-        for (JobRecord job : jobs) {
-            // Create a new JobBean with cleaned data
-            JobBean cleanedJob = new JobBean();
-            
-            // Copy basic fields directly
-            cleanedJob.setId(job.id());
-            cleanedJob.setUrl(job.url());
-            cleanedJob.setJobSlug(job.jobSlug());
-            cleanedJob.setJobTitle(job.jobTitle());
-            cleanedJob.setCompanyName(job.companyName());
-            cleanedJob.setCompanyLogo(job.companyLogo());
-            cleanedJob.setJobGeo(job.jobGeo());
-            cleanedJob.setJobLevel(job.jobLevel());
-            cleanedJob.setPubDate(job.pubDate());
-            cleanedJob.setAnnualSalaryMin(job.annualSalaryMin());
-            cleanedJob.setAnnualSalaryMax(job.annualSalaryMax());
-            cleanedJob.setSalaryCurrency(job.salaryCurrency());
-            cleanedJob.setRating(job.rating());
-            cleanedJob.setComments(job.comments());
-            
-            // Handle collection fields
-            if (job.jobIndustry() != null) {
-                cleanedJob.setJobIndustry(new ArrayList<>(job.jobIndustry()));
-            } else {
-                cleanedJob.setJobIndustry(new ArrayList<>());
-            }
-            
-            if (job.jobType() != null) {
-                cleanedJob.setJobType(new ArrayList<>(job.jobType()));
-            } else {
-                cleanedJob.setJobType(new ArrayList<>());
-            }
-            
-            // Clean excerpt - extract first sentence without HTML
-            String excerpt = "";
-            if (job.jobExcerpt() != null) {
-                excerpt = extractFirstSentence(stripHTML(job.jobExcerpt()));
-            }
-            cleanedJob.setJobExcerpt(excerpt);
-            
-            // Simplify job description
-            String description = "Position at " + job.companyName() + " - " + job.jobTitle();
-            cleanedJob.setJobDescription(description);
-            
-            // Add to the list of cleaned records
-            cleanedRecords.add(cleanedJob.toRecord());
-        }
-        
-        return cleanedRecords;
-    }
-    
-    /**
-     * Strips HTML tags from a string.
-     * 
-     * @param html The string possibly containing HTML tags
-     * @return The string with HTML tags removed
-     */
-    private String stripHTML(String html) {
-        if (html == null) { 
-            return ""; 
-        }
-        return html.replaceAll("<[^>]*>", "").replaceAll("\\s+", " ").trim();
-    }
-    
-    /**
-     * Extracts the first sentence from a text string.
-     * 
-     * @param text The text to extract from
-     * @return The first sentence or a truncated version if no end marker found
-     */
-    private String extractFirstSentence(String text) {
-        if (text == null || text.isEmpty()) { 
-            return ""; 
-        }
-        
-        // Find the end of the first sentence
-        int endPos = -1;
-        for (String endMark : new String[]{".", "!", "?"}) {
-            int pos = text.indexOf(endMark);
-            if (pos >= 0 && (endPos == -1 || pos < endPos)) {
-                endPos = pos + 1;
-            }
-        }
-        
-        // If a sentence end was found, return just that sentence
-        if (endPos > 0) {
-            return text.substring(0, endPos);
-        }
-        
-        // Otherwise truncate to a reasonable length
-        if (text.length() > 100) {
-            return text.substring(0, 97) + "...";
-        }
-        
-        return text;
     }
 
     /**

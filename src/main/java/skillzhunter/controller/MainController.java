@@ -22,6 +22,8 @@ public class MainController implements IController {
     private IView view;
     /** Saved jobs tab. */
     private SavedJobsTab savedJobsTab;
+    /** Standard path for saved jobs file */
+    private static final String DEFAULT_SAVED_JOBS_PATH = "data/SavedJobs.csv";
 
     /**
      * Constructor for MainController.
@@ -341,6 +343,16 @@ public class MainController implements IController {
         }
     }
 
+    /**
+     * Clean job record and sanitize html for view.
+     * @param job Job record to clean
+     * @return Cleaned job record
+     */
+    @Override
+    public JobRecord cleanJobRecord(JobRecord job){
+        JobRecord cleanJobRecord = DataFormatter.processJobHtml(job);
+        return cleanJobRecord;
+    }
     /**
      * Main method for testing purposes.
      * @param args Command line arguments (not used).

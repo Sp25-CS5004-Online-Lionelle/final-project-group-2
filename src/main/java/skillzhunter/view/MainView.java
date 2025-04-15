@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -47,7 +49,18 @@ public class MainView extends JFrame implements IView {
         super("Jobz Hunter App");
         this.controller = controller;
         this.setLocation(200, 200);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        // Change from EXIT_ON_CLOSE to DO_NOTHING_ON_CLOSE
+        // We'll handle closing manually with our window listener
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        
+        // Add window listener to handle close button (X) click
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                exitHelper();
+            }
+        });
 
         // Set default theme (light mode) early
         theme = ColorTheme.LIGHT;
@@ -93,28 +106,23 @@ public class MainView extends JFrame implements IView {
     }
 
     /**
-     * Sets up the exit key (Ctrl+Q).
+     * Sets up the exit key (Q).
      */
     private void setupExitKeyAction() {
         Action exitAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Show confirmation dialog, just like in the menu
-                int result = JOptionPane.showConfirmDialog(
-                    tabbedPane,
-                    "Are you sure you want to exit?",
-                    "Exit",
-                    JOptionPane.YES_NO_OPTION
-                );
-                if (result == JOptionPane.YES_OPTION) {
-                    System.exit(0);
-                }
+                exitHelper();
             }
         };
 
         JComponent rootPane = getRootPane();
         InputMap inputMap = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        
+        // Keep just Q key without modifiers
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Q, 0), "exit");
+        
         ActionMap actionMap = rootPane.getActionMap();
         actionMap.put("exit", exitAction);
     }
@@ -171,11 +179,7 @@ public class MainView extends JFrame implements IView {
     private void mapMenuEvents() {
         // Exit Functionality
         customMenuBar.getExitItem().addActionListener(exitEvent -> {
-            int result = JOptionPane.showConfirmDialog(tabbedPane, "Are you sure you want to exit?", 
-            "Exit", JOptionPane.YES_NO_OPTION);
-            if (result == JOptionPane.YES_OPTION) {
-                System.exit(0);
-            }
+            exitHelper();
         });
         
         // Theme switching
@@ -248,6 +252,9 @@ public class MainView extends JFrame implements IView {
             warningIcon);
     }
 
+    /**
+     * Sets the visibility of the main view.
+     */
     @Override
     public void run() {
         setVisible(true);
@@ -256,5 +263,22 @@ public class MainView extends JFrame implements IView {
         SwingUtilities.invokeLater(() -> {
             applyTheme(theme);
         });
+    }
+
+    /**
+     * Exits the application with a confirmation dialog.
+     */
+    public void exitHelper() {
+        int result = JOptionPane.showConfirmDialog(
+                    tabbedPane,
+                    "Your jobs will be auto-saved to SavedJobs.csv.\nAre you sure you want to exit?",
+                    "Exit",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE,
+                    IconLoader.loadIcon("images/warning.png")
+                );
+                if (result == JOptionPane.YES_OPTION) {
+                    System.exit(0);
+                }
     }
 }

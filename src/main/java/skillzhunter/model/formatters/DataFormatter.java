@@ -1,6 +1,5 @@
 package skillzhunter.model.formatters;
 
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -8,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -143,8 +143,8 @@ public final class DataFormatter {
 
     /**
      * Export the job records to a CSV file.
-     *  This method will escape HTML tags.
-     *  This method will also cut down
+     * This method will escape HTML tags and entities.
+     * This method will also cut down
      * @param jobs
      * @param filePath
      */
@@ -168,7 +168,14 @@ public final class DataFormatter {
             + "annualSalaryMin,annualSalaryMax,salaryCurrency,rating,comments");
             writer.newLine();
 
+            // Make sure all jobs are sanitized before writing to CSV
+            List<JobRecord> sanitizedJobs = new ArrayList<>();
             for (JobRecord job : jobs) {
+                JobRecord sanitizedJob = processJobHtml(job);
+                sanitizedJobs.add(sanitizedJob);
+            }
+
+            for (JobRecord job : sanitizedJobs) {
                 StringBuilder line = new StringBuilder();
                 line.append(job.id()).append(",");
                 line.append(escapeCSV(job.url())).append(",");
@@ -212,6 +219,9 @@ public final class DataFormatter {
                 // Force flush after each record to ensure data is written
                 writer.flush();
             }
+            
+            System.out.println("Successfully exported " + sanitizedJobs.size() + " jobs to " + filePath);
+            
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Error writing CSV file: " + e.getMessage());
@@ -385,8 +395,15 @@ public final class DataFormatter {
             return null;
         }
         
+        System.out.println("Processing job HTML for job: " + job.id() + " - " + job.jobTitle());
+        
         // Create a new JobBean and clean all HTML content
         JobBean bean = new JobBean();
+        
+        // Log industries before processing
+        if (job.jobIndustry() != null) {
+            System.out.println("Job industries before processing: " + String.join(", ", job.jobIndustry()));
+        }
         
         // Copy values, cleaning HTML where needed
         bean.setId(job.id());
@@ -395,7 +412,19 @@ public final class DataFormatter {
         bean.setJobTitle(job.jobTitle() != null ? replaceHtmlEntities(job.jobTitle()) : job.jobTitle());
         bean.setCompanyName(job.companyName() != null ? replaceHtmlEntities(job.companyName()) : job.companyName());
         bean.setCompanyLogo(job.companyLogo());
-        bean.setJobIndustry(job.jobIndustry());
+        
+        // Process each industry string individually to ensure entities are replaced
+        if (job.jobIndustry() != null) {
+            List<String> cleanedIndustries = new ArrayList<>();
+            for (String industry : job.jobIndustry()) {
+                cleanedIndustries.add(replaceHtmlEntities(industry));
+            }
+            bean.setJobIndustry(cleanedIndustries);
+            System.out.println("Job industries after processing: " + String.join(", ", cleanedIndustries));
+        } else {
+            bean.setJobIndustry(job.jobIndustry());
+        }
+        
         bean.setJobType(job.jobType());
         bean.setJobGeo(job.jobGeo() != null ? replaceHtmlEntities(job.jobGeo()) : job.jobGeo());
         bean.setJobLevel(job.jobLevel() != null ? replaceHtmlEntities(job.jobLevel()) : job.jobLevel());
@@ -411,7 +440,10 @@ public final class DataFormatter {
         bean.setRating(job.rating());
         bean.setComments(job.comments() != null ? replaceHtmlEntities(job.comments()) : job.comments());
         
-        return bean.toRecord();
+        JobRecord processedJob = bean.toRecord();
+        System.out.println("Finished processing job HTML for job: " + processedJob.id());
+        
+        return processedJob;
     }
 
     /**
