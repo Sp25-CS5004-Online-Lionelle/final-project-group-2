@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -112,25 +114,32 @@ public class Jobs implements IModel {
         return new JobBoardApi();
     }
 
-
     /**
-     * Gets the industries to be used in the search in a list.
-     * @return Map of industries based on keys and is sorted to a list.
+     * Gets the industries to be used in the search in a list, with proper capitalization.
+     * This method uses HR as a special case.
+     * @return List of industries properly capitalized and sorted.
      */
     @Override
     public List<String> getIndustries() {
-        return INDUSTRY_MAP.keySet().stream().sorted().toList();
+        Map<String, String> specialCases = new HashMap<>();
+        specialCases.put("hr", "HR");
+        
+        List<String> industries = INDUSTRY_MAP.keySet().stream().sorted().toList();
+        return capitalizeItems(industries, specialCases);
     }
 
     /**
-     * Gets locations to be used in the search in a list.
-     * @return location list
+     * Gets locations to be used in the search in a list, with proper capitalization.
+     * This method uses USA as a special case.
+     * @return List of locations properly capitalized and sorted.
      */
     @Override
     public List<String> getLocations() {
-        return LOCATION_MAP.keySet().stream().sorted().toList();
+        Map<String, String> specialCases = new HashMap<>();
+        specialCases.put("usa", "USA");
+        List<String> locations = LOCATION_MAP.keySet().stream().sorted().toList();
+        return capitalizeItems(locations, specialCases);
     }
-
     /**
      * Add a new job.
      * @param job JobRecord instance to add
