@@ -7,88 +7,57 @@ import skillzhunter.model.JobRecord;
 import skillzhunter.view.IView;
 import skillzhunter.view.SavedJobsTab;
 
+/**
+ * Interface for the controller in the MVC architecture.
+ */
 public interface IController {
     /**
-     * Get a reference to the view.
-     * @return the view
+     * Interface for an alert observer that receives notifications from the controller.
      */
-    IView getView();
-
+    interface AlertObserver {
+        /**
+         * Called when an alert needs to be shown.
+         * @param alertMessage The alert message to show
+         */
+        void onAlert(String alertMessage);
+    }
+    
     /**
-     * Get a reference to the model.
-     * @return the model
+     * Registers an alert observer with this controller.
+     * @param observer The alert observer to register
      */
-    IModel getModel();
-
+    void registerAlertObserver(AlertObserver observer);
+    
     /**
-     * Get all locations from the API.
+     * Unregisters an alert observer from this controller.
+     * @param observer The alert observer to unregister
+     */
+    void unregisterAlertObserver(AlertObserver observer);
+    
+    /**
+     * Gets the locations from the model.
      * @return List of locations
      */
     List<String> getLocations();
-
+    
     /**
-     * Get all industries from the API.
+     * Gets the industries from the model.
      * @return List of industries
      */
     List<String> getIndustries();
-
-    /**
-     * Make an API call to get jobs.
-     * @param query The search query
-     * @param numberOfResults The number of results to return
-     * @param location The location to filter by
-     * @param industry The industry to filter by
-     * @return List of JobRecord objects
-     */
-    List<JobRecord> getApiCall(String query, Integer numberOfResults, String location, String industry);
-
-    /**
-     * Get the list of saved jobs.
-     * @return List of JobRecord objects
-     */
-    List<JobRecord> getSavedJobs();
-
-    /**
-     * Add a job to the saved jobs list.
-     * @param jobRecord The JobRecord object to add
-     */
-    void jobToSavedList(JobRecord jobRecord);
     
     /**
-     * Used when the another part of
-     * the program needs to alert the user.
-     * @param alert the alert message to be sent
-     **/
-    void sendAlert(String alert);
-
-    /**
-     * Check if a job is already in the saved jobs list.
-     *
-     * @param jobRecord The job record to check
-     * @return true if the job is already saved, false otherwise
+     * Gets the model.
+     * @return The model
      */
-    boolean isJobAlreadySaved(JobRecord jobRecord);
-
+    IModel getModel();
+    
     /**
-     * Remove a job from the saved jobs list.
-     * @param id The ID of the job to remove
+     * Gets the view.
+     * @return The view
      */
-    void removeJobFromList(int id);
-
-    /**
-     * Writes the saved jobs to a CSV file.
-     * @param filePath The path to the CSV file
-     */
-    void pathToCSV(String filePath);
-
-    /**
-     * Exports job records to a file in the specified format.
-     * @param jobs The list of JobRecord objects to export
-     * @param formatStr The format string (e.g., "CSV", "JSON", "XML")
-     * @param filePath The path to save the file to
-     */
-    void exportToFileType(List<JobRecord> jobs, String formatStr, String filePath);
-
+    IView getView();
+    
     /**
      * Gets the saved jobs tab.
      * @return The saved jobs tab
@@ -96,34 +65,88 @@ public interface IController {
     SavedJobsTab getSavedJobsTab();
     
     /**
-     * Try to add a job to the saved jobs list, checking for duplicates.
-     * 
-     * @param jobRecord The JobRecord object to add
+     * Gets the API call for job search.
+     * @param query The search query
+     * @param numberOfResults The number of results to return
+     * @param location The location to filter by
+     * @param industry The industry to filter by
+     * @return List of job records
+     */
+    List<JobRecord> getApiCall(String query, Integer numberOfResults, String location, String industry);
+    
+    /**
+     * Gets the saved jobs from the model.
+     * @return List of saved job records
+     */
+    List<JobRecord> getSavedJobs();
+    
+    /**
+     * Sets the saved jobs in the model.
+     * @param savedJobs List of job records to set
+     * @return List of saved job records
+     */
+    List<JobRecord> setSavedJobs(List<JobRecord> savedJobs);
+    
+    /**
+     * Checks if a job is already in the saved jobs list.
+     * @param jobRecord The job record to check
+     * @return true if the job is already saved, false otherwise
+     */
+    boolean isJobAlreadySaved(JobRecord jobRecord);
+    
+    /**
+     * Adds a job to the saved jobs list.
+     * @param jobRecord The job record to add
+     */
+    void jobToSavedList(JobRecord jobRecord);
+    
+    /**
+     * Tries to add a job to the saved jobs list, checking for duplicates.
+     * @param jobRecord The job record to add
      * @return true if the job was added successfully, false if it was already in the list
      */
     boolean tryAddJobToSavedList(JobRecord jobRecord);
     
     /**
+     * Removes a job from the saved jobs list.
+     * @param index The index of the job to remove
+     */
+    void removeJobFromList(int index);
+    
+    /**
+     * Saves the job records to a CSV file.
+     * @param filePath The file path to save the CSV file
+     */
+    void pathToCSV(String filePath);
+    
+    /**
+     * Exports the saved jobs to a specified format and file path.
+     * @param jobs The list of job records to export
+     * @param formatStr The format string (e.g., "csv", "json")
+     * @param filePath The file path to save the exported file
+     */
+    void exportToFileType(List<JobRecord> jobs, String formatStr, String filePath);
+    
+    /**
      * Updates a job with new comments and rating.
-     * 
      * @param id The ID of the job to update
      * @param comments The comments to set
      * @param rating The rating to set
-     * @return The updated JobRecord
+     * @return The updated job record
      */
     JobRecord getUpdateJob(int id, String comments, int rating);
     
     /**
-     * Sets the saved jobs.
-     * 
-     * @param savedJobs List of JobRecord objects to set
-     * @return List of JobRecord objects
+     * Sends an alert message.
+     * This notifies all registered alert observers.
+     * @param alert The alert message to send
      */
-    List<JobRecord> setSavedJobs(List<JobRecord> savedJobs);
-
+    void sendAlert(String alert);
+    
     /**
-     * Clean job record and sanitize html for view.
-     * @param args
+     * Cleans a job record and sanitizes HTML for view.
+     * @param job The job record to clean
+     * @return The cleaned job record
      */
-    public JobRecord cleanJobRecord(JobRecord job);
+    JobRecord cleanJobRecord(JobRecord job);
 }
