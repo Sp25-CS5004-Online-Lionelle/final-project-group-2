@@ -242,9 +242,9 @@ JobBean --> JobRecord : creates
 
 %% Class Definitions Section
 
-class SkillsHunterApp {
+class SkillzHunterApp {
     <<driver>>
-    -SkillsHunterApp() 
+    -SkillzHunterApp() 
     +main(String[] args): void
 }
 
