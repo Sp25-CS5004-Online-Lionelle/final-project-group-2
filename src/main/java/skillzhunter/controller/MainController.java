@@ -363,4 +363,17 @@ public class MainController implements IController, AlertListener {
         
         return model.cleanJob(job);
     }
+
+    /**
+     * Suggests a query correction based on the given query and result count.
+     * This method uses the model's suggestQueryCorrection method.
+     * @return A query suggestion.
+     */
+    @Override
+    public String suggestQueryCorrection(String query, int resultCount) {
+        if (model == null) {
+            return null;
+        }
+        return model.suggestQueryCorrection(query, resultCount);
+    }
 }
