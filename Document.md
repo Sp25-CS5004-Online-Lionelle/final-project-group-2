@@ -192,6 +192,9 @@ JobView --> IController : uses
 JobView --> JobsTable : contains
 JobView --> ThemedButton : uses
 JobView --> ColorTheme : uses
+JobView --> JobsLoader : uses
+
+JobsLoader --> JobRecord : uses
 
 BaseJobDetailsDialogue <|-- JobDetailsDialogue : extends
 BaseJobDetailsDialogue <|-- SavedJobDetailsDialogue : extends
@@ -602,6 +605,40 @@ namespace view {
         #createThemedButton(String, ThemedButton.ButtonType): ThemedButton
     }
     
+    class JobsLoader {
+        -static COLUMN_NAMES: String[]
+        -JobsLoader()
+        +static getColumnNames(): String[]
+        +static getJobList(Collection~JobRecord~): List~JobRecord~
+        +static getData(Collection~JobRecord~): Object[][]
+        +static getLogoUrls(Collection~JobRecord~): String[]
+    }
+    
+    class JobsTable {
+        -tableModel: DefaultTableModel
+        -sorter: TableRowSorter
+        -columnNames: String[]
+        -customHeaderRenderer: CustomHeader
+        -currentTheme: ColorTheme
+        -imageCellRenderer: ImageCellRenderer
+        +JobsTable()
+        +JobsTable(String[], Object[][])
+        -setupColumnRenderers(): void
+        +applyTheme(ColorTheme): void
+        -setupHeaderRenderer(): void
+        +setData(Object[][]): void
+        -configureColumnSorters(): void
+        -extractMinSalary(String): int
+        +setColumnNames(String[]): void
+        +addRow(Object[]): void
+        +removeRow(int): void
+        +updateCell(int, int, Object): void
+        +getRowCount(): int
+        +getColumnCount(): int
+        +getColumnNames(): String[]
+        +cleanup(): void
+    }
+    
     class FindJobTab {
         -controller: IController
         -locations: String[]
@@ -779,31 +816,6 @@ namespace view {
         +getTheme(): ColorTheme
     }
     
-    class JobsTable {
-        -tableModel: DefaultTableModel
-        -sorter: TableRowSorter
-        -columnNames: String[]
-        -customHeaderRenderer: CustomHeader
-        -currentTheme: ColorTheme
-        -imageCellRenderer: ImageCellRenderer
-        +JobsTable()
-        +JobsTable(String[], Object[][])
-        -setupColumnRenderers(): void
-        +applyTheme(ColorTheme): void
-        -setupHeaderRenderer(): void
-        +setData(Object[][]): void
-        -configureColumnSorters(): void
-        -extractMinSalary(String): int
-        +setColumnNames(String[]): void
-        +addRow(Object[]): void
-        +removeRow(int): void
-        +updateCell(int, int, Object): void
-        +getRowCount(): int
-        +getColumnCount(): int
-        +getColumnNames(): String[]
-        +cleanup(): void
-    }
-    
     class BaseJobDetailsDialogue {
         <<abstract>>
         #static LOGO_WIDTH: int
@@ -916,15 +928,6 @@ namespace view {
         -updateTabStyles(): void
         +getSelectedTabIndex(): int
         +setSelectedTab(int): void
-    }
-    
-    class JobsLoader {
-        -static COLUMN_NAMES: String[]
-        -JobsLoader()
-        +static getColumnNames(): String[]
-        +static getJobList(Collection~JobRecord~): List~JobRecord~
-        +static getData(Collection~JobRecord~): Object[][]
-        +static getLogoUrls(Collection~JobRecord~): String[]
     }
     
     class StarRatingPanel {
