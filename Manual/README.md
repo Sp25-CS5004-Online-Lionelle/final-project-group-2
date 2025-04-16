@@ -1,4 +1,3 @@
-# Manual 
 Job Hunter Manual 
 
 The job hunter app is an application designed to allow users to easily find and save employment opportunities in an easy-to-use graphical user interface. This document is the user manual associated with the application with the aim of guiding user explaining how to use the application. The components of this application can split between two over-arching goals: Finding a and Saving a Job. 
@@ -20,3 +19,27 @@ Exit: allows the user to exit the application.
 Search Button Group: This button group outlines all search functionality and filters available to the user. Using these buttons, users can filter their query by industry, location and by number of returned results.  Users also have the option of displaying a salary graph which outlines all salaries. 
 
 Job Details: after selecting a row from the table, the users can then use this button group to open and investigate individual jobs. By selecting the open button, the “Job Details” popout will appear. From here, user can comment on the job, rate it and then finally save it for later use. All saved job will appear next in the saved jobs tab.  
+
+ 
+
+ 
+
+Saved Jobs: 
+
+After discovering and saving job opportunities, users can move to the `Saved Jobs`. This tab contains all saved jobs. Jobs on this tab will persist across user sessions. The image below outlines the components of this tab, and the preceding paragraph describes each component. 
+
+PictureSaved Job Components: 
+
+Saved Jobs: This table shows all jobs saved. This table will only persist across sessions if the user selects the `save` button. 
+
+Saved Jobs Controls: this button group allows the user to perform basic operation the save job table. These operations include the following: 
+
+Open: After selecting a row, this button allows the users to investigate the job in friendly format. 
+
+Edit: After selecting a row, this button allows the user to edit the saved data of the job. 
+
+Delete: this button deletes the selected job from the table. 
+
+Save: this button saves the existing table which will persist across user sessions 
+
+Export: This button allows the user to export the job list to the format of their choosing.  
