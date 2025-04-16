@@ -667,7 +667,7 @@ namespace view {
         -getNumberOfResults(): int
         -checkForSuggestions(String, int, String, String): void
         -performSearch(String, int, String, String): void
-        -handleSearchResults(List~JobRecord~, int): void
+        -handleSearchResults(List~JobRecord~, int, String): void
         +makeBottomButtonPanel(): JPanel
         -updateVisualizationIfNeeded(List~JobRecord~): void
         -applyThemeToVisualization(ColorTheme): void
