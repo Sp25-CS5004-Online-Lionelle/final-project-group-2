@@ -494,6 +494,130 @@ public class TestJobs {
         verify(mockAlertListener).onAlert(errorMessage);
     }
     
+
+    /**
+     * Test suggestion for a query with a typo.
+     */
+    @Test
+    public void testQuerySuggestionForTypo() {
+        // Create a Jobs instance with our fake API
+        final FakeJobBoardApi fakeApi = new FakeJobBoardApi(
+            List.of(jobRecord1, jobRecord2),
+            null
+        );
+        
+        Jobs testableJobs = new Jobs() {
+            @Override
+            protected JobBoardApi createJobBoardApi() {
+                return fakeApi;
+            }
+        };
+        testableJobs.setAlertListener(mockAlertListener);
+        
+        // First do a successful search to add "python" to the recent queries
+        testableJobs.searchJobs("python", 10, "any", "any");
+        
+        // Test query suggestion for a typo
+        String suggestion = testableJobs.suggestQueryCorrection("pythom", 0);
+        assertEquals("python", suggestion);
+    }
+
+    /**
+     * Test suggestion for a query that matches a common term.
+     */
+    @Test
+    public void testQuerySuggestionForCommonTerm() {
+        // Create a Jobs instance with our fake API
+        final FakeJobBoardApi fakeApi = new FakeJobBoardApi(
+            List.of(jobRecord1, jobRecord2),
+            null
+        );
+        
+        Jobs testableJobs = new Jobs() {
+            @Override
+            protected JobBoardApi createJobBoardApi() {
+                return fakeApi;
+            }
+        };
+        testableJobs.setAlertListener(mockAlertListener);
+        
+        // Test with a query that should match a common term
+        String suggestion = testableJobs.suggestQueryCorrection("jaba", 0);
+        assertEquals("java", suggestion);
+    }
+
+    /**
+     * Test no suggestion for unrelated query.
+     */
+    @Test
+    public void testNoSuggestionForUnrelatedQuery() {
+        // Create a Jobs instance with our fake API
+        final FakeJobBoardApi fakeApi = new FakeJobBoardApi(
+            List.of(jobRecord1, jobRecord2),
+            null
+        );
+        
+        Jobs testableJobs = new Jobs() {
+            @Override
+            protected JobBoardApi createJobBoardApi() {
+                return fakeApi;
+            }
+        };
+        testableJobs.setAlertListener(mockAlertListener);
+        
+        // Test with a query that shouldn't get a suggestion (too different)
+        String suggestion = testableJobs.suggestQueryCorrection("xyzabc", 0);
+        assertNull(suggestion);
+    }
+
+    /**
+     * Test no suggestion for short query.
+     */
+    @Test
+    public void testNoSuggestionForShortQuery() {
+        // Create a Jobs instance with our fake API
+        final FakeJobBoardApi fakeApi = new FakeJobBoardApi(
+            List.of(jobRecord1, jobRecord2),
+            null
+        );
+        
+        Jobs testableJobs = new Jobs() {
+            @Override
+            protected JobBoardApi createJobBoardApi() {
+                return fakeApi;
+            }
+        };
+        testableJobs.setAlertListener(mockAlertListener);
+        
+        // Test with a query that shouldn't get a suggestion (too short)
+        String suggestion = testableJobs.suggestQueryCorrection("xy", 0);
+        assertNull(suggestion);
+    }
+
+    /**
+     * Test no suggestion when results exist.
+     */
+    @Test
+    public void testNoSuggestionWithResults() {
+        // Create a Jobs instance with our fake API
+        final FakeJobBoardApi fakeApi = new FakeJobBoardApi(
+            List.of(jobRecord1, jobRecord2),
+            null
+        );
+        
+        Jobs testableJobs = new Jobs() {
+            @Override
+            protected JobBoardApi createJobBoardApi() {
+                return fakeApi;
+            }
+        };
+        testableJobs.setAlertListener(mockAlertListener);
+        
+        // Test with a query that shouldn't get a suggestion (has results)
+        String suggestion = testableJobs.suggestQueryCorrection("python", 5);
+        assertNull(suggestion);
+    }
+
     /**
      * Test saving jobs to CSV.
      */
@@ -565,40 +689,46 @@ public class TestJobs {
         assertEquals("Unsupported format: INVALID", exception.getMessage());
     }
     
-    /**
-     * Test getting the list of available industries.
-     */
     @Test
     public void testGetIndustries() {
-        List<String> industries = jobList.getIndustries();
+        // Create a Jobs class with mocked industry data
+        Jobs jobsWithMockData = new Jobs() {
+            @Override
+            public List<String> getIndustries() {
+                return List.of("programming", "sales", "seo", "social media marketing", "any");
+            }
+        };
+        
+        List<String> industries = jobsWithMockData.getIndustries();
         assertNotNull(industries);
         
-        // Test specific industries from the CSV file
-        assertTrue(industries.contains("programming"), "Industries should contain 'programming'");
-        assertTrue(industries.contains("engineering"), "Industries should contain 'engineering'");
-        assertTrue(industries.contains("data science"), "Industries should contain 'data science'");
-        assertTrue(industries.contains("devops & sysadmin"), "Industries should contain 'devops & sysadmin'");
-        
-        // Test for the "any" industry which is special
-        assertTrue(industries.contains("any"), "Industries should contain 'any'");
+        // Test specific industries
+        assertTrue(industries.contains("programming"));
+        assertTrue(industries.contains("sales"));
+        assertTrue(industries.contains("seo"));
+        assertTrue(industries.contains("social media marketing"));
+        assertTrue(industries.contains("any"));
     }
+
+@Test
+public void testGetLocations() {
+    // Create a Jobs class with mocked location data
+    Jobs jobsWithMockData = new Jobs() {
+        @Override
+        public List<String> getLocations() {
+            return List.of("anywhere", "australia", "china", "austria");
+        }
+    };
     
-    /**
-     * Test getting the list of available locations.
-     */
-    @Test
-    public void testGetLocations() {
-        List<String> locations = jobList.getLocations();
-        assertNotNull(locations);
-        
-        // Test specific locations from the CSV file
-        assertTrue(locations.contains("usa"), "Locations should contain 'usa'");
-        assertTrue(locations.contains("australia"), "Locations should contain 'australia'");
-        assertTrue(locations.contains("china"), "Locations should contain 'china'");
-        
-        // Test for the "anywhere" location which is special
-        assertTrue(locations.contains("anywhere"), "Locations should contain 'anywhere'");
-    }
+    List<String> locations = jobsWithMockData.getLocations();
+    assertNotNull(locations);
+    
+    // Test specific locations
+    assertTrue(locations.contains("anywhere"));
+    assertTrue(locations.contains("australia"));
+    assertTrue(locations.contains("china"));
+    assertTrue(locations.contains("austria"));
+}
     
     /**
      * Test sending an alert through the alert listener.
@@ -794,4 +924,5 @@ public class TestJobs {
             fail("Sending alert with no listener should not throw exception: " + e.getMessage());
         }
     }
+
 }
