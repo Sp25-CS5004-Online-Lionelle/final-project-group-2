@@ -382,6 +382,7 @@ namespace model {
         -commonTerms: List~String~
         +addSuccessfulQuery(String): void
         +suggestCorrection(String, int): String
+        -findBestMatch(String, Lis~String~)
         -calculateLevenshteinDistance(String, String): int
     }
 
