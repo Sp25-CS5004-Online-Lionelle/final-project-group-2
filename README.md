@@ -1,4 +1,4 @@
-# Final Project for CS 5004 - Skillzhunter
+# Final Project for CS 5004 - Skillz Hunter
 # Skillz Hunter
 
 ## Job Search and Management Application
@@ -17,6 +17,7 @@ Skillz Hunter is a desktop application designed to help users find and manage jo
 * **Search Jobs**: Find jobs by title, industry, and location and gives suggestions for searches based on key words
 * **View Job Details**: See comprehensive information about each job including salary ranges using an API
 * **Save Jobs**: Store jobs you're interested in for later reference
+* **Sort Jobs**: Sort jobs by name and amount
 * **Rate and Comment**: Add personal ratings and comments to saved jobs
 * **Salary Visualization**: View a graphical representation of salary ranges
 * **Export Capabilities**: Export saved jobs in CSV, JSON, or XML formats
