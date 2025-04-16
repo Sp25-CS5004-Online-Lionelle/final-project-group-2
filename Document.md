@@ -143,750 +143,290 @@ Port over from HW 9 => helper functions for get request
 ---
 config:
   theme: mc
-title: Skillz Hunter App Initial Design
+title: Skillz Hunter App - Comprehensive Design
 ---
-
 
 classDiagram
 
-%% Main
-Main *..  IModel: uses
-Main *..  IView: uses
-Main *..  MainController: uses
+%% Relationships Section
+SkillzHunterApp --> IModel : creates
+SkillzHunterApp --> IController : creates
+SkillzHunterApp --> IView : creates
+SkillzHunterApp --> Jobs : creates
+SkillzHunterApp --> MainController : creates
+SkillzHunterApp --> MainView : creates
 
-%% IController
-IController *.. IModel: uses
-IController *.. JobRecord: uses
-IController *.. IView: uses
-IController *.. SavedJobsTab: uses %% is this needed?
+IController <|-- MainController : implements
+IController --> IModel : uses
+IController --> IView : uses
+IController --> JobRecord : uses
 
-%% Main Controller
-IController <|-- MainController: Implements
-MainController *.. IModel: uses
-MainController *.. JobRecord: uses
-MainController *.. Jobs: uses
-MainController *.. DataFormatter: uses
-MainController *.. IView: uses
-MainController *.. MainView: uses
-MainController *.. SavedJobsTab: uses
+IModel <|.. Jobs : implements
+IModel --> AlertListener : uses
 
-%% formatters
-DataFormatter *.. JobRecord: uses
-DataFormatter *.. Formats: uses
-DomainXmlWrapper *.. JobRecord: uses
+MainController --> AlertListener : implements
+MainView --> AlertObserver : implements
+MainView --> IView : implements
 
-%% net
-JobBoardApi *.. JobBoardApiResult: uses
-JobBoardApi *.. JobRecord: uses
-JobBoardApi *.. JobBoardApiResult: uses
-JobBoardApi *.. Artifacts: uses
-JobBoardApi *.. ResponseRecord: uses
+Jobs --> JobBoardApi : uses
+Jobs --> JobBoardApiResult : uses
+Jobs --> DataFormatter : uses
+Jobs --> QuerySuggestionService : contains
+Jobs --> JobRecord : uses
+Jobs --> JobBean : uses
+Jobs --> ResponseRecord : uses
 
+DataFormatter --> JobRecord : uses
+DataFormatter --> Formats : uses
+DataFormatter --> DomainXmlWrapper : uses
 
+DomainXmlWrapper --> JobRecord : contains
 
-%% IModel
-%% Note: why is the model setting the controller?? Controller should call model not the other way around
-IModel *.. IController: uses
+JobBoardApi --> JobBoardApiResult : returns
+JobBoardApi --> ResponseRecord : uses
+JobBoardApi --> JobRecord : uses
 
+JobView <|-- FindJobTab : extends
+JobView <|-- SavedJobsTab : extends
+JobView --> IController : uses
+JobView --> JobsTable : contains
+JobView --> ThemedButton : uses
+JobView --> ColorTheme : uses
 
-%% Jobs
-%% Note: why is the model setting the controller?? Controller should call model not the other way around
-%% Note: - processJobRecords(List~JobRecord~): List~JobRecord~ ??? I see this was added back in. According to the styler this is not used why are we keeping it?
-%% Note: searchApi(String): List~JobRecord~ ?? this i should be private I think
-%% Note:  + setController(IController): void ??? I think we just need to add the Override Annotation.
-IModel <|.. Jobs: Implements
-Jobs *.. IController: uses 
-Jobs *.. DataFormatter: uses
-Jobs *.. Formats: uses
-Jobs *.. JobBoardApi: uses
-Jobs *.. JobBoardApiResult: uses
-Jobs *.. Artifacts: uses
+BaseJobDetailsDialogue <|-- JobDetailsDialogue : extends
+BaseJobDetailsDialogue <|-- SavedJobDetailsDialogue : extends
+BaseJobDetailsDialogue --> JobRecord : uses
+BaseJobDetailsDialogue --> IconLoader : uses
 
-%% BaseJobDetailsDialogue
-BaseJobDetailsDialogue *.. JobRecord: uses
+JobDetailsDialogue --> IController : uses
+JobDetailsDialogue --> JobActionHelper : uses
+JobDetailsDialogue --> SavedJobDetailsDialogue : uses
+JobDetailsDialogue --> StarRatingPanel : uses
 
-%% Find Job
-%% Note: We should call IController and never MainController
-%% Note: IMO this "switchToSavedJobsTab" seems odd to me I feel like this should be in mainView Or something.
-FindJobTab <|.. JobView: extends
-FindJobTab *.. IController: uses
-FindJobTab *.. MainController: uses
-FindJobTab *.. SavedJobsTab: uses
-FindJobTab *.. JobDetailsDialogue : uses
-FindJobTab *.. SalaryVisualizationPanel : uses
-FindJobTab *.. IconLoader : uses
+SavedJobDetailsDialogue --> IController : uses
+SavedJobDetailsDialogue --> JobActionHelper : uses
+SavedJobDetailsDialogue --> ThemedButton : uses
 
+FindJobTab --> IController : uses
+FindJobTab --> SalaryVisualizationPanel : contains
+FindJobTab --> JobRecord : uses
+FindJobTab --> JobDetailsDialogue : uses
+FindJobTab --> JobActionHelper : uses
+FindJobTab --> IconLoader : uses
 
+SavedJobsTab --> IController : uses
+SavedJobsTab --> JobRecord : uses
+SavedJobsTab --> JobActionHelper : uses
+SavedJobsTab --> IconLoader : uses
 
+JobActionHelper --> IController : uses
+JobActionHelper --> JobRecord : uses
+JobActionHelper --> IconLoader : uses
+JobActionHelper --> StarRatingPanel : uses
+JobActionHelper --> SavedJobsTab : accesses
 
-%% IView
-%% Note: controller argument is not used but has a doc string?
-%% Note: does this class really have a point at this point. If so we should look at expanding it to all things common across Main, and Tabs
-%% Note: I think "Addfeatrues" is dead
+CustomMenuBar --> ColorTheme : uses
+CustomMenuBar --> IconLoader : uses
 
+CustomHeader --> IconLoader : uses
 
-%% JobActionHelper
-%% Note: Needs Documentation and style clean up
-JobActionHelper *.. IconLoader : uses
+JobsTable --> CustomHeader : uses
+JobsTable --> ImageCellRenderer : contains
+JobsTable --> ColorTheme : uses
 
+TabStyleManager --> ColorTheme : uses
 
-%% JobDetailsDialogue
-%% Note: Should note use MainController and only use IController
-%% Note: Style Clean up
-BaseJobDetailsDialogue <|.. JobDetailsDialogue: extends
-JobDetailsDialogue *.. JobRecord
-JobDetailsDialogue *.. IController
-JobDetailsDialogue *.. MainController
-JobDetailsDialogue *.. StarRatingPanel
-JobDetailsDialogue *.. SavedJobDetailsDialogue
-JobDetailsDialogue *.. JobActionHelper
-JobDetailsDialogue *.. IconLoader
+SalaryVisualizationPanel --> JobRecord : uses
+SalaryVisualizationPanel --> ColorTheme : uses
 
+ThemedButton --> ColorTheme : uses
 
+ImageCellRenderer --> IconLoader : uses
 
-%% JobsLoader
-JobsLoader *.. JobRecord: uses
+JobBean --> JobRecord : creates
 
-%% JobView
-%% Note: OShould most of the variables be private? 
-JobView *.. IController 
-JobView *.. ThemedButton  
-JobView *.. JobsTable   
-JobView *.. ColorTheme
+%% Class Definitions Section
 
-%% Random Icon loader
-CustomMenuBar *.. IconLoader
-CustomMenuBar *.. CustomHeader
-BaseJobDetailsDialogue *.. CustomHeader
-
-
-%% MainView
-MainView *.. IController : uses
-MainView *.. JobView : uses
-MainView *.. CustomMenuBar : uses
-MainView *.. TabStyleManager : uses
-MainView *.. ColorTheme : uses
-MainView *.. IconLoader : uses
-
-%% SavedJobsTab
-SavedJobsTab <|-- JobView : Inherits
-SavedJobsTab *.. IController : uses
-SavedJobsTab *.. JobRecord : uses
-SavedJobsTab *.. ThemedButton : uses
-SavedJobsTab *.. JobActionHelper : uses
-SavedJobsTab *.. IconLoader
-
-TabStyleManager *.. ColorTheme
-ThemedButton *.. ColorTheme
-JobsTable *.. ImageCellRenderer
-
-%% ColorTheme
-%% note:shouldn't most of them variables be private or protected?
-%% note: It seem like we are passing way to many variables in contructor
-
-
-
-
-
-class Main{
-<<driver>>
-+ SkillsHunterApp():void
-+ main(): void
-
+class SkillsHunterApp {
+    <<driver>>
+    -SkillsHunterApp() 
+    +main(String[] args): void
 }
 
-
-
-namespace view {
-  class ThemedButton {
-        - ColorTheme theme
-        - boolean isHovering
-        - ButtonType buttonType
-        + ThemedButton(String)
-        + ThemedButton(String, ButtonType)
-        - void initializeButton()
-        + void applyTheme(ColorTheme)
-        + void setButtonType(ButtonType)
-        + ButtonType getButtonType()
-        - void updateButtonColors()
-        + ColorTheme getTheme()
+namespace controller {
+    class IController {
+        <<interface>>
+        +setModel(IModel): void
+        +setView(IView): void
+        +registerAlertObserver(AlertObserver): void
+        +unregisterAlertObserver(AlertObserver): void
+        +getLocations(): List~String~
+        +getIndustries(): List~String~
+        +getModel(): IModel
+        +getView(): IView
+        +getApiCall(String, Integer, String, String): List~JobRecord~
+        +getSavedJobs(): List~JobRecord~
+        +setSavedJobs(List~JobRecord~): List~JobRecord~
+        +isJobAlreadySaved(JobRecord): boolean
+        +jobToSavedList(JobRecord): void
+        +tryAddJobToSavedList(JobRecord): boolean
+        +removeJobFromList(int): void
+        +pathToCSV(String): void
+        +exportToFileType(List~JobRecord~, String, String): void
+        +getUpdateJob(int, String, int): JobRecord
+        +sendAlert(String): void
+        +cleanJobRecord(JobRecord): JobRecord
+        +suggestQueryCorrection(String, int): String
     }
 
-
-  class TabStyleManager {
-        - final JTabbedPane tabbedPane
-        - final JLabel[] tabLabels
-        - ColorTheme theme
-        - final boolean isMacOS
-        + TabStyleManager(JTabbedPane, String[])
-        - boolean isMacOSPlatform()
-        + void applyTheme(ColorTheme)
-        - Color[] getTabColors(boolean)
-        - void updateTabStyles()
-        + int getSelectedTabIndex()
-        + void setSelectedTab(int)
+    class MainController {
+        -model: IModel
+        -view: IView
+        -alertObservers: List~AlertObserver~
+        +MainController()
+        +registerAlertObserver(AlertObserver): void
+        +unregisterAlertObserver(AlertObserver): void
+        +setModel(IModel): void
+        +setView(IView): void
+        +getView(): IView
+        +getModel(): IModel
+        +getLocations(): List~String~
+        +getIndustries(): List~String~
+        -capitalizeItems(List~String~, Map~String, String~): List~String~
+        -capitalizeWord(String): String
+        +getApiCall(String, Integer, String, String): List~JobRecord~
+        +getSavedJobs(): List~JobRecord~
+        +setSavedJobs(List~JobRecord~): List~JobRecord~
+        +isJobAlreadySaved(JobRecord): boolean
+        +jobToSavedList(JobRecord): void
+        +tryAddJobToSavedList(JobRecord): boolean
+        +removeJobFromList(int): void
+        +pathToCSV(String): void
+        +exportToFileType(List~JobRecord~, String, String): void
+        +getUpdateJob(int, String, int): JobRecord
+        +onAlert(String): void
+        +sendAlert(String): void
+        +cleanJobRecord(JobRecord): JobRecord
+        +suggestQueryCorrection(String, int): String
     }
-
-  class StarRatingPanel {
-          - final JLabel[] stars
-          - int rating
-          - RatingChangeListener listener
-          + StarRatingPanel(int)
-          + void setRating(int)
-          + int getRating()
-          + void setRatingChangeListener(RatingChangeListener)
-          - void updateStarsDisplay(int)
-          - ImageIcon getEmptyStar()
-          - ImageIcon getFilledStar()
-      }
-
-    class SavedJobsTab {
-        - openButton: ThemedButton
-        - saveButton: ThemedButton
-        - exportButton: ThemedButton
-        - editButton: ThemedButton
-        - deleteButton: ThemedButton
-        - final openIcon: ImageIcon
-        - final saveIcon: ImageIcon
-        - final exportIcon: ImageIcon
-        - final warningIcon: ImageIcon
-        - final successIcon: ImageIcon
-        - final editIcon: ImageIcon
-        - final deleteIcon: ImageIcon
-        + SavedJobsTab(IController, List~JobRecord~)
-        - handleSaveAction(): void
-        - handleExportAction(JComboBox~String~): void
-        - showNoJobsMessage(JFrame, String): void
-        - showSaveConfirmDialog(JFrame, int): boolean
-        - showExportConfirmDialog(JFrame, String): boolean
-        - createDataDirectoryAndGetFilePath(String): String
-        - getExportFilePath(JFrame, String): String
-        - saveJobsToFile(JFrame, List~JobRecord~, String, String): void
-        - exportJobsToFile(JFrame, List~JobRecord~, String, String): void
-        - cleanJobRecordsForExport(List~JobRecord~): List~JobRecord~
-        - stripHTML(String): String
-        - extractFirstSentence(String): String
-        - openSelectedJob(): void
-        - editSelectedJob(): void
-        - deleteSelectedJob(): void
-    }
-
-
-
-
-    class SavedJobDetailsDialogue {
-        - static final EDIT_ICON: ImageIcon
-        - static final DELETE_ICON: ImageIcon
-        - static final CLOSE_ICON: ImageIcon
-        - static final WARNING_ICON: ImageIcon
-        - static final BUTTON_WIDTH: int
-        + static show(Component, JobRecord, IController): void
-        - static validateInputs(Component, JobRecord, IController): boolean
-        - static createButtonPanel(JDialog, JobRecord, IController, Component): JPanel
-        - static createButton(String, ThemedButton.ButtonType, ImageIcon): ThemedButton
-        - static calculateButtonHeight(ThemedButton...): int
-        - static setButtonSizes(ThemedButton, ThemedButton, ThemedButton, int): void
-        - static configureButtonActions(JDialog, ThemedButton, ThemedButton, ThemedButton, JobRecord, IController, Component): void
-        - static configureDialogProperties(JDialog, Component): void
-    }
-
-
-   class SalaryVisualizationPanel {
-        - jobs: List~JobRecord~
-        - static final PADDING: int
-        - static final POINT_SIZE: int
-        - static final POINT_COLOR: Color
-        - static final POINT_HOVER_COLOR: Color
-        - static final LINE_COLOR: Color
-        - dataPoints: List~Point2D~
-        - hitBoxes: List~Rectangle2D~
-        - hoveredIndex: int
-        - theme: ColorTheme
-        + SalaryVisualizationPanel(jobs: List~JobRecord~)
-        - sortJobsBySalary(): void
-        + updateJobs(List~JobRecord~): void
-        + applyTheme(ColorTheme): void
-        # paintComponent(Graphics): void
-        - drawNoDataMessage(Graphics): void
-        - drawAxes(Graphics2D, int, int, int): void
-        - formatSalaryLabel(int): String
-        - drawDataPoints(Graphics2D, int, int, int): void
-        - calculateAverageSalary(JobRecord): int
-        - truncateString(String, int): String
-    }
-
-
-
-
-class MainView {
-        <<final>>
-        - mainPane: JPanel
-        - findJobTab: JobView
-        - savedJobTab: JobView
-        - tabbedPane: JTabbedPane
-        - tabStyleManager: TabStyleManager
-        - controller: IController
-        - customMenuBar: CustomMenuBar
-        - theme: ColorTheme
-        + MainView(IController)
-        + setupExitKeyAction()
-        + buildTabbedPane(JobView, JobView): JTabbedPane
-        + createCustomMenu()
-        + mapMenuEvents()
-        + applyTheme(ColorTheme)
-        + notifyUser(String)
-        + addFeatures(IController)
-        + run()
-    }
-
-class JobView {
-        <<abstract>>
-        # searchButton: ThemedButton
-        # searchField: JTextArea
-        # recordText: JTextArea
-        # jobsTable: JobsTable
-        # theme: ColorTheme
-        # jobsList: List~JobRecord~
-        # openJob: ThemedButton
-        # controller: IController
-        # topButtonLayout: JPanel
-        # mainPanel: JPanel
-        # savedJobs: boolean
-
-
-        + JobView()
-        + initView()
-        + makeTopButtonPanel(): JPanel
-        + makeBottomButtonPanel(): JPanel
-        + makeTablePanel(): JPanel
-        + applyTheme(ColorTheme)
-        + setJobsList(List~JobRecord~)
-        + getJobsList(): List~JobRecord~
-        + setRecordText(String)
-        + addJobRecord(JobRecord)
-        + removeJobRecord(int)
-        + updateJobsList(List~JobRecord~)
-        + addFeatures(IController)
-        + getTheme(): ColorTheme
-        + createThemedButton(String): ThemedButton
-        + createThemedButton(String,ThemedButton.ButtonType): ThemedButton
-    }
-  
-  class JobsTable {
-        <<final>>
-        - tableModel: DefaultTableModel
-        - sorter: TableRowSorter~DefaultTableModel~
-        - columnNames: String[]
-        - customHeaderRenderer: CustomHeader
-        - currentTheme: ColorTheme
-        - imageCellRenderer: ImageCellRenderer
-        + JobsTable()
-        + JobsTable(String[], Object[][])
-        + applyTheme(ColorTheme)
-        + setData(Object[][])
-        + setColumnNames(String[])
-        + addRow(Object[])
-        + removeRow(int)
-        + updateCell(int,int,Object)
-        + getRowCount(): int
-        + getColumnCount(): int
-        + getColumnNames(): String[]
-        + cleanup()
-        - setupColumnRenderers()
-        - setupHeaderRenderer()
-        - configureColumnSorters()
-        - extractMinSalary(String): int
-    }
-
-
-  class JobsLoader {
-      <<final>>
-      - static final String[] COLUMN_NAMES: String[]
-      + static getColumnNames(): String[]
-      + static getJobList( Collection~JobRecord~): List~JobRecord~
-      + static getData(Collection~JobRecord~): Object[][]
-      + static getLogoUrls(Collection~JobRecord~): String[]
-  }
-
-
-class JobDetailsDialogue {
-        <<final>>
-        - static final ImageIcon INFO_ICON: ImageIcon
-        - static final ImageIcon WARNING_ICON: ImageIcon
-        - static final ImageIcon SUCCESS_ICON: ImageIcon
-        + static showJobDetails(Component, JobRecord, List~JobRecord~, IController)
-        + private static showFindJobDetails( Component, JobRecord, IController)
-        + private static createContentPanel( JobRecord): JPanel
-        + private static createRatingPanel(JobRecord): JPanel
-        + private static createButtonPanel( JDialog, Component,  JobRecord, IController): JPanel
-        + private static handleSaveAction( JDialog, Component, JobRecord, IController)
-
-    }
-
-
-
-class JobActionHelper {
-    <<final>>
-    - static final EDIT_ICON: ImageIcon
-    - static final DELETE_ICON: ImageIcon
-    - static final WARNING_ICON: ImageIcon
-    - static final SUCCESS_ICON: ImageIcon
     
-    + static saveJob(JobRecord,String, int, IController,Component): void
-    + static editJob(JobRecord,IController, Component): JobRecord
-    + static deleteJob(JobRecord, IController, Component): boolean
-    + static showNoSelectionMessage(String, Component): void
-    + static updateSavedJobsTabView(Component, IController): void
-    + static switchToSavedJobsTab(Component, IController): void
-    - static findTabbedPane(Component): JTabbedPane
-}
-
-
-
-class IView {
-      <<interface>>
-      + run(): void
-      + notifyUser(message: String): void
-      + addFeatures(controller: IController): void
-  }
-
-class ImageCellRenderer {
-    <<abstract>>
-    - static final IMAGE_WIDTH: int
-    - static final IMAGE_HEIGHT: int
-    - imageCache: Map~String, ImageIcon~
-    - loadingStatus: Map~String, Boolean~
-    
-    + getTableCellRendererComponent(JTable, Object, boolean,boolean,int,int): Component
-    + loadImageAsync(String, JLabel, JTable): void
-    + clearCache(): void
-}
-
-
-class IconLoader {
-    <<final>>
-    + static final loadIcon(String): ImageIcon
-    + static final loadIcon(String, int, int): ImageIcon
-    + static final createTextIcon(String, int): ImageIcon
-    + static final loadCompanyLogo(String, int, int, String): ImageIcon
-}
-
-
-class FindJobTab {
-        - final controller: IController
-        - final locations: String[]
-        - final industries: String[]
-        - searchResults: List~JobRecord~
-        - industryLabel: JLabel
-        - locationLabel: JLabel
-        - resultsLabel: JLabel
-        - titleLabel: JLabel
-        - final openIcon: ImageIcon
-        - final saveIcon: ImageIcon
-        - final infoIcon: ImageIcon
-        - final warningIcon: ImageIcon
-        - salaryVisualizationPanel: SalaryVisualizationPanel
-        - showVisualizationCheckbox: JCheckBox
-        - tablePanel: JPanel
-        - saveJob: ThemedButton
-
-        + FindJobTab(controller)
-        - setupEnterKeyAction(): void
-        - disableEnterKeyTraversalIn(container): void
-        - modifyTablePanel(): void
-        - updateVisualizationIfNeeded(List~JobRecord~): void
-        - applyThemeToVisualization(ColorTheme): void
-        - openSelectedJob(): void
-        - saveSelectedJob(): void
-        - switchToSavedJobsTab(): void
-        - findTabbedPane(Component): JTabbedPane
+    class AlertObserver {
+        <<interface>>
+        +onAlert(String): void
     }
-
-
-
-
-
-class CustomMenuBar {
-    - final settingsButton: JButton
-    - final settingsMenu: JPopupMenu
-    - exitItem: JMenuItem
-    - lightModeItem: JMenuItem
-    - darkModeItem: JMenuItem
-    - lineColor: Color
-    - lineThickness: int
-
-    + CustomMenuBar()
-    - createSettingsButton(): JButton
-    + paintComponent(Graphics): void
-    - buildMenuStructure(): void
-    + applyTheme(ColorTheme): void
-    + setLineThickness(thickness: int): void
-    + getExitItem(): JMenuItem
-    + getLightModeItem(): JMenuItem
-    + getDarkModeItem(): JMenuItem
-}
-
-class CustomHeader {
-    - final defaultRenderer: TableCellRenderer
-    - upArrowLight: ImageIcon
-    - downArrowLight: ImageIcon
-    - upArrowDark: ImageIcon
-    - downArrowDark: ImageIcon
-    - isDarkMode: boolean
-
-    + CustomHeader(TableCellRenderer)
-    + setDarkMode( boolean): void
-    - createColoredArrow(ImageIcon, Color): ImageIcon
-    + getTableCellRendererComponent(JTable,Object,boolean,boolean,int, int): Component
-}
-
-  class BaseJobDetailsDialogue {
-  <<abstract>>
-      - static final LOGO_WIDTH: int
-      - static final LOGO_HEIGHT: int
-
-      + static createBaseDialog(Component, JobRecord, String): JDialog
-      + static createMainContentPanel(JobRecord): JPanel
-      + static addDetailRow(JPanel, String, String): void
-  }
-
-  class ColorTheme {
-        <<final>>
-        
-        - buttonNormal: Color
-        - buttonHover: Color
-        - secondaryButtonNormal: Color
-        - secondaryButtonHover: Color
-        - successButtonNormal: Color
-        - successButtonHover: Color
-        - dangerButtonNormal: Color
-        - dangerButtonHover: Color
-        - warningButtonNormal: Color
-        - warningButtonHover: Color
-        - infoButtonNormal: Color
-        - infoButtonHover: Color
-
-        - background: Color
-        - foreground: Color
-        - fieldBackground: Color
-        - fieldForeground: Color
-        - buttonForeground: Color
-        - labelForeground: Color
-
-        - menuBarBackgroundLight: Color
-        - menuBarForegroundLight: Color
-        - menuBarBackgroundDark: Color
-        - menuBarForegroundDark: Color
-
-        - winSelectedBgLight: Color
-        - winSelectedFgLight: Color
-        - winUnselectedBgLight: Color
-        - winUnselectedFgLight: Color
-
-        - winSelectedBgDark: Color
-        - winSelectedFgDark: Color
-        - winUnselectedBgDark: Color
-        - winUnselectedFgDark: Color
-
-        - macSelectedBgLight: Color
-        - macSelectedFgLight: Color
-        - macUnselectedBgLight: Color
-        - macUnselectedFgLight: Color
-
-        - macSelectedBgDark: Color
-        - macSelectedFgDark: Color
-        - macUnselectedBgDark: Color
-        - macUnselectedFgDark: Color
-
-        - winTabPaneBgLight: Color
-        - winTabPaneBgDark: Color
-        - macTabPaneBgLight: Color
-        - macTabPaneBgDark: Color
-
-        + ColorTheme(color..., color) 
-        + static final LIGHT: ColorTheme
-        + static final DARK: ColorTheme
-    }
-}
-
-
-
-
-
-
-
-namespace Controller {
-
-class IController {
-<<Interface>>
-+ getView(): IView
-+ getModel(): IModel
-+ getLocations(): List~String~
-+ getIndustries(): List~String~
-+ getApiCall(String, Integer, String, String ): List<JobRecord>
-+ getSavedJobs(): List<JobRecord>
-+ job2SavedList(): JobRecord
-+ sendAlert(): String
-+ isJobAlreadySaved(): JobRecord
-+ removeJobFromList(): int
-+ path2CSV(): String
-+ export2FileType(List~JobRecord~, String, String): void
-+ getSavedJobsTab(): SavedJobsTab
-}
-
-
-%% Notes:
-%% * setModel, setView: Why are these protected this would be used externally
-%% * setController: why are we setting the controller? IMO The model should never call the controller.
-
-class MainController {
-- mode: IModel
-- view: IView
-# setModel: IModel
-
-- capitalizeItems(List<String>, Map<String, String>): List~String~
-- capitalizeWord(String): String
-+ ()
-+ ()
-+ () VVVV These should be in main controller VVV
-+ sendAlert(String): void
-+ getUpdateJob(int, String, int): JobRecord
-+ tryAddJobToSavedList(JobRecord): Boolean
-+ setSavedJobs(List~JobRecord~): List~JobRecord~
-# setModel(IModel): void
-# setView(IModel): void
-
-}
-
 }
 
 namespace model {
-    class DataFormatter {
-        + write(Collection~JobRecord~, Formats, OutputStream): void
-        + exportCustomCSV(List~JobRecord~, String): void
-        - prettyPrint(Collection~JobRecord~, OutputStream): void
-        - prettySingle(JobRecord, PrintStream): void
-        - writeXmlData(Collection~JobRecord~, OutputStream): void
-        - writeJsonData(Collection~JobRecord~, OutputStream): void
-        - writeCSVData(Collection~JobRecord~, OutputStream): void
-        - stripHTML(String): String
-        - extractFirstSentence(String): String
-        - escapeCSV(String): String
-        - DataFormatter(): void
+    class IModel {
+        <<interface>>
+        +setAlertListener(AlertListener): void
+        +getIndustries(): List~String~
+        +getLocations(): List~String~
+        +capitalizeItems(List~String~, Map~String, String~): List~String~
+        +addJob(JobRecord): void
+        +getJobRecord(String): JobRecord
+        +getJobRecords(): List~JobRecord~
+        +removeJob(int): boolean
+        +updateJob(int, String, int): void
+        +searchJobs(String, Integer, String, String): List~JobRecord~
+        +suggestQueryCorrection(String, int): String
+        +saveJobsToCsv(String): void
+        +exportSavedJobs(List~JobRecord~, String, String): void
+        +cleanJob(JobRecord): JobRecord
+        +sendAlert(String): void
     }
 
-
-  class DomainXmlWrapper {
-  - private final Collection<JobRecord> job
-
-  + DomainXmlWrapper(Collection<JobRecord>)
-  }
-
-    
-    
-  class Formats {
-    <<Enumeration>>
-    + JSON
-    + XML
-    + CSV
-    + PRETTY
-    + static containsValues(String): Formats    
+    class Jobs {
+        -static final INDUSTRY_MAP: Map~String, String~
+        -static final LOCATION_MAP: Map~String, String~
+        -alertListener: AlertListener
+        -jobList: List~JobRecord~
+        -runs: int
+        -api: JobBoardApi
+        -static final DEFAULT_SAVED_JOBS_PATH: String
+        -isTestMode: boolean
+        -isInitialSearch: boolean
+        -suggestionService: QuerySuggestionService
+        +Jobs()
+        +setAlertListener(AlertListener): void
+        -isRunningInTestEnvironment(): boolean
+        #createJobBoardApi(): JobBoardApi
+        +getIndustries(): List~String~
+        +getLocations(): List~String~
+        +addJob(JobRecord): void
+        +getJobRecord(String): JobRecord
+        +getJobRecords(): List~JobRecord~
+        +removeJob(int): boolean
+        +updateJob(int, String, int): void
+        +searchJobs(String, Integer, String, String): List~JobRecord~
+        +saveJobsToCsv(String): void
+        +exportSavedJobs(List~JobRecord~, String, String): void
+        +cleanJob(JobRecord): JobRecord
+        +sendAlert(String): void
+        -loadJobsFromCsv(String): void
+        +cleanJobIndustries(): void
+        +capitalizeItems(List~String~, Map~String, String~): List~String~
+        -capitalizeWord(String): String
+        +suggestQueryCorrection(String, int): String
     }
 
-    class JobBoardApi {
-        - static final OkHttpClient CLIENT
-        - static final ObjectMapper OBJECT_MAPPER
-        - static final Map~String, String~ INDUSTRY_MAP
-        - static final Map~String, String~ LOCATION_MAP
-        - String errorMessage
-
-        + JobBoardApi()
-        + static loadCsvData(String, String, String): Map~String, String~
-        + getJobBoard(String): JobBoardApiResult
-        + getJobBoard(String, Integer): JobBoardApiResult
-        + getJobBoard(String, Integer, String): JobBoardApiResult
-        + getJobBoard(String, Integer, String, String): JobBoardApiResult
-        + static replaceHtmlEntities(String): String
-        # searchApi(String): List~JobRecord~ 
-        - processJobRecords(List~JobRecord~): List~JobRecord~ 
-        + main(String[]): void
+    class AlertListener {
+        <<interface>>
+        +onAlert(String): void
+    }
     
+    class QuerySuggestionService {
+        -static final MAX_EDIT_DISTANCE: int
+        -static final MIN_QUERY_LENGTH: int
+        -recentQueries: List~String~
+        -commonTerms: List~String~
+        +addSuccessfulQuery(String): void
+        +suggestCorrection(String, int): String
+        -calculateLevenshteinDistance(String, String): int
     }
 
-
-
-      class JobBoardApiResult {
-        - static final OkHttpClient CLIENT
-        - static final ObjectMapper OBJECT_MAPPER
-        - static final Map<String, String> INDUSTRY_MAP
-        - static final Map<String, String> LOCATION_MAP
-        - String errorMessage
-
-        + JobBoardApi()
-        + getJobBoard(String): JobBoardApiResult
-        + getJobBoard(String, Integer): JobBoardApiResult
-        + getJobBoard(String, Integer, String): JobBoardApiResult
-        + getJobBoard(String, Integer, String, String): JobBoardApiResult
-        + static loadCsvData(String, String, String): Map<String, String>
-        + static replaceHtmlEntities(String): String
-        # searchApi(String): List<JobRecord>
-        - processJobRecords(List<JobRecord>): List<JobRecord>
-
-        + main(String[]): void
-      }
-
-      %% Notes:
-      %% * why are we setting the controller in the model. the Model should NEVER call the controller
-      class IModel {
-      + setController(IController): void
-      + addJob(JobRecord): void
-      + getJobRecord(String): JobRecord
-      + removeJob(int): Boolean
-      + updateJob(int, String, int): void
-      + searchJobs(String, Integer, String, String): List<JobRecord>
-      + getLocations(): List<String>
-      + getIndustries(): List<String>
-      + saveJobsToCsv(String): void
-      + exportSavedJobs(List<JobRecord>, String, String): void
-      + sendAlert(String): void
-      }
-
-      class Jobs {
-      - static final Map~String, String~ INDUSTRY_MAP
-      - static final Map~String, String~ LOCATION_MAP 
-      - IController controller
-      - final List~JobRecord~ jobList
-      - int runs
-      - final JobBoardApi api
-
-      + jobs()
-      + setController(IController): void
-
-
-      }
-
-
-      class JobBean {
-        +int id
-        +String url
-        +String jobSlug
-        +String jobTitle
-        +String companyName
-        +String companyLogo
-        +List~String~ jobIndustry
-        +List<String~ jobType
-        +String jobGeo
-        +String jobLevel
-        +String jobExcerpt
-        +String jobDescription
-        +String pubDate
-        +int annualSalaryMin
-        +int annualSalaryMax
-        +String salaryCurrency
-        +int rating
-        +String comments
-
-        +JobBean(): void
+    class JobRecord {
+        <<record>>
+        +id: int
+        +url: String
+        +jobSlug: String
+        +jobTitle: String
+        +companyName: String
+        +companyLogo: String
+        +jobIndustry: List~String~
+        +jobType: List~String~
+        +jobGeo: String
+        +jobLevel: String
+        +jobExcerpt: String
+        +jobDescription: String
+        +pubDate: String
+        +annualSalaryMin: int
+        +annualSalaryMax: int
+        +salaryCurrency: String
+        +rating: int
+        +comments: String
+    }
+    
+    class JobBean {
+        -id: int
+        -url: String
+        -jobSlug: String
+        -jobTitle: String
+        -companyName: String
+        -companyLogo: String
+        -jobIndustry: List~String~
+        -jobType: List~String~
+        -jobGeo: String
+        -jobLevel: String
+        -jobExcerpt: String
+        -jobDescription: String
+        -pubDate: String
+        -annualSalaryMin: int
+        -annualSalaryMax: int
+        -salaryCurrency: String
+        -rating: int
+        -comments: String
+        +JobBean()
         +getId(): int
         +setId(int): void
         +getUrl(): String
@@ -899,10 +439,10 @@ namespace model {
         +setCompanyName(String): void
         +getCompanyLogo(): String
         +setCompanyLogo(String): void
-        +getJobIndustry(): List<String>
-        +setJobIndustry(List<String>): void
-        +getJobType(): List<String>
-        +setJobType(List<String>): void
+        +getJobIndustry(): List~String~
+        +setJobIndustry(List~String~): void
+        +getJobType(): List~String~
+        +setJobType(List~String~): void
         +getJobGeo(): String
         +setJobGeo(String): void
         +getJobLevel(): String
@@ -927,51 +467,475 @@ namespace model {
         +equals(Object): boolean
         +hashCode(): int
         +toString(): String
-
-      }
-
-
-      class ResponseRecord {
-      <<Record>>
-        + apiVersion String
-        + documentationUrl String
-        + friendlyNotice String
-        + jobCount int
-        + xRayHash String
-        + clientKey String
-        + lastUpdate String
-        + jobs List<JobRecord>
-      }
-
-      class JobRecord {
-      <<Record>>
-      + id int  
-      + url String  
-      + jobSlug String  
-      + jobTitle String  
-      + companyName String  
-      + companyLogo String  
-      + jobIndustry List<String>  
-      + jobType List<String>  
-      + jobGeo String  
-      + jobLevel String  
-      + jobExcerpt String  
-      + jobDescription String  
-      + pubDate String  
-      + annualSalaryMin int  
-      + annualSalaryMax int  
-      + salaryCurrency String  
-      + rating int  
-      + comments String
-      }
-
+    }
+    
+    class ResponseRecord {
+        <<record>>
+        +apiVersion: String
+        +documentationUrl: String
+        +friendlyNotice: String
+        +jobCount: int
+        +xRayHash: String
+        +clientKey: String
+        +lastUpdate: String
+        +jobs: List~JobRecord~
+    }
 }
 
+namespace model.formatters {
+    class DataFormatter {
+        -DataFormatter()
+        +static write(Collection~JobRecord~, Formats, OutputStream): void
+        +static exportCustomCSV(List~JobRecord~, String): void
+        -static prettyPrint(Collection~JobRecord~, OutputStream): void
+        -static prettySingle(JobRecord, PrintStream): void
+        -static writeXmlData(Collection~JobRecord~, OutputStream): void
+        -static writeJsonData(Collection~JobRecord~, OutputStream): void
+        -static writeCSVData(Collection~JobRecord~, OutputStream): void
+        +static stripHTML(String): String
+        +static extractFirstSentence(String): String
+        +static escapeCSV(String): String
+        +static replaceHtmlEntities(String): String
+        +static processJobHtml(JobRecord): JobRecord
+        +static read(InputStream, Formats): List~JobRecord~
+    }
+    
+    class DomainXmlWrapper {
+        -job: Collection~JobRecord~
+        +DomainXmlWrapper(Collection~JobRecord~)
+    }
+    
+    class Formats {
+        <<enumeration>>
+        JSON
+        XML
+        CSV
+        PRETTY
+        +static containsValues(String): Formats
+    }
+}
 
-class Artifacts {
-+ /data/industries.csv Path
-+ /data/locations.csv Path
-+ /data/SavedJobs.csv Path
+namespace model.net {
+    class JobBoardApi {
+        -static CLIENT: OkHttpClient
+        -static OBJECT_MAPPER: ObjectMapper
+        -static INDUSTRY_MAP: Map~String, String~
+        -static LOCATION_MAP: Map~String, String~
+        -errorMessage: String
+        +JobBoardApi()
+        +static loadCsvData(String, String, String): Map~String, String~
+        +getJobBoard(String): JobBoardApiResult
+        +getJobBoard(String, Integer): JobBoardApiResult
+        +getJobBoard(String, Integer, String): JobBoardApiResult
+        +getJobBoard(String, Integer, String, String): JobBoardApiResult
+        #searchApi(String): List~JobRecord~
+        +main(String[]): void
+    }
+    
+    class JobBoardApiResult {
+        -jobs: List~JobRecord~
+        -errorMessage: String
+        +JobBoardApiResult(List~JobRecord~, String)
+        +getJobs(): List~JobRecord~
+        +getErrorMessage(): String
+        +hasError(): boolean
+    }
+}
+
+namespace view {
+    class IView {
+        <<interface>>
+        +setController(IController): void
+        +run(): void
+        +notifyUser(String): void
+    }
+
+    class MainView {
+        -mainPane: JPanel
+        -findJobTab: JobView
+        -savedJobTab: JobView
+        -tabbedPane: JTabbedPane
+        -tabStyleManager: TabStyleManager
+        -controller: IController
+        -customMenuBar: CustomMenuBar
+        -theme: ColorTheme
+        +MainView()
+        +setController(IController): void
+        +onAlert(String): void
+        -setupExitKeyAction(): void
+        -buildTabbedPane(JobView, JobView): JTabbedPane
+        -createCustomMenu(): void
+        -mapMenuEvents(): void
+        -applyTheme(ColorTheme): void
+        +notifyUser(String): void
+        +run(): void
+        -exitHelper(): void
+    }
+    
+    class JobView {
+        <<abstract>>
+        #searchButton: ThemedButton
+        #searchField: JTextArea
+        #recordText: JTextArea
+        #jobsTable: JobsTable
+        #theme: ColorTheme
+        #jobsList: List~JobRecord~
+        #openJob: ThemedButton
+        #controller: IController
+        #topButtonLayout: JPanel
+        #mainPanel: JPanel
+        #savedJobs: boolean
+        +JobView()
+        +initView(): void
+        +makeTopButtonPanel(): JPanel
+        +makeBottomButtonPanel(): JPanel
+        +makeTablePanel(): JPanel
+        +applyTheme(ColorTheme): void
+        +setJobsList(List~JobRecord~): void
+        +getJobsList(): List~JobRecord~
+        +setRecordText(String): void
+        +addJobRecord(JobRecord): void
+        +removeJobRecord(int): void
+        +updateJobsList(List~JobRecord~): void
+        +addFeatures(IController): void
+        #getTheme(): ColorTheme
+        #createThemedButton(String): ThemedButton
+        #createThemedButton(String, ThemedButton.ButtonType): ThemedButton
+    }
+    
+    class FindJobTab {
+        -controller: IController
+        -locations: String[]
+        -industries: String[]
+        -searchResults: List~JobRecord~
+        -industryLabel: JLabel
+        -locationLabel: JLabel
+        -resultsLabel: JLabel
+        -titleLabel: JLabel
+        -openIcon: ImageIcon
+        -saveIcon: ImageIcon
+        -warningIcon: ImageIcon
+        -questionIcon: ImageIcon
+        -salaryVisualizationPanel: SalaryVisualizationPanel
+        -showVisualizationCheckbox: JCheckBox
+        -tablePanel: JPanel
+        -saveJob: ThemedButton
+        -searchField: TextField
+        -industryCombo: JComboBox
+        -locationCombo: JComboBox
+        -resultsCombo: JComboBox
+        +FindJobTab(IController)
+        -setupEnterKeyAction(): void
+        -disableEnterKeyTraversalIn(Container): void
+        -modifyTablePanel(): void
+        +makeTopButtonPanel(): JPanel
+        -performSearch(String, int, String, String): void
+        -handleSearchResults(List~JobRecord~, String): void
+        +makeBottomButtonPanel(): JPanel
+        -updateVisualizationIfNeeded(List~JobRecord~): void
+        -applyThemeToVisualization(ColorTheme): void
+        +applyTheme(ColorTheme): void
+        -openSelectedJob(): void
+        -saveSelectedJob(): void
+        +updateJobsList(List~JobRecord~): void
+        +setJobsList(List~JobRecord~): void
+    }
+    
+    class SavedJobsTab {
+        -openButton: ThemedButton
+        -saveButton: ThemedButton
+        -exportButton: ThemedButton
+        -editButton: ThemedButton
+        -deleteButton: ThemedButton
+        -openIcon: ImageIcon
+        -saveIcon: ImageIcon
+        -exportIcon: ImageIcon
+        -warningIcon: ImageIcon
+        -successIcon: ImageIcon
+        -editIcon: ImageIcon
+        -deleteIcon: ImageIcon
+        +SavedJobsTab(IController, List~JobRecord~)
+        +makeTopButtonPanel(): JPanel
+        +makeBottomButtonPanel(): JPanel
+        -handleSaveAction(): void
+        -handleExportAction(JComboBox): void
+        -showNoJobsMessage(JFrame, String): void
+        -showSaveConfirmDialog(JFrame, int): boolean
+        -showExportConfirmDialog(JFrame, String): boolean
+        -createDataDirectoryAndGetFilePath(String): String
+        -getExportFilePath(JFrame, String): String
+        -saveJobsToFile(JFrame, List~JobRecord~, String, String): void
+        -exportJobsToFile(JFrame, List~JobRecord~, String, String): void
+        -openSelectedJob(): void
+        -editSelectedJob(): void
+        -deleteSelectedJob(): void
+        +applyTheme(ColorTheme): void
+    }
+    
+    class ColorTheme {
+        -colors: Map~String, Color~
+        +static LIGHT: ColorTheme
+        +static DARK: ColorTheme
+        -ColorTheme(Map~String, Color~)
+        -static createLightTheme(): ColorTheme
+        -static createDarkTheme(): ColorTheme
+        +getColor(String): Color
+        +getButtonNormal(): Color
+        +getButtonHover(): Color
+        +getSecondaryButtonNormal(): Color
+        +getSecondaryButtonHover(): Color
+        +getSuccessButtonNormal(): Color
+        +getSuccessButtonHover(): Color
+        +getDangerButtonNormal(): Color
+        +getDangerButtonHover(): Color
+        +getWarningButtonNormal(): Color
+        +getWarningButtonHover(): Color
+        +getInfoButtonNormal(): Color
+        +getInfoButtonHover(): Color
+        +getBackground(): Color
+        +getForeground(): Color
+        +getFieldBackground(): Color
+        +getFieldForeground(): Color
+        +getButtonForeground(): Color
+        +getLabelForeground(): Color
+        +getTitleTextColor(): Color
+        +getTaglineTextColor(): Color
+        +getMenuBarBackgroundLight(): Color
+        +getMenuBarForegroundLight(): Color
+        +getMenuBarBackgroundDark(): Color
+        +getMenuBarForegroundDark(): Color
+        +getWinSelectedBgLight(): Color
+        +getWinSelectedFgLight(): Color
+        +getWinUnselectedBgLight(): Color
+        +getWinUnselectedFgLight(): Color
+        +getWinSelectedBgDark(): Color
+        +getWinSelectedFgDark(): Color
+        +getWinUnselectedBgDark(): Color
+        +getWinUnselectedFgDark(): Color
+        +getMacSelectedBgLight(): Color
+        +getMacSelectedFgLight(): Color
+        +getMacUnselectedBgLight(): Color
+        +getMacUnselectedFgLight(): Color
+        +getMacSelectedBgDark(): Color
+        +getMacSelectedFgDark(): Color
+        +getMacUnselectedBgDark(): Color
+        +getMacUnselectedFgDark(): Color
+        +getWinTabPaneBgLight(): Color
+        +getWinTabPaneBgDark(): Color
+        +getMacTabPaneBgLight(): Color
+        +getMacTabPaneBgDark(): Color
+    }
+    
+    class CustomHeader {
+        -defaultRenderer: TableCellRenderer
+        -upArrowLight: ImageIcon
+        -downArrowLight: ImageIcon
+        -upArrowDark: ImageIcon
+        -downArrowDark: ImageIcon
+        -isDarkMode: boolean
+        +CustomHeader(TableCellRenderer)
+        +setDarkMode(boolean): void
+        -createColoredArrow(ImageIcon, Color): ImageIcon
+        +getTableCellRendererComponent(JTable, Object, boolean, boolean, int, int): Component
+    }
+    
+    class CustomMenuBar {
+        -settingsButton: JButton
+        -settingsMenu: JPopupMenu
+        -exitItem: JMenuItem
+        -lightModeItem: JMenuItem
+        -darkModeItem: JMenuItem
+        -lineColor: Color
+        -lineThickness: int
+        -titleLabel: JLabel
+        -taglineLabel: JLabel
+        -static SETTINGS_WIDTH: int
+        +CustomMenuBar()
+        -createSettingsButton(): JButton
+        +paintComponent(Graphics): void
+        -buildMenuStructure(): void
+        +applyTheme(ColorTheme): void
+        -isDarkColor(Color): boolean
+        +setLineThickness(int): void
+        +getExitItem(): JMenuItem
+        +getLightModeItem(): JMenuItem
+        +getDarkModeItem(): JMenuItem
+    }
+    
+    class ThemedButton {
+        -theme: ColorTheme
+        -isHovering: boolean
+        -buttonType: ButtonType
+        +ThemedButton(String)
+        +ThemedButton(String, ButtonType)
+        -initializeButton(): void
+        +applyTheme(ColorTheme): void
+        +setButtonType(ButtonType): void
+        +getButtonType(): ButtonType
+        -updateButtonColors(): void
+        +getTheme(): ColorTheme
+    }
+    
+    class JobsTable {
+        -tableModel: DefaultTableModel
+        -sorter: TableRowSorter
+        -columnNames: String[]
+        -customHeaderRenderer: CustomHeader
+        -currentTheme: ColorTheme
+        -imageCellRenderer: ImageCellRenderer
+        +JobsTable()
+        +JobsTable(String[], Object[][])
+        -setupColumnRenderers(): void
+        +applyTheme(ColorTheme): void
+        -setupHeaderRenderer(): void
+        +setData(Object[][]): void
+        -configureColumnSorters(): void
+        -extractMinSalary(String): int
+        +setColumnNames(String[]): void
+        +addRow(Object[]): void
+        +removeRow(int): void
+        +updateCell(int, int, Object): void
+        +getRowCount(): int
+        +getColumnCount(): int
+        +getColumnNames(): String[]
+        +cleanup(): void
+    }
+    
+    class BaseJobDetailsDialogue {
+        <<abstract>>
+        #static LOGO_WIDTH: int
+        #static LOGO_HEIGHT: int
+        #static DEFAULT_DIALOG_WIDTH: int
+        #static DEFAULT_DIALOG_HEIGHT: int
+        #static MIN_DIALOG_WIDTH: int
+        #static CHAR_WIDTH_FACTOR: double
+        #static MAX_WIDTH_SCREEN_PERCENT: double
+        +static createBaseDialog(Component, JobRecord, String): JDialog
+        +static createMainContentPanel(JobRecord): JPanel
+        +static calculateAndSetDialogSize(JDialog, JobRecord): void
+        +static addDetailRow(JPanel, String, String): void
+    }
+    
+    class JobDetailsDialogue {
+        -static INFO_ICON: ImageIcon
+        -static WARNING_ICON: ImageIcon
+        -static SUCCESS_ICON: ImageIcon
+        +static showJobDetails(Component, JobRecord, List~JobRecord~, IController): void
+        -static showFindJobDetails(Component, JobRecord, IController): void
+        -static createContentPanel(JobRecord): JPanel
+        -static createRatingPanel(JobRecord): JPanel
+        -static createButtonPanel(JDialog, Component, JobRecord, IController): JPanel
+        -static handleSaveAction(JDialog, Component, JobRecord, IController): void
+    }
+    
+    class SavedJobDetailsDialogue {
+        -static EDIT_ICON: ImageIcon
+        -static DELETE_ICON: ImageIcon
+        -static CLOSE_ICON: ImageIcon
+        -static WARNING_ICON: ImageIcon
+        -static BUTTON_WIDTH: int
+        +static show(Component, JobRecord, IController): void
+        -static validateInputs(Component, JobRecord, IController): boolean
+        -static createButtonPanel(JDialog, JobRecord, IController, Component): JPanel
+        -static createButton(String, ThemedButton.ButtonType, ImageIcon): ThemedButton
+        -static calculateButtonHeight(ThemedButton...): int
+        -static setButtonSizes(ThemedButton, ThemedButton, ThemedButton, int): void
+        -static configureButtonActions(JDialog, ThemedButton, ThemedButton, ThemedButton, JobRecord, IController, Component): void
+        -static configureDialogProperties(JDialog, Component): void
+    }
+    
+    class JobActionHelper {
+        -static EDIT_ICON: ImageIcon
+        -static DELETE_ICON: ImageIcon
+        -static WARNING_ICON: ImageIcon
+        -static SUCCESS_ICON: ImageIcon
+        -JobActionHelper()
+        +static saveJob(JobRecord, String, int, IController, Component): void
+        +static editJob(JobRecord, IController, Component): JobRecord
+        +static deleteJob(JobRecord, IController, Component): boolean
+        +static showNoSelectionMessage(String, Component): void
+        +static updateSavedJobsTabView(Component, IController): void
+        +static switchToSavedJobsTab(Component, IController): void
+        -static findTabbedPane(Component): JTabbedPane
+    }
+    
+    class SalaryVisualizationPanel {
+        -jobs: List~JobRecord~
+        -static PADDING: int
+        -static POINT_SIZE: int
+        -static POINT_COLOR: Color
+        -static POINT_HOVER_COLOR: Color
+        -static LINE_COLOR: Color
+        -dataPoints: List~Point2D~
+        -hitBoxes: List~Rectangle2D~
+        -hoveredIndex: int
+        -theme: ColorTheme
+        +SalaryVisualizationPanel(List~JobRecord~)
+        -sortJobsBySalary(): void
+        +updateJobs(List~JobRecord~): void
+        +applyTheme(ColorTheme): void
+        #paintComponent(Graphics): void
+        -drawNoDataMessage(Graphics): void
+        -drawAxes(Graphics2D, int, int, int): void
+        -formatSalaryLabel(int): String
+        -drawDataPoints(Graphics2D, int, int, int): void
+        -calculateAverageSalary(JobRecord): int
+        -truncateString(String, int): String
+    }
+    
+    class IconLoader {
+        -IconLoader()
+        +static loadIcon(String): ImageIcon
+        +static loadIcon(String, int, int): ImageIcon
+        +static createTextIcon(String, int): ImageIcon
+        +static loadCompanyLogo(String, int, int, String): ImageIcon
+    }
+    
+    class ImageCellRenderer {
+        -static IMAGE_WIDTH: int
+        -static IMAGE_HEIGHT: int
+        -imageCache: Map~String, ImageIcon~
+        -loadingStatus: Map~String, Boolean~
+        +getTableCellRendererComponent(JTable, Object, boolean, boolean, int, int): Component
+        -loadImageAsync(String, JLabel, JTable): void
+        +clearCache(): void
+    }
+    
+    class TabStyleManager {
+        -tabbedPane: JTabbedPane
+        -tabLabels: JLabel[]
+        -theme: ColorTheme
+        -isMacOS: boolean
+        +TabStyleManager(JTabbedPane, String[])
+        -isMacOSPlatform(): boolean
+        +applyTheme(ColorTheme): void
+        -getTabColors(boolean): Color[]
+        -updateTabStyles(): void
+        +getSelectedTabIndex(): int
+        +setSelectedTab(int): void
+    }
+    
+    class JobsLoader {
+        -static COLUMN_NAMES: String[]
+        -JobsLoader()
+        +static getColumnNames(): String[]
+        +static getJobList(Collection~JobRecord~): List~JobRecord~
+        +static getData(Collection~JobRecord~): Object[][]
+        +static getLogoUrls(Collection~JobRecord~): String[]
+    }
+    
+    class StarRatingPanel {
+        -stars: JLabel[]
+        -rating: int
+        -listener: RatingChangeListener
+        +StarRatingPanel(int)
+        +setRating(int): void
+        +getRating(): int
+        +setRatingChangeListener(RatingChangeListener): void
+        -updateStarsDisplay(int): void
+        -getEmptyStar(): ImageIcon
+        -getFilledStar(): ImageIcon
+    }
 }
 
 ```
