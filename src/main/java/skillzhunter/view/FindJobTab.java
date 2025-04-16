@@ -61,6 +61,8 @@ public class FindJobTab extends JobView {
     private final ImageIcon saveIcon;
     /** warning icon. */
     private final ImageIcon warningIcon;
+    /** question icon. */
+    private final ImageIcon questionIcon;
     /** Salary range viz. */
     private SalaryVisualizationPanel salaryVisualizationPanel;
     /** show vis button. */
@@ -69,6 +71,14 @@ public class FindJobTab extends JobView {
     private JPanel tablePanel;
     /** theme button.*/
     private ThemedButton saveJob; // Now using ThemedButton instead of javax.swing.JButton
+    /** Search field for job title. */
+    private TextField searchField;
+    /** Industry selection combo box. */
+    private JComboBox<String> industryCombo;
+    /** Location selection combo box. */
+    private JComboBox<String> locationCombo;
+    /** Results count combo box. */
+    private JComboBox<Integer> resultsCombo;
 
     /** 
      * Constructor for FindJobTab.
@@ -86,6 +96,7 @@ public class FindJobTab extends JobView {
         this.openIcon = IconLoader.loadIcon("images/open.png");
         this.saveIcon = IconLoader.loadIcon("images/saveIcon.png");
         this.warningIcon = IconLoader.loadIcon("images/warning.png");
+        this.questionIcon = IconLoader.loadIcon("images/lightbulb.png");
         
         super.initView();
 
@@ -201,14 +212,14 @@ public class FindJobTab extends JobView {
         searchRow.setLayout(new BoxLayout(searchRow, BoxLayout.LINE_AXIS));
 
         // Create UI components
-        TextField searchField = new TextField("", 20);    
+        searchField = new TextField("", 20);    
         searchButton = createThemedButton("Find Jobs \t🔎", ThemedButton.ButtonType.PRIMARY);
         Integer[] results = {5, 10, 20, 50};
-        JComboBox<String> industryCombo = new JComboBox<>(industries);
+        industryCombo = new JComboBox<>(industries);
         industryCombo.setEditable(true);
-        JComboBox<String> locationCombo = new JComboBox<>(locations);
+        locationCombo = new JComboBox<>(locations);
         locationCombo.setEditable(true);
-        JComboBox<Integer> resultsCombo = new JComboBox<>(results);
+        resultsCombo = new JComboBox<>(results);
         resultsCombo.setPrototypeDisplayValue(100);
         resultsCombo.setEditable(true);
 
@@ -263,35 +274,119 @@ public class FindJobTab extends JobView {
                 }
             }
             
+            // Get the search query
+            String query = searchField.getText();
+            
             // Perform search
-            searchResults = controller.getApiCall(searchField.getText(), 
-                    numberOfResults, location, industry);
-
-            if (searchResults != null && !searchResults.isEmpty()) {
-                setJobsList(searchResults);
-                updateVisualizationIfNeeded(searchResults);
-            } else {
-                // Check if the number of results requested is too large
-                if (numberOfResults > 50) {
-                    ImageIcon warningIcon = IconLoader.loadIcon("images/warning.png");
-                    JOptionPane.showMessageDialog(this,
-                            "The number of results requested is too large.\nPlease try a smaller number.",
-                            "Too Many Results Requested",
-                            JOptionPane.WARNING_MESSAGE,
-                            warningIcon);
-                } else {
-                    // Show custom popup if no results found for the query
-                    ImageIcon errorIcon = IconLoader.loadIcon("images/warning.png");
-                    JOptionPane.showMessageDialog(this,
-                            "No jobs found for the given query.\nTry different keywords or filters.",
-                            "No Results Found",
-                            JOptionPane.INFORMATION_MESSAGE,
-                            errorIcon);
-                }
-            }
+            performSearch(query, numberOfResults, location, industry);
         });
 
         return searchRow;
+    }
+    
+    /**
+     * Performs a search with the specified parameters.
+     * 
+     * @param query The search query
+     * @param numberOfResults The number of results to return
+     * @param location The location filter
+     * @param industry The industry filter
+     */
+    private void performSearch(String query, int numberOfResults, String location, String industry) {
+        // Perform the search
+        searchResults = controller.getApiCall(query, numberOfResults, location, industry);
+
+        // Handle the search results
+        handleSearchResults(searchResults, query);
+    }
+    
+    /**
+     * Handles search results, including showing suggestions for unsuccessful searches.
+     * 
+     * @param results The search results
+     * @param query The original query
+     */
+    private void handleSearchResults(List<JobRecord> results, String query) {
+        if (results != null && !results.isEmpty()) {
+            // Search successful - update UI with results
+            setJobsList(results);
+            updateVisualizationIfNeeded(results);
+        } else {
+            // Check if the number of results requested is too large
+            Integer resultsObj = null;
+            if (resultsCombo.getSelectedItem() instanceof Integer) {
+                resultsObj = (Integer) resultsCombo.getSelectedItem();
+            } else if (resultsCombo.getSelectedItem() instanceof String) {
+                try {
+                    resultsObj = Integer.parseInt((String) resultsCombo.getSelectedItem());
+                } catch (NumberFormatException ex) {
+                    // Ignore parsing error here
+                }
+            }
+            
+            if (resultsObj != null && resultsObj > 50) {
+                ImageIcon warningIcon = IconLoader.loadIcon("images/warning.png");
+                JOptionPane.showMessageDialog(this,
+                        "The number of results requested is too large.\nPlease try a smaller number.",
+                        "Too Many Results Requested",
+                        JOptionPane.WARNING_MESSAGE,
+                        warningIcon);
+                return;
+            }
+            
+            // Check if we can suggest a correction for the query
+            if (query != null && !query.isEmpty() && 
+                !query.equalsIgnoreCase("any") && !query.equalsIgnoreCase("all")) {
+                
+                // Get a suggestion from the model/controller
+                String suggestion = controller.suggestQueryCorrection(query, results == null ? 0 : results.size());
+                
+                if (suggestion != null && !suggestion.equalsIgnoreCase(query)) {
+                    // Show a "Did you mean...?" dialog
+                    int choice = JOptionPane.showConfirmDialog(
+                        this,
+                        "Did you mean \"" + suggestion + "\"?",
+                        "Search Suggestion",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        questionIcon);
+                    
+                    if (choice == JOptionPane.YES_OPTION) {
+                        // Update the search field and perform new search
+                        searchField.setText(suggestion);
+                        
+                        // Get current values from combo boxes
+                        String location = locationCombo.getSelectedItem().toString();
+                        String industry = industryCombo.getSelectedItem().toString();
+                        int numberOfResults = 10;
+                        
+                        if (resultsObj != null) {
+                            numberOfResults = resultsObj;
+                        }
+                        
+                        // Perform the new search with the suggested query
+                        performSearch(suggestion, numberOfResults, location, industry);
+                        return;
+                    }
+                }
+                
+                // Show generic "no results" message if no suggestion or if suggestion was declined
+                ImageIcon errorIcon = IconLoader.loadIcon("images/warning.png");
+                JOptionPane.showMessageDialog(this,
+                        "No jobs found for the given query.\nTry different keywords or filters.",
+                        "No Results Found",
+                        JOptionPane.INFORMATION_MESSAGE,
+                        errorIcon);
+            } else {
+                // Show generic "no results" message for empty or generic queries
+                ImageIcon errorIcon = IconLoader.loadIcon("images/warning.png");
+                JOptionPane.showMessageDialog(this,
+                        "No jobs found for the given query.\nTry different keywords or filters.",
+                        "No Results Found",
+                        JOptionPane.INFORMATION_MESSAGE,
+                        errorIcon);
+            }
+        }
     }
 
     @Override
@@ -427,19 +522,16 @@ public class FindJobTab extends JobView {
     
     /**
      * Updates the job list and visualization if needed.
-     * This method ensures we don't override search results with saved jobs.
      * @param jobsList The list of jobs to update
      */
     @Override
     public void updateJobsList(List<JobRecord> jobsList) {
-        // Only update if we don't have search results yet
-        if (searchResults == null || searchResults.isEmpty()) {
+        if (searchResults != null && !searchResults.isEmpty()) {
+            super.setJobsList(searchResults);
+            updateVisualizationIfNeeded(searchResults);
+        } else {
             super.updateJobsList(jobsList);
             updateVisualizationIfNeeded(jobsList);
-        } else {
-            // Otherwise maintain our search results
-            super.updateJobsList(searchResults);
-            updateVisualizationIfNeeded(searchResults);
         }
     }
     
@@ -453,4 +545,3 @@ public class FindJobTab extends JobView {
         updateVisualizationIfNeeded(jobsList);
     }
 }
-

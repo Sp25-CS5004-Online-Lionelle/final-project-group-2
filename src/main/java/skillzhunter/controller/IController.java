@@ -143,4 +143,10 @@ public interface IController {
      * @return The cleaned job record
      */
     JobRecord cleanJobRecord(JobRecord job);
+
+    /**
+     * Suggests query corrections based on common terms.
+     * @return A query suggestion
+     */
+    String suggestQueryCorrection(String query, int resultCount);
 }

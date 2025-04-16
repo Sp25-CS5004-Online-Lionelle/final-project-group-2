@@ -106,4 +106,12 @@ public interface IModel {
      * @return Capitalized list of strings
      */
     List<String> capitalizeItems(List<String> items, Map<String, String> specialCases);
+
+    /**
+     * Suggests a correction for a query if it might be a typo.
+     * @param query
+     * @param resultCount
+     * @return
+     */
+    String suggestQueryCorrection(String query, int resultCount);
 }

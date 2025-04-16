@@ -39,14 +39,17 @@ public class Jobs implements IModel {
     /** Object representing the Jobs Api.*/
     private final JobBoardApi api;
 
-    /** Standard path for saved jobs file */
+    /** Standard path for saved jobs file. */
     private static final String DEFAULT_SAVED_JOBS_PATH = "data/SavedJobs.csv";
 
-    /** Flag to indicate if running in test mode */
+    /** Flag to indicate if running in test mode. */
     private boolean isTestMode = false;
     
-    /** Flag to indicate if this is an initial search on startup */
+    /** Flag to indicate if this is an initial search on startup. */
     private boolean isInitialSearch = true;
+
+    /** Flag to indicate if suggestion can be provided. */
+    private final QuerySuggestionService suggestionService = new QuerySuggestionService();
 
     /**
      * Constructor for Jobs class.
@@ -308,6 +311,12 @@ public class Jobs implements IModel {
             processedJobs.add(DataFormatter.processJobHtml(job));
         }
 
+        // Add query to successful queries if results found
+        if (!processedJobs.isEmpty() && query != null && !query.isEmpty() && 
+            !query.equalsIgnoreCase("any") && !query.equalsIgnoreCase("all")) {
+            suggestionService.addSuccessfulQuery(query);
+        }
+    
         return processedJobs;
     }
 
@@ -450,6 +459,12 @@ public class Jobs implements IModel {
     }
 
     @Override
+    /**
+     * Capitalizes the first letter of each word in a list of items.
+     * @param items List of items to capitalize
+     * @param specialCases Map of special cases where the key is the lowercase word and the value is the capitalized version
+     * @return List of capitalized items
+     */
     public List<String> capitalizeItems(List<String> items, Map<String, String> specialCases) {
         return items.stream()
                 .map(item -> {
@@ -479,5 +494,16 @@ public class Jobs implements IModel {
             return word;
         }
         return Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase();
+    }
+
+    /**
+     * Suggests a correction for a query if it might be a typo.
+     * @param query
+     * @param resultCount
+     * @return
+     */
+    @Override
+    public String suggestQueryCorrection(String query, int resultCount) {
+        return suggestionService.suggestCorrection(query, resultCount);
     }
 }
