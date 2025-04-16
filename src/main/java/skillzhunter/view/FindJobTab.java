@@ -360,7 +360,7 @@ public class FindJobTab extends JobView {
         searchResults = controller.getApiCall(query, numberOfResults, location, industry);
         
         // Handle the search results
-        handleSearchResults(searchResults, numberOfResults);
+        handleSearchResults(searchResults, numberOfResults, query);
     }
     
     /**
@@ -369,7 +369,7 @@ public class FindJobTab extends JobView {
      * @param results The search results
      * @param numberOfResults The number of results that was requested
      */
-    private void handleSearchResults(List<JobRecord> results, int numberOfResults) {
+    private void handleSearchResults(List<JobRecord> results, int numberOfResults, String query) {
         if (results != null && !results.isEmpty()) {
             // Search successful - update UI with results
             setJobsList(results);
@@ -386,7 +386,7 @@ public class FindJobTab extends JobView {
             } else {
                 ImageIcon errorIcon = IconLoader.loadIcon("images/warning.png");
                 JOptionPane.showMessageDialog(this,
-                        "No jobs found for the given query.\nTry different keywords or filters.",
+                        "No jobs found for: " + query,
                         "No Results Found",
                         JOptionPane.INFORMATION_MESSAGE,
                         errorIcon);
