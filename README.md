@@ -10,7 +10,7 @@ Skillz Hunter is a desktop application designed to help users find and manage jo
 * Eleah Burman - https://github.com/EleahBurman
 * Joshua Roberge - https://github.com/jroberge16
 * Judson Tallandier - https://github.com/iamjtii
-* Tor Ekstrom - https://github.com/torekst
+* Tor Ekstrom - https://github.com/tekstrom11
 
 ## Features
 
