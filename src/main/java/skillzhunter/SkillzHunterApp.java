@@ -8,9 +8,9 @@ import skillzhunter.view.IView;
 import skillzhunter.view.MainView;
 
 
-public final class SkillsHunterApp {
+public final class SkillzHunterApp {
 
-    private SkillsHunterApp() {
+    private SkillzHunterApp() {
         // empty
     }
 
