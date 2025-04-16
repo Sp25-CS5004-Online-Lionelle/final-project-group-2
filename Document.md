@@ -1,4 +1,4 @@
-# Skillz Hunter App Desing
+# Skillz Hunter App Design
 
 The Diagram below outlines the general structure of the Skillz Hunter App.
 
@@ -129,14 +129,6 @@ Port over from HW 9 => helper functions for get request
 }
 
 ```
-
-
-
-
-
-
-
-
 
 # Final Design
 ```mermaid
