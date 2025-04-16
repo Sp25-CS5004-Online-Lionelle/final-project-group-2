@@ -143,7 +143,7 @@ Port over from HW 9 => helper functions for get request
 ---
 config:
   theme: mc
-title: Skillz Hunter App - Comprehensive Design
+title: Skillz Hunter App - Final Design
 ---
 
 classDiagram
@@ -292,8 +292,6 @@ namespace controller {
         +getModel(): IModel
         +getLocations(): List~String~
         +getIndustries(): List~String~
-        -capitalizeItems(List~String~, Map~String, String~): List~String~
-        -capitalizeWord(String): String
         +getApiCall(String, Integer, String, String): List~JobRecord~
         +getSavedJobs(): List~JobRecord~
         +setSavedJobs(List~JobRecord~): List~JobRecord~
@@ -382,7 +380,7 @@ namespace model {
         -commonTerms: List~String~
         +addSuccessfulQuery(String): void
         +suggestCorrection(String, int): String
-        -findBestMatch(String, Lis~String~)
+        -findBestMatch(String, List~String~): String
         -calculateLevenshteinDistance(String, String): int
     }
 
@@ -630,8 +628,12 @@ namespace view {
         -disableEnterKeyTraversalIn(Container): void
         -modifyTablePanel(): void
         +makeTopButtonPanel(): JPanel
+        -getLocationValue(): String
+        -getIndustryValue(): String
+        -getNumberOfResults(): int
+        -checkForSuggestions(String, int, String, String): void
         -performSearch(String, int, String, String): void
-        -handleSearchResults(List~JobRecord~, String): void
+        -handleSearchResults(List~JobRecord~, int): void
         +makeBottomButtonPanel(): JPanel
         -updateVisualizationIfNeeded(List~JobRecord~): void
         -applyThemeToVisualization(ColorTheme): void

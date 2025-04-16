@@ -19,7 +19,7 @@ public class QuerySuggestionService {
      * Minimum length for a search term to be considered for suggestions.
      * Prevents suggestions for very short queries.
      */
-    private static final int MIN_QUERY_LENGTH = 3;
+    private static final int MIN_QUERY_LENGTH = 2;
     
     /**
      * Recent successful queries to use as suggestions.
@@ -58,10 +58,11 @@ public class QuerySuggestionService {
     
     /**
      * Checks if the query might be a typo and suggests alternatives.
-     * ONLY suggests corrections when:
-     * 1. The search returned NO results (resultCount == 0)
-     * 2. The query isn't too short
-     * 3. The query isn't exactly a common term or previous successful query
+     * Checks for:
+     * - Missing letters (jav -> java)
+     * - Extra letters (javaa -> java)
+     * - Swapped letters (jvaa -> java)
+     * - Wrong first/last letter (Yava -> java, javz -> java)
      * 
      * @param query The query to check
      * @param resultCount The number of results found for this query
@@ -74,17 +75,18 @@ public class QuerySuggestionService {
         }
         
         // Don't suggest if the query is already a common term
-        if (commonTerms.contains(query.toLowerCase())) {
+        String queryLower = query.toLowerCase();
+        if (commonTerms.contains(queryLower)) {
             return null;
         }
         
         // Don't suggest if the query is already a previously successful query
-        if (recentQueries.contains(query.toLowerCase())) {
+        if (recentQueries.contains(queryLower)) {
             return null;
         }
         
         // First try matching with common terms (higher priority)
-        String commonTermSuggestion = findBestMatch(query, commonTerms);
+        String commonTermSuggestion = findBestMatch(queryLower, commonTerms);
         
         // If found a good match in common terms, return it
         if (commonTermSuggestion != null) {
@@ -92,35 +94,53 @@ public class QuerySuggestionService {
         }
         
         // If no match in common terms, try with recent queries
-        return findBestMatch(query, recentQueries);
+        return findBestMatch(queryLower, recentQueries);
     }
     
     /**
-     * Finds the best matching term from a list of candidates.
+     * Finds the best matching term from a list of words.
      * 
      * @param query The query to find matches for
-     * @param candidates The list of candidate terms to search
+     * @param words The list of words to search
      * @return The best matching term, or null if no good match
      */
-    private String findBestMatch(String query, List<String> candidates) {
+    private String findBestMatch(String query, List<String> words) {
         String bestSuggestion = null;
         int minDistance = MAX_EDIT_DISTANCE + 1; // Start higher than our max threshold
         
-        String queryLower = query.toLowerCase();
-        
-        // Find the closest term
-        for (String term : candidates) {
+        // Check each candidate
+        for (String word : words) {
+            String wordLower = word.toLowerCase();
+            
             // Skip exact matches
-            String termLower = term.toLowerCase();
-            if (queryLower.equals(termLower)) {
+            if (query.equals(wordLower)) {
                 continue;
             }
             
-            int distance = calculateLevenshteinDistance(queryLower, termLower);
+            // Special case: missing first letter ("ython" -> "python")
+            if (wordLower.length() > query.length() && 
+                wordLower.substring(1).equals(query)) {
+                return word;
+            }
+            
+            // Special case: missing last letter ("pytho" -> "python")
+            if (wordLower.length() > query.length() && 
+                wordLower.startsWith(query)) {
+                return word;
+            }
+            
+            // Special case: wrong first letter ("qython" -> "python")
+            if (wordLower.length() == query.length() && 
+                wordLower.substring(1).equals(query.substring(1))) {
+                return word;
+            }
+            
+            // Standard Levenshtein distance for missing middle letters ("pthn" -> "python")
+            int distance = calculateLevenshteinDistance(query, wordLower);
             
             if (distance <= MAX_EDIT_DISTANCE && distance < minDistance) {
                 minDistance = distance;
-                bestSuggestion = term;
+                bestSuggestion = word;
             }
         }
         

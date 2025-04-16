@@ -245,43 +245,106 @@ public class FindJobTab extends JobView {
 
         // Set search action
         searchButton.addActionListener(e -> {
-            Object locationObj = locationCombo.getSelectedItem();
-            Object industryObj = industryCombo.getSelectedItem();
-            Object resultsObj = resultsCombo.getSelectedItem();
-            int numberOfResults = 10;
-
-            // If null, set to default values
-            String location = (locationObj != null) ? locationObj.toString() : "any";
-            String industry = (industryObj != null) ? industryObj.toString() : "any";
-
-            // If resultsObj is null, set to default
-            if (resultsObj instanceof Integer num) {
-                numberOfResults = num;
-            } else if (resultsObj instanceof String res) {
-                try {
-                    numberOfResults = Integer.parseInt(res);
-                } catch (NumberFormatException ex) {
-                    //add non-numeric dialogue
-                    ImageIcon warningIcon = IconLoader.loadIcon("images/warning.png");
-                    JOptionPane.showMessageDialog(this,
-                        "Couldn't parse the number of results requested."
-                            + "\nPlease ensure you enter a numeric value."
-                            + "\nReturned 10 results.",
-                        "Null or Non-Numeric Value",
-                        JOptionPane.WARNING_MESSAGE,
-                        warningIcon);
-                    numberOfResults = 10;
-                }
-            }
-            
-            // Get the search query
+            // Get search parameters
             String query = searchField.getText();
+            String location = getLocationValue();
+            String industry = getIndustryValue();
+            int numberOfResults = getNumberOfResults();
             
-            // Perform search
-            performSearch(query, numberOfResults, location, industry);
+            // Check for suggestions before performing the search
+            checkForSuggestions(query, numberOfResults, location, industry);
         });
 
         return searchRow;
+    }
+    
+    /**
+     * Gets the value from the location combo box.
+     * @return The selected location or "any" if none selected
+     */
+    private String getLocationValue() {
+        Object locationObj = locationCombo.getSelectedItem();
+        return (locationObj != null) ? locationObj.toString() : "any";
+    }
+    
+    /**
+     * Gets the value from the industry combo box.
+     * @return The selected industry or "any" if none selected
+     */
+    private String getIndustryValue() {
+        Object industryObj = industryCombo.getSelectedItem();
+        return (industryObj != null) ? industryObj.toString() : "any";
+    }
+    
+    /**
+     * Gets the number of results from the results combo box.
+     * @return The number of results to return
+     */
+    private int getNumberOfResults() {
+        Object resultsObj = resultsCombo.getSelectedItem();
+        int numberOfResults = 10; // Default value
+        
+        if (resultsObj instanceof Integer num) {
+            numberOfResults = num;
+        } else if (resultsObj instanceof String res) {
+            try {
+                numberOfResults = Integer.parseInt(res);
+            } catch (NumberFormatException ex) {
+                // Show error message for non-numeric input
+                ImageIcon warningIcon = IconLoader.loadIcon("images/warning.png");
+                JOptionPane.showMessageDialog(this,
+                    "Couldn't parse the number of results requested."
+                        + "\nPlease ensure you enter a numeric value."
+                        + "\nReturned 10 results.",
+                    "Null or Non-Numeric Value",
+                    JOptionPane.WARNING_MESSAGE,
+                    warningIcon);
+                numberOfResults = 10;
+            }
+        }
+        
+        return numberOfResults;
+    }
+    
+    /**
+     * Checks if a query might have a typo and suggests corrections.
+     * If a suggestion is accepted, performs search with the suggestion.
+     * Otherwise, performs search with the original query.
+     * 
+     * @param query The original search query
+     * @param numberOfResults The number of results to return
+     * @param location The location to filter by
+     * @param industry The industry to filter by
+     */
+    private void checkForSuggestions(String query, int numberOfResults, String location, String industry) {
+        // Only check for suggestions for non-empty, non-generic queries
+        if (query != null && !query.isEmpty() && 
+            !query.equalsIgnoreCase("any") && !query.equalsIgnoreCase("all")) {
+            
+            // Get suggestion before performing the search
+            String suggestion = controller.suggestQueryCorrection(query, 0);
+            
+            if (suggestion != null && !suggestion.equalsIgnoreCase(query)) {
+                // Show "Did you mean...?" dialog
+                int choice = JOptionPane.showConfirmDialog(
+                    this,
+                    "Did you mean \"" + suggestion + "\"?",
+                    "Search Suggestion",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    questionIcon);
+                
+                if (choice == JOptionPane.YES_OPTION) {
+                    // Update search field and use suggestion
+                    searchField.setText(suggestion);
+                    performSearch(suggestion, numberOfResults, location, industry);
+                    return;
+                }
+            }
+        }
+        
+        // If no suggestion or suggestion declined, perform search with original query
+        performSearch(query, numberOfResults, location, industry);
     }
     
     /**
@@ -295,90 +358,32 @@ public class FindJobTab extends JobView {
     private void performSearch(String query, int numberOfResults, String location, String industry) {
         // Perform the search
         searchResults = controller.getApiCall(query, numberOfResults, location, industry);
-
+        
         // Handle the search results
-        handleSearchResults(searchResults, query);
+        handleSearchResults(searchResults, numberOfResults);
     }
     
     /**
-     * Handles search results, including showing suggestions for unsuccessful searches.
+     * Handles search results and shows appropriate messages.
      * 
      * @param results The search results
-     * @param query The original query
+     * @param numberOfResults The number of results that was requested
      */
-    private void handleSearchResults(List<JobRecord> results, String query) {
+    private void handleSearchResults(List<JobRecord> results, int numberOfResults) {
         if (results != null && !results.isEmpty()) {
             // Search successful - update UI with results
             setJobsList(results);
             updateVisualizationIfNeeded(results);
         } else {
-            // Check if the number of results requested is too large
-            Integer resultsObj = null;
-            if (resultsCombo.getSelectedItem() instanceof Integer) {
-                resultsObj = (Integer) resultsCombo.getSelectedItem();
-            } else if (resultsCombo.getSelectedItem() instanceof String) {
-                try {
-                    resultsObj = Integer.parseInt((String) resultsCombo.getSelectedItem());
-                } catch (NumberFormatException ex) {
-                    // Ignore parsing error here
-                }
-            }
-            
-            if (resultsObj != null && resultsObj > 50) {
+            // Show appropriate error messages for empty results
+            if (numberOfResults > 50) {
                 ImageIcon warningIcon = IconLoader.loadIcon("images/warning.png");
                 JOptionPane.showMessageDialog(this,
                         "The number of results requested is too large.\nPlease try a smaller number.",
                         "Too Many Results Requested",
                         JOptionPane.WARNING_MESSAGE,
                         warningIcon);
-                return;
-            }
-            
-            // Check if we can suggest a correction for the query
-            if (query != null && !query.isEmpty() && 
-                !query.equalsIgnoreCase("any") && !query.equalsIgnoreCase("all")) {
-                
-                // Get a suggestion from the model/controller
-                String suggestion = controller.suggestQueryCorrection(query, results == null ? 0 : results.size());
-                
-                if (suggestion != null && !suggestion.equalsIgnoreCase(query)) {
-                    // Show a "Did you mean...?" dialog
-                    int choice = JOptionPane.showConfirmDialog(
-                        this,
-                        "Did you mean \"" + suggestion + "\"?",
-                        "Search Suggestion",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE,
-                        questionIcon);
-                    
-                    if (choice == JOptionPane.YES_OPTION) {
-                        // Update the search field and perform new search
-                        searchField.setText(suggestion);
-                        
-                        // Get current values from combo boxes
-                        String location = locationCombo.getSelectedItem().toString();
-                        String industry = industryCombo.getSelectedItem().toString();
-                        int numberOfResults = 10;
-                        
-                        if (resultsObj != null) {
-                            numberOfResults = resultsObj;
-                        }
-                        
-                        // Perform the new search with the suggested query
-                        performSearch(suggestion, numberOfResults, location, industry);
-                        return;
-                    }
-                }
-                
-                // Show generic "no results" message if no suggestion or if suggestion was declined
-                ImageIcon errorIcon = IconLoader.loadIcon("images/warning.png");
-                JOptionPane.showMessageDialog(this,
-                        "No jobs found for the given query.\nTry different keywords or filters.",
-                        "No Results Found",
-                        JOptionPane.INFORMATION_MESSAGE,
-                        errorIcon);
             } else {
-                // Show generic "no results" message for empty or generic queries
                 ImageIcon errorIcon = IconLoader.loadIcon("images/warning.png");
                 JOptionPane.showMessageDialog(this,
                         "No jobs found for the given query.\nTry different keywords or filters.",
@@ -522,16 +527,19 @@ public class FindJobTab extends JobView {
     
     /**
      * Updates the job list and visualization if needed.
+     * This method ensures we don't override search results with saved jobs.
      * @param jobsList The list of jobs to update
      */
     @Override
     public void updateJobsList(List<JobRecord> jobsList) {
-        if (searchResults != null && !searchResults.isEmpty()) {
-            super.setJobsList(searchResults);
-            updateVisualizationIfNeeded(searchResults);
-        } else {
+        // Only update if we don't have search results yet
+        if (searchResults == null || searchResults.isEmpty()) {
             super.updateJobsList(jobsList);
             updateVisualizationIfNeeded(jobsList);
+        } else {
+            // Otherwise maintain our search results
+            super.updateJobsList(searchResults);
+            updateVisualizationIfNeeded(searchResults);
         }
     }
     
