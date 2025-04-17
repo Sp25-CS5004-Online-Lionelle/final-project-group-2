@@ -93,13 +93,7 @@ public interface IController {
      * @param jobRecord The job record to add
      */
     void jobToSavedList(JobRecord jobRecord);
-    
-    /**
-     * Tries to add a job to the saved jobs list, checking for duplicates.
-     * @param jobRecord The job record to add
-     * @return true if the job was added successfully, false if it was already in the list
-     */
-    boolean tryAddJobToSavedList(JobRecord jobRecord);
+
     
     /**
      * Removes a job from the saved jobs list.

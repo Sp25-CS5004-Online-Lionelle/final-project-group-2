@@ -202,30 +202,12 @@ public class MainController implements IController, AlertListener {
         if (model == null || jobRecord == null) {
             return;
         }
-        
-        model.addJob(jobRecord);
-    }
-    
-    /**
-     * Try to add a job to the saved jobs list, checking for duplicates.
-     * 
-     * @param jobRecord The JobRecord object to add
-     * @return true if the job was added successfully, false if it was already in the list
-     */
-    @Override
-    public boolean tryAddJobToSavedList(JobRecord jobRecord) {
-        if (model == null || jobRecord == null) {
-            return false;
-        }
-        
+                
         // Check if the job is already in the list
         if (isJobAlreadySaved(jobRecord)) {
-            return false;
+            return;
         }
-        
-        // Add the job to the list
         model.addJob(jobRecord);
-        return true;
     }
 
     /**

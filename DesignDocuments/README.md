@@ -269,7 +269,6 @@ namespace controller {
         +setSavedJobs(List~JobRecord~): List~JobRecord~
         +isJobAlreadySaved(JobRecord): boolean
         +jobToSavedList(JobRecord): void
-        +tryAddJobToSavedList(JobRecord): boolean
         +removeJobFromList(int): void
         +pathToCSV(String): void
         +exportToFileType(List~JobRecord~, String, String): void
@@ -297,7 +296,6 @@ namespace controller {
         +setSavedJobs(List~JobRecord~): List~JobRecord~
         +isJobAlreadySaved(JobRecord): boolean
         +jobToSavedList(JobRecord): void
-        +tryAddJobToSavedList(JobRecord): boolean
         +removeJobFromList(int): void
         +pathToCSV(String): void
         +exportToFileType(List~JobRecord~, String, String): void
