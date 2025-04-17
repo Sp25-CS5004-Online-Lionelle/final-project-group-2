@@ -264,7 +264,6 @@ namespace controller {
         +setSavedJobs(List~JobRecord~): List~JobRecord~
         +isJobAlreadySaved(JobRecord): boolean
         +jobToSavedList(JobRecord): void
-        +tryAddJobToSavedList(JobRecord): boolean
         +removeJobFromList(int): void
         +pathToCSV(String): void
         +exportToFileType(List~JobRecord~, String, String): void
@@ -292,7 +291,6 @@ namespace controller {
         +setSavedJobs(List~JobRecord~): List~JobRecord~
         +isJobAlreadySaved(JobRecord): boolean
         +jobToSavedList(JobRecord): void
-        +tryAddJobToSavedList(JobRecord): boolean
         +removeJobFromList(int): void
         +pathToCSV(String): void
         +exportToFileType(List~JobRecord~, String, String): void
@@ -857,7 +855,6 @@ namespace view {
         -static WARNING_ICON: ImageIcon
         -static SUCCESS_ICON: ImageIcon
         -JobActionHelper()
-        +static saveJob(JobRecord, String, int, IController, Component): void
         +static editJob(JobRecord, IController, Component): JobRecord
         +static deleteJob(JobRecord, IController, Component): boolean
         +static showNoSelectionMessage(String, Component): void

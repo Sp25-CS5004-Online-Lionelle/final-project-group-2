@@ -36,34 +36,6 @@ public final class JobActionHelper {
     }
 
     /**
-     * Saves a job to the saved jobs list with the provided comments and rating.
-     * Displays a success message and switches to the Saved Jobs tab.
-     * 
-     * @param job the JobRecord to be saved
-     * @param comments user comments for the job, can be null or empty
-     * @param rating user rating for the job
-     * @param controller the controller to handle the save operation
-     * @param parent the parent component for dialog display
-     */
-    public static void saveJob(JobRecord job, String comments, int rating, 
-                               IController controller, Component parent) {
-        controller.jobToSavedList(job);
-        controller.getUpdateJob(job.id(), 
-            comments != null && !comments.isEmpty() ? comments : "No comments provided", 
-            rating);
-
-        if (parent != null) {
-            JOptionPane.showMessageDialog(parent,
-                "Job saved successfully!",
-                "Job Saved",
-                JOptionPane.INFORMATION_MESSAGE,
-                SUCCESS_ICON);
-        }
-
-        switchToSavedJobsTab(parent, controller);
-    }
-
-    /**
      * Opens a dialog to edit an existing job with comments and rating.
      * If confirmed, updates the job in the system and shows a success message.
      * 
