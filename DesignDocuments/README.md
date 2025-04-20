@@ -639,30 +639,18 @@ namespace view {
         -locations: String[]
         -industries: String[]
         -searchResults: List~JobRecord~
-        -industryLabel: JLabel
-        -locationLabel: JLabel
-        -resultsLabel: JLabel
-        -titleLabel: JLabel
-        -openIcon: ImageIcon
-        -saveIcon: ImageIcon
-        -warningIcon: ImageIcon
-        -questionIcon: ImageIcon
+        -components: Map~String, Component~
+        -icons: Map~String, ImageIcon~
         -salaryVisualizationPanel: SalaryVisualizationPanel
         -showVisualizationCheckbox: JCheckBox
         -tablePanel: JPanel
-        -saveJob: ThemedButton
-        -searchField: TextField
-        -industryCombo: JComboBox
-        -locationCombo: JComboBox
-        -resultsCombo: JComboBox
         +FindJobTab(IController)
         -setupEnterKeyAction(): void
         -disableEnterKeyTraversalIn(Container): void
         -modifyTablePanel(): void
         +makeTopButtonPanel(): JPanel
-        -getLocationValue(): String
-        -getIndustryValue(): String
-        -getNumberOfResults(): int
+        -getSelectedItem(JComboBox): String
+        -getNumberOfResults(JComboBox): int
         -checkForSuggestions(String, int, String, String): void
         -performSearch(String, int, String, String): void
         -handleSearchResults(List~JobRecord~, int, String): void
@@ -860,7 +848,6 @@ namespace view {
         -static WARNING_ICON: ImageIcon
         -static SUCCESS_ICON: ImageIcon
         -JobActionHelper()
-        +static saveJob(JobRecord, String, int, IController, Component): void
         +static editJob(JobRecord, IController, Component): JobRecord
         +static deleteJob(JobRecord, IController, Component): boolean
         +static showNoSelectionMessage(String, Component): void
