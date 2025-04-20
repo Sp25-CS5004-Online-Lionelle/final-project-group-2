@@ -4,8 +4,9 @@ import java.awt.FileDialog;
 import java.awt.FlowLayout;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
@@ -17,38 +18,15 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import skillzhunter.controller.IController;
-import skillzhunter.model.JobBean;
 import skillzhunter.model.JobRecord;
 
 public class SavedJobsTab extends JobView {
     
-    // Store buttons as fields to apply theme later
-    /** open button. */
-    private ThemedButton openButton;
-    /** save button. */
-    private ThemedButton saveButton;
-    /** export button. */
-    private ThemedButton exportButton;
-    /** edit button. */
-    private ThemedButton editButton;
-    /** delete button. */
-    private ThemedButton deleteButton;
-
-    // Icons for buttons and dialogs
-    /** open icon. */
-    private final ImageIcon openIcon;
-    /** save icon. */
-    private final ImageIcon saveIcon;
-    /** export icon. */
-    private final ImageIcon exportIcon;
-    /** warning icon. */
-    private final ImageIcon warningIcon;
-    /** success icon. */
-    private final ImageIcon successIcon;
-    /** edit icon. */
-    private final ImageIcon editIcon;
-    /** delete icon. */
-    private final ImageIcon deleteIcon;
+    /** Map of buttons for easy reference and theme application. */
+    private Map<String, ThemedButton> buttons = new HashMap<>();
+    
+    /** Map of icons used in this tab. */
+    private Map<String, ImageIcon> icons = new HashMap<>();
 
     /**
      * Constructor for SavedJobsTab.
@@ -62,19 +40,24 @@ public class SavedJobsTab extends JobView {
         // set inherited field from jobview
         this.controller = controller;
         
-        // Use IconLoader to load icons
-        this.openIcon = IconLoader.loadIcon("images/open.png");
-        this.saveIcon = IconLoader.loadIcon("images/saveIcon.png");
-        this.exportIcon = IconLoader.loadIcon("images/exportIcon.png");
-        this.warningIcon = IconLoader.loadIcon("images/warning.png");
-        this.successIcon = IconLoader.loadIcon("images/success.png");
-        this.editIcon = IconLoader.loadIcon("images/edit.png");
-        this.deleteIcon = IconLoader.loadIcon("images/delete.png");
+        // Load icons with a loop
+        String[] iconNames = {"open", "saveIcon", "exportIcon", "warning", "success", "edit", "delete"};
+        String[] iconKeys = {"OPEN", "SAVE", "EXPORT", "WARNING", "SUCCESS", "EDIT", "DELETE"};
+        
+        for (int i = 0; i < iconNames.length; i++) {
+            icons.put(iconKeys[i], IconLoader.loadIcon("images/" + iconNames[i] + ".png"));
+        }
         
         super.initView();
         updateJobsList(savedJobs);
     }
     
+    /**
+     * Creates the top button panel.
+     * This is intentionally left blank for this tab.
+     *
+     * @return An empty panel for the top row
+     */
     @Override
     public JPanel makeTopButtonPanel() {
         //Blank top row override
@@ -82,80 +65,68 @@ public class SavedJobsTab extends JobView {
         return topRow;
     }
 
+    /**
+     * Creates the bottom button panel that contains action buttons.
+     * Includes Open, Edit, Delete, Save and Export buttons with their respective actions.
+     *
+     * @return The panel containing action buttons
+     */
     @Override
     public JPanel makeBottomButtonPanel() {
         JPanel bottomRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
-        // Create buttons and store them as fields with consistent sizing
-        openButton = createThemedButton("Open", ThemedButton.ButtonType.PRIMARY);
-        openButton.setIcon(openIcon);
-        openButton.setHorizontalTextPosition(SwingConstants.LEFT);
-        openButton.setIconTextGap(5);
+        // Button configuration data: name, type, icon, action method
+        Object[][] buttonConfig = {
+            {"Open", ThemedButton.ButtonType.PRIMARY, "OPEN", "openSelectedJob"},
+            {"Edit", ThemedButton.ButtonType.INFO, "EDIT", "editSelectedJob"},
+            {"Delete", ThemedButton.ButtonType.DANGER, "DELETE", "deleteSelectedJob"},
+            {"Save", ThemedButton.ButtonType.SUCCESS, "SAVE", "handleSaveAction"},
+            {"Export", ThemedButton.ButtonType.SECONDARY, "EXPORT", "handleExportAction"}
+        };
         
-        // Edit button - using INFO type
-        editButton = createThemedButton("Edit", ThemedButton.ButtonType.INFO);
-        editButton.setIcon(editIcon);
-        editButton.setHorizontalTextPosition(SwingConstants.LEFT);
-        editButton.setIconTextGap(5);
-        
-        // Delete button - using DANGER type for destructive actions
-        deleteButton = createThemedButton("Delete", ThemedButton.ButtonType.DANGER);
-        deleteButton.setIcon(deleteIcon);
-        deleteButton.setHorizontalTextPosition(SwingConstants.LEFT);
-        deleteButton.setIconTextGap(5);
-        
-        // Save button - using SUCCESS type
-        saveButton = createThemedButton("Save", ThemedButton.ButtonType.SUCCESS);
-        saveButton.setIcon(saveIcon);
-        saveButton.setHorizontalTextPosition(SwingConstants.LEFT);
-        saveButton.setIconTextGap(5);
-        
-        // Export button - using SECONDARY type
-        exportButton = createThemedButton("Export", ThemedButton.ButtonType.SECONDARY);
-        exportButton.setIcon(exportIcon);
-        exportButton.setHorizontalTextPosition(SwingConstants.LEFT);
-        exportButton.setIconTextGap(5);
+        // Create buttons with a loop
+        for (Object[] config : buttonConfig) {
+            String name = (String) config[0];
+            ThemedButton.ButtonType type = (ThemedButton.ButtonType) config[1];
+            String iconKey = (String) config[2];
+            
+            ThemedButton button = createThemedButton(name, type);
+            button.setIcon(icons.get(iconKey));
+            button.setHorizontalTextPosition(SwingConstants.LEFT);
+            button.setIconTextGap(5);
+            
+            // Store button in map
+            buttons.put(name.toUpperCase(), button);
+        }
 
         // Create a dropdown for export formats
         String[] formats = {"CSV", "JSON", "XML"};
         JComboBox<String> formatDropdown = new JComboBox<>(formats);
 
-        // Set preferred size for all buttons to ensure consistency
+        // Get max button height for consistent sizing
         int buttonWidth = 100;  // Fixed width for all buttons
-        int buttonHeight = Math.max(
-            openButton.getPreferredSize().height,
-            Math.max(
-                editButton.getPreferredSize().height,
-                Math.max(
-                    deleteButton.getPreferredSize().height,
-                    Math.max(
-                        saveButton.getPreferredSize().height,
-                        exportButton.getPreferredSize().height
-                    )
-                )
-            )
-        );
+        int buttonHeight = 0;
+        for (ThemedButton button : buttons.values()) {
+            buttonHeight = Math.max(buttonHeight, button.getPreferredSize().height);
+        }
         
-        openButton.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
-        editButton.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
-        deleteButton.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
-        saveButton.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
-        exportButton.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
+        // Set consistent size for all buttons
+        for (ThemedButton button : buttons.values()) {
+            button.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
+        }
 
-        // Add buttons to panel
-        bottomRow.add(openButton);
-        bottomRow.add(editButton);
-        bottomRow.add(deleteButton);
-        bottomRow.add(saveButton);
-        bottomRow.add(exportButton);
+        // Add buttons to panel in order
+        for (String buttonName : new String[]{"OPEN", "EDIT", "DELETE", "SAVE", "EXPORT"}) {
+            bottomRow.add(buttons.get(buttonName));
+        }
         bottomRow.add(formatDropdown);
 
-        // Set listeners - using helper methods for common actions
-        openButton.addActionListener(e -> openSelectedJob());
-        editButton.addActionListener(e -> editSelectedJob());
-        deleteButton.addActionListener(e -> deleteSelectedJob());
-        saveButton.addActionListener(e -> handleSaveAction());
-        exportButton.addActionListener(e -> handleExportAction(formatDropdown));
+        // Set listeners with a more modular approach
+        buttons.get("OPEN").addActionListener(e -> openSelectedJob());
+        buttons.get("EDIT").addActionListener(e -> editSelectedJob());
+        buttons.get("DELETE").addActionListener(e -> deleteSelectedJob());
+        buttons.get("SAVE").addActionListener(e -> handleSaveAction());
+        buttons.get("EXPORT").addActionListener(e -> handleExportAction(formatDropdown));
 
         return bottomRow;
     }
@@ -185,13 +156,8 @@ public class SavedJobsTab extends JobView {
         // Use just the filename "SavedJobs.csv" which is passed into method with data directory
         String filePath = createDataDirectoryAndGetFilePath("SavedJobs.csv");
         
-        //Create new list called cleanedJobs
-        List<JobRecord> cleanedJobs = new ArrayList<>();
-        // Create a cleaned version of the jobs by using controller cleanJobRecord
-        for(JobRecord job : savedJobs){
-            controller.cleanJobRecord(job);
-            cleanedJobs.add(job);
-        }
+        // Clean jobs before saving
+        List<JobRecord> cleanedJobs = cleanJobRecords(savedJobs);
         
         // Save the jobs to file
         saveJobsToFile(parentFrame, cleanedJobs, "CSV", filePath);
@@ -232,16 +198,27 @@ public class SavedJobsTab extends JobView {
             return; 
         }
         
-        //Create new list called cleanedJobs
-        List<JobRecord> cleanedJobs = new ArrayList<>();
-        // Create a cleaned version of the jobs by using controller cleanJobRecord
-        for(JobRecord job : savedJobs){
-            controller.cleanJobRecord(job);
-            cleanedJobs.add(job);
-        }
+        // Clean jobs before exporting
+        List<JobRecord> cleanedJobs = cleanJobRecords(savedJobs);
         
         // Export the jobs to the selected format
         exportJobsToFile(parentFrame, cleanedJobs, selectedFormat, filePath);
+    }
+    
+    /**
+     * Cleans a list of job records using the controller.
+     * 
+     * @param jobs The jobs to clean
+     * @return A list of cleaned job records
+     */
+    private List<JobRecord> cleanJobRecords(List<JobRecord> jobs) {
+        List<JobRecord> cleanedJobs = new ArrayList<>();
+        // Create a cleaned version of the jobs by using controller cleanJobRecord
+        for(JobRecord job : jobs){
+            controller.cleanJobRecord(job);
+            cleanedJobs.add(job);
+        }
+        return cleanedJobs;
     }
 
     /**
@@ -255,7 +232,7 @@ public class SavedJobsTab extends JobView {
             "No jobs to " + action + ".",
             action.substring(0, 1).toUpperCase() + action.substring(1) + " Jobs",
             JOptionPane.INFORMATION_MESSAGE,
-            warningIcon);
+            icons.get("WARNING"));
     }
 
     /**
@@ -271,7 +248,7 @@ public class SavedJobsTab extends JobView {
             JOptionPane.QUESTION_MESSAGE,
             JOptionPane.YES_NO_OPTION);
         
-        optionPane.setIcon(saveIcon);
+        optionPane.setIcon(icons.get("SAVE"));
         
         JDialog dialog = optionPane.createDialog(parentFrame, "Confirm Save");
         dialog.setVisible(true);
@@ -293,7 +270,7 @@ public class SavedJobsTab extends JobView {
             JOptionPane.QUESTION_MESSAGE,
             JOptionPane.YES_NO_OPTION);
         
-        optionPane.setIcon(exportIcon);
+        optionPane.setIcon(icons.get("EXPORT"));
         
         JDialog dialog = optionPane.createDialog(parentFrame, "Confirm Export");
         dialog.setVisible(true);
@@ -370,7 +347,7 @@ public class SavedJobsTab extends JobView {
                 "Jobs successfully saved to " + fileName,
                 "Save Complete",
                 JOptionPane.INFORMATION_MESSAGE,
-                successIcon);
+                icons.get("SUCCESS"));
         } catch (Exception ex) {
             // Show error message if save fails
             ex.printStackTrace();
@@ -378,7 +355,7 @@ public class SavedJobsTab extends JobView {
                 "Error saving jobs: " + ex.getMessage(),
                 "Save Failed",
                 JOptionPane.ERROR_MESSAGE,
-                warningIcon);
+                icons.get("WARNING"));
         }
     }
 
@@ -400,7 +377,7 @@ public class SavedJobsTab extends JobView {
                 "Jobs successfully exported in " + format + " format to:\n" + filePath,
                 "Export Complete",
                 JOptionPane.INFORMATION_MESSAGE,
-                exportIcon);
+                icons.get("EXPORT"));
         } catch (Exception ex) {
             // Show error message if export fails
             ex.printStackTrace();
@@ -408,7 +385,7 @@ public class SavedJobsTab extends JobView {
                 "Error exporting jobs: " + ex.getMessage(),
                 "Export Failed",
                 JOptionPane.ERROR_MESSAGE,
-                warningIcon);
+                icons.get("WARNING"));
         }
     }
 
@@ -462,22 +439,18 @@ public class SavedJobsTab extends JobView {
         }
     }
 
+    /**
+     * Applies the given color theme to all components in this tab.
+     * 
+     * @param theme The color theme to apply
+     */
     @Override
     public void applyTheme(ColorTheme theme) {
         // Call parent implementation for common styling
         super.applyTheme(theme);
         
-        // Create a list of all buttons and apply theme to each
-        List<ThemedButton> buttons = Arrays.asList(
-            openButton, 
-            saveButton, 
-            exportButton, 
-            editButton, 
-            deleteButton
-        );
-        
-        // Apply theme to all buttons
-        for (ThemedButton button : buttons) {
+        // Apply theme to all buttons with a simple loop
+        for (ThemedButton button : buttons.values()) {
             button.applyTheme(theme);
         }
 
