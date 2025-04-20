@@ -10,7 +10,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -46,39 +48,17 @@ public class FindJobTab extends JobView {
     /** search results list. */
     private List<JobRecord> searchResults = new ArrayList<>();
     
-    // UI components
-    /** Industry label. */
-    private JLabel industryLabel;
-    /** Location label. */
-    private JLabel locationLabel;
-    /** Search button label. */
-    private JLabel resultsLabel;
-    /** title label. */
-    private JLabel titleLabel;
-    /** Search button. */
-    private final ImageIcon openIcon;
-    /** save icon. */
-    private final ImageIcon saveIcon;
-    /** warning icon. */
-    private final ImageIcon warningIcon;
-    /** question icon. */
-    private final ImageIcon questionIcon;
-    /** Salary range viz. */
+    /** Map for UI components. */
+    private Map<String, Component> components = new HashMap<>();  
+    /** Map for icons. */
+    private Map<String, ImageIcon> icons = new HashMap<>();
+    
+    /** Salary range visualization panel. */
     private SalaryVisualizationPanel salaryVisualizationPanel;
-    /** show vis button. */
+    /** Show visualization checkbox. */
     private JCheckBox showVisualizationCheckbox;
-    /** table panel. */
+    /** Table panel. */
     private JPanel tablePanel;
-    /** theme button.*/
-    private ThemedButton saveJob; // Now using ThemedButton instead of javax.swing.JButton
-    /** Search field for job title. */
-    private TextField searchField;
-    /** Industry selection combo box. */
-    private JComboBox<String> industryCombo;
-    /** Location selection combo box. */
-    private JComboBox<String> locationCombo;
-    /** Results count combo box. */
-    private JComboBox<Integer> resultsCombo;
 
     /** 
      * Constructor for FindJobTab.
@@ -87,28 +67,27 @@ public class FindJobTab extends JobView {
      */
     public FindJobTab(IController controller) {
         super();
-        
         this.controller = controller;
         this.locations = controller.getLocations().toArray(new String[0]);
         this.industries = controller.getIndustries().toArray(new String[0]);
 
-        // Use IconLoader to load icons
-        this.openIcon = IconLoader.loadIcon("images/open.png");
-        this.saveIcon = IconLoader.loadIcon("images/saveIcon.png");
-        this.warningIcon = IconLoader.loadIcon("images/warning.png");
-        this.questionIcon = IconLoader.loadIcon("images/lightbulb.png");
+        // Load icons into map with simple loop
+        String[] iconNames = {"open", "saveIcon", "warning", "lightbulb", "success"};
+        for (String name : iconNames) {
+            icons.put(name, IconLoader.loadIcon("images/" + name + ".png"));
+        }
         
         super.initView();
-
-        // Load initial set of jobs
         searchResults = controller.getApiCall("any", 10, "any", "any");
         setJobsList(searchResults);
-        
         modifyTablePanel();
         setupEnterKeyAction();
     }
 
-    //These next two methods are all about setting up the enter key to search
+    /**
+     * Sets up the enter key action to trigger search.
+     * This allows users to press Enter to search instead of clicking the button.
+     */
     private void setupEnterKeyAction() {
         Action enterAction = new AbstractAction() {
             @Override
@@ -124,7 +103,13 @@ public class FindJobTab extends JobView {
         disableEnterKeyTraversalIn(this);
     }
 
-    //Helper method to disable Enter key default behavior in text components
+    /**
+     * Helper method to disable Enter key default behavior in text components.
+     * This prevents the Enter key from being handled by the default focus traversal
+     * mechanism and instead triggers the search action.
+     * 
+     * @param container The container to process
+     */
     private void disableEnterKeyTraversalIn(Container container) {
         for (Component comp : container.getComponents()) {
             if (comp instanceof JTextField || comp instanceof TextField) {
@@ -133,12 +118,11 @@ public class FindJobTab extends JobView {
                     public void keyPressed(KeyEvent e) {
                         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                             searchButton.doClick();
-                            e.consume(); // Prevent default handling
+                            e.consume();
                         }
                     }
                 });
             }
-            // Recursively process nested containers
             if (comp instanceof Container) {
                 disableEnterKeyTraversalIn((Container) comp);
             }
@@ -147,10 +131,10 @@ public class FindJobTab extends JobView {
 
     /**
      * Modifies the table panel to include the visualization panel.
+     * This adds a salary visualization below the jobs table.
      */
     private void modifyTablePanel() {
-         // Find the table panel
-         for (int i = 0; i < mainPanel.getComponentCount(); i++) {
+        for (int i = 0; i < mainPanel.getComponentCount(); i++) {
             if (mainPanel.getComponent(i) instanceof JPanel
                 && ((JPanel) mainPanel.getComponent(i)).getLayout() instanceof BorderLayout) {
                 tablePanel = (JPanel) mainPanel.getComponent(i);
@@ -158,14 +142,11 @@ public class FindJobTab extends JobView {
             }
         }
         
-        if (tablePanel == null) {
-            return;
-        }        
-        // Create and set up visualization
+        if (tablePanel == null) return;
+            
         salaryVisualizationPanel = new SalaryVisualizationPanel(searchResults);
         salaryVisualizationPanel.setPreferredSize(new Dimension(800, 200));
         
-        // Set up panel containers
         JPanel tableContainer = new JPanel(new BorderLayout());
         tableContainer.add(tablePanel.getComponent(0), BorderLayout.CENTER);
         
@@ -177,11 +158,9 @@ public class FindJobTab extends JobView {
         combinedPanel.add(tableContainer, BorderLayout.CENTER);
         combinedPanel.add(visualizationContainer, BorderLayout.SOUTH);
         
-        // Replace original panel content
         tablePanel.removeAll();
         tablePanel.add(combinedPanel, BorderLayout.CENTER);
         
-        // Add checkbox to the top panel
         JPanel topPanel = (JPanel) mainPanel.getComponent(0);
         showVisualizationCheckbox = new JCheckBox("Show Salary Graph", true);
         showVisualizationCheckbox.addActionListener(e -> {
@@ -193,65 +172,81 @@ public class FindJobTab extends JobView {
         topPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         topPanel.add(showVisualizationCheckbox);
         
-        // Initial update
         updateVisualizationIfNeeded(searchResults);
         
-        // Apply theme if available
         if (getTheme() != null) {
             applyThemeToVisualization(getTheme());
         }
         
-        // Revalidate and repaint
         tablePanel.revalidate();
         tablePanel.repaint();
     }
 
+    /**
+     * Creates the top button panel that contains search controls.
+     * Includes industry, location, and results filters, as well as
+     * a search field and search button.
+     *
+     * @return The panel containing search controls
+     */
     @Override
     public JPanel makeTopButtonPanel() {
         JPanel searchRow = new JPanel();
         searchRow.setLayout(new BoxLayout(searchRow, BoxLayout.LINE_AXIS));
 
-        // Create UI components
-        searchField = new TextField("", 20);    
+        // Create components with simple arrays
+        String[] labels = {"Industry: ", "Location: ", "# of Results: ", "Job Title: "};
+        String[] keys = {"industryLabel", "locationLabel", "resultsLabel", "titleLabel"};
+        
+        // Create search field and button
+        TextField searchField = new TextField("", 20);
+        components.put("searchField", searchField);
         searchButton = createThemedButton("Find Jobs \t🔎", ThemedButton.ButtonType.PRIMARY);
-        Integer[] results = {5, 10, 20, 50};
-        industryCombo = new JComboBox<>(industries);
+        
+        // Create combo boxes
+        JComboBox<String> industryCombo = new JComboBox<>(industries);
         industryCombo.setEditable(true);
-        locationCombo = new JComboBox<>(locations);
+        components.put("industryCombo", industryCombo);
+        
+        JComboBox<String> locationCombo = new JComboBox<>(locations);
         locationCombo.setEditable(true);
-        resultsCombo = new JComboBox<>(results);
-        resultsCombo.setPrototypeDisplayValue(100);
+        components.put("locationCombo", locationCombo);
+        
+        Integer[] results = {5, 10, 20, 50};
+        JComboBox<Integer> resultsCombo = new JComboBox<>(results);
+        resultsCombo.setPrototypeDisplayValue(Integer.valueOf(100));
         resultsCombo.setEditable(true);
+        components.put("resultsCombo", resultsCombo);
+        
+        // Create and store labels
+        for (int i = 0; i < labels.length; i++) {
+            components.put(keys[i], new JLabel(labels[i]));
+        }
 
-        // Create labels
-        industryLabel = new JLabel("Industry: ");
-        locationLabel = new JLabel("Location: ");
-        resultsLabel = new JLabel("# of Results: ");
-        titleLabel = new JLabel("Job Title: ");
-
-        // Add components
-        searchRow.add(industryLabel);
-        searchRow.add(industryCombo);
-        searchRow.add(Box.createRigidArea(new Dimension(5, 0)));
-        searchRow.add(locationLabel);
-        searchRow.add(locationCombo);
-        searchRow.add(Box.createRigidArea(new Dimension(5, 0)));
-        searchRow.add(resultsLabel);
-        searchRow.add(resultsCombo);
-        searchRow.add(Box.createRigidArea(new Dimension(5, 0)));
-        searchRow.add(titleLabel);
-        searchRow.add(searchField);
-        searchRow.add(searchButton);
+        // Add components in order with spacers
+        Component[][] layout = {
+            {components.get("industryLabel"), industryCombo},
+            {null, Box.createRigidArea(new Dimension(5, 0))},
+            {components.get("locationLabel"), locationCombo},
+            {null, Box.createRigidArea(new Dimension(5, 0))},
+            {components.get("resultsLabel"), resultsCombo},
+            {null, Box.createRigidArea(new Dimension(5, 0))},
+            {components.get("titleLabel"), searchField, searchButton}
+        };
+        
+        for (Component[] row : layout) {
+            for (Component comp : row) {
+                if (comp != null) searchRow.add(comp);
+            }
+        }
 
         // Set search action
         searchButton.addActionListener(e -> {
-            // Get search parameters
             String query = searchField.getText();
-            String location = getLocationValue();
-            String industry = getIndustryValue();
-            int numberOfResults = getNumberOfResults();
+            String location = getSelectedItem(locationCombo);
+            String industry = getSelectedItem(industryCombo);
+            int numberOfResults = getNumberOfResults(resultsCombo);
             
-            // Check for suggestions before performing the search
             checkForSuggestions(query, numberOfResults, location, industry);
         });
 
@@ -259,30 +254,26 @@ public class FindJobTab extends JobView {
     }
     
     /**
-     * Gets the value from the location combo box.
-     * @return The selected location or "any" if none selected
+     * Gets the selected item from a combo box as a string.
+     * 
+     * @param combo The combo box to get the selected item from
+     * @return The selected item as a string, or "any" if nothing is selected
      */
-    private String getLocationValue() {
-        Object locationObj = locationCombo.getSelectedItem();
-        return (locationObj != null) ? locationObj.toString() : "any";
-    }
-    
-    /**
-     * Gets the value from the industry combo box.
-     * @return The selected industry or "any" if none selected
-     */
-    private String getIndustryValue() {
-        Object industryObj = industryCombo.getSelectedItem();
-        return (industryObj != null) ? industryObj.toString() : "any";
+    private String getSelectedItem(JComboBox<?> combo) {
+        Object obj = combo.getSelectedItem();
+        return (obj != null) ? obj.toString() : "any";
     }
     
     /**
      * Gets the number of results from the results combo box.
+     * Handles both integer and string inputs, with appropriate error handling.
+     * 
+     * @param resultsCombo The combo box containing the number of results
      * @return The number of results to return
      */
-    private int getNumberOfResults() {
+    private int getNumberOfResults(JComboBox<?> resultsCombo) {
         Object resultsObj = resultsCombo.getSelectedItem();
-        int numberOfResults = 10; // Default value
+        int numberOfResults = 10; // Default
         
         if (resultsObj instanceof Integer num) {
             numberOfResults = num;
@@ -290,19 +281,16 @@ public class FindJobTab extends JobView {
             try {
                 numberOfResults = Integer.parseInt(res);
             } catch (NumberFormatException ex) {
-                // Show error message for non-numeric input
-                ImageIcon warningIcon = IconLoader.loadIcon("images/warning.png");
                 JOptionPane.showMessageDialog(this,
-                    "Couldn't parse the number of results requested."
-                        + "\nPlease ensure you enter a numeric value."
-                        + "\nReturned 10 results.",
+                    "Couldn't parse the number of results requested.\n" +
+                    "Please ensure you enter a numeric value.\n" +
+                    "Returned 10 results.",
                     "Null or Non-Numeric Value",
                     JOptionPane.WARNING_MESSAGE,
-                    warningIcon);
+                    icons.get("warning"));
                 numberOfResults = 10;
             }
         }
-        
         return numberOfResults;
     }
     
@@ -317,33 +305,27 @@ public class FindJobTab extends JobView {
      * @param industry The industry to filter by
      */
     private void checkForSuggestions(String query, int numberOfResults, String location, String industry) {
-        // Only check for suggestions for non-empty, non-generic queries
         if (query != null && !query.isEmpty() && 
             !query.equalsIgnoreCase("any") && !query.equalsIgnoreCase("all")) {
             
-            // Get suggestion before performing the search
             String suggestion = controller.suggestQueryCorrection(query, 0);
             
             if (suggestion != null && !suggestion.equalsIgnoreCase(query)) {
-                // Show "Did you mean...?" dialog
                 int choice = JOptionPane.showConfirmDialog(
                     this,
                     "Did you mean \"" + suggestion + "\"?",
                     "Search Suggestion",
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE,
-                    questionIcon);
+                    icons.get("lightbulb"));
                 
                 if (choice == JOptionPane.YES_OPTION) {
-                    // Update search field and use suggestion
-                    searchField.setText(suggestion);
+                    ((TextField)components.get("searchField")).setText(suggestion);
                     performSearch(suggestion, numberOfResults, location, industry);
                     return;
                 }
             }
         }
-        
-        // If no suggestion or suggestion declined, perform search with original query
         performSearch(query, numberOfResults, location, industry);
     }
     
@@ -356,10 +338,7 @@ public class FindJobTab extends JobView {
      * @param industry The industry filter
      */
     private void performSearch(String query, int numberOfResults, String location, String industry) {
-        // Perform the search
         searchResults = controller.getApiCall(query, numberOfResults, location, industry);
-        
-        // Handle the search results
         handleSearchResults(searchResults, numberOfResults, query);
     }
     
@@ -368,57 +347,69 @@ public class FindJobTab extends JobView {
      * 
      * @param results The search results
      * @param numberOfResults The number of results that was requested
+     * @param query The original search query
      */
     private void handleSearchResults(List<JobRecord> results, int numberOfResults, String query) {
         if (results != null && !results.isEmpty()) {
-            // Search successful - update UI with results
             setJobsList(results);
             updateVisualizationIfNeeded(results);
         } else {
-            // Show appropriate error messages for empty results
             if (numberOfResults > 50) {
-                ImageIcon warningIcon = IconLoader.loadIcon("images/warning.png");
                 JOptionPane.showMessageDialog(this,
-                        "The number of results requested is too large.\nPlease try a smaller number.",
-                        "Too Many Results Requested",
-                        JOptionPane.WARNING_MESSAGE,
-                        warningIcon);
+                    "The number of results requested is too large.\nPlease try a smaller number.",
+                    "Too Many Results Requested",
+                    JOptionPane.WARNING_MESSAGE,
+                    icons.get("warning"));
             } else {
-                ImageIcon errorIcon = IconLoader.loadIcon("images/warning.png");
                 JOptionPane.showMessageDialog(this,
-                        "No jobs found for: " + query,
-                        "No Results Found",
-                        JOptionPane.INFORMATION_MESSAGE,
-                        errorIcon);
+                    "No jobs found for: " + query,
+                    "No Results Found",
+                    JOptionPane.INFORMATION_MESSAGE,
+                    icons.get("warning"));
             }
         }
     }
 
+    /**
+     * Creates the bottom button panel that contains action buttons.
+     * Includes Open and Save buttons for job management.
+     *
+     * @return The panel containing action buttons
+     */
     @Override
     public JPanel makeBottomButtonPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
 
-        // Create and configure Open button with PRIMARY type
-        openJob = createThemedButton("Open", ThemedButton.ButtonType.PRIMARY);
-        openJob.setIcon(openIcon);
-        openJob.setHorizontalTextPosition(SwingConstants.LEFT);
-        openJob.setIconTextGap(5);
-        openJob.addActionListener(e -> openSelectedJob());
+        // Create buttons with array
+        String[][] buttonProps = {
+            {"Open", "PRIMARY", "open", "open"}, 
+            {"Save", "SUCCESS", "saveIcon", "save"}
+        };
+        
+        for (String[] props : buttonProps) {
+            ThemedButton button = createThemedButton(props[0], 
+                ThemedButton.ButtonType.valueOf(props[1]));
+            button.setIcon(icons.get(props[2]));
+            button.setHorizontalTextPosition(SwingConstants.LEFT);
+            button.setIconTextGap(5);
+            
+            if ("open".equals(props[3])) {
+                button.addActionListener(e -> openSelectedJob());
+                openJob = button;
+            } else {
+                button.addActionListener(e -> saveSelectedJob());
+                components.put("saveJob", button);
+            }
+            
+            buttonPanel.add(button);
+        }
 
-        // Create and configure Save button with SUCCESS type
-        saveJob = createThemedButton("Save", ThemedButton.ButtonType.SUCCESS);
-        saveJob.setIcon(saveIcon);
-        saveJob.setHorizontalTextPosition(SwingConstants.LEFT);
-        saveJob.setIconTextGap(5);
-        saveJob.addActionListener(e -> saveSelectedJob());
-
-        buttonPanel.add(openJob);
-        buttonPanel.add(saveJob);
         return buttonPanel;
     }
     
     /**
      * Updates the visualization panel with job data if needed.
+     * 
      * @param jobs The list of jobs to update the visualization with
      */
     private void updateVisualizationIfNeeded(List<JobRecord> jobs) {
@@ -429,6 +420,7 @@ public class FindJobTab extends JobView {
     
     /**
      * Applies theme to visualization components.
+     * 
      * @param theme The color theme to apply
      */
     private void applyThemeToVisualization(ColorTheme theme) {
@@ -442,31 +434,31 @@ public class FindJobTab extends JobView {
         }
     }
 
+    /**
+     * Applies the specified color theme to all components in this panel.
+     * 
+     * @param theme The color theme to apply
+     */
     @Override
     public void applyTheme(ColorTheme theme) {
-        // Call parent implementation for common styling
         super.applyTheme(theme);
-        
-        // Apply theme to visualization components
         applyThemeToVisualization(theme);
         
-        // Apply theme to saveJob button (which might not be handled by parent)
-        if (saveJob != null) {
-            saveJob.applyTheme(theme);
+        if (components.get("saveJob") != null) {
+            ((ThemedButton)components.get("saveJob")).applyTheme(theme);
         }
         
-        // Use correct theme foreground color for labels
-        java.awt.Color color = (theme == ColorTheme.DARK)
-                ? ColorTheme.DARK.getLabelForeground() : ColorTheme.LIGHT.getLabelForeground();
-                
-        industryLabel.setForeground(color);
-        locationLabel.setForeground(color);
-        resultsLabel.setForeground(color);
-        titleLabel.setForeground(color);
+        // Apply theme to all labels with a single loop
+        java.awt.Color color = theme.getLabelForeground();
+        for (String key : new String[]{"industryLabel", "locationLabel", "resultsLabel", "titleLabel"}) {
+            if (components.get(key) instanceof JLabel) {
+                ((JLabel)components.get(key)).setForeground(color);
+            }
+        }
     }
 
     /**
-     * Opens the selected job in a new dialog
+     * Opens the selected job in a new dialog.
      * Displays job details in a new dialog when a job is selected from the table.
      * Uses JobDetailsDialogue directly for proper rating functionality.
      */
@@ -475,23 +467,21 @@ public class FindJobTab extends JobView {
         if (viewIdx >= 0) {
             int modelIdx = jobsTable.convertRowIndexToModel(viewIdx);
             JobRecord selectedJob = jobsList.get(modelIdx);
-            // Use controller directly with JobDetailsDialogue
             JobDetailsDialogue.showJobDetails(jobsTable, selectedJob, 
-                    controller.getSavedJobs(), controller);
+                controller.getSavedJobs(), controller);
         } else {
             JobActionHelper.showNoSelectionMessage("Please select a job to open", this);
         }
     }
 
     /**
-     * Saves the selected job directly without opening the dialog
+     * Saves the selected job directly without opening the dialog.
      * Adds the job to saved jobs and switches to the Saved Jobs tab.
      * Uses JobActionHelper for consistent save behavior.
      */
     private void saveSelectedJob() {
         int viewIdx = jobsTable.getSelectedRow();
         if (viewIdx < 0) {
-            // No job selected
             JobActionHelper.showNoSelectionMessage("Please select a job to save", this);
             return;
         }
@@ -499,45 +489,39 @@ public class FindJobTab extends JobView {
         int modelIdx = jobsTable.convertRowIndexToModel(viewIdx);
         JobRecord selectedJob = jobsList.get(modelIdx);
         
-        // Check if job is already saved using controller's method
         if (controller.isJobAlreadySaved(selectedJob)) {
             JOptionPane.showMessageDialog(this,
                 "This job is already saved.",
                 "Job Already Saved",
                 JOptionPane.WARNING_MESSAGE,
-                warningIcon);
+                icons.get("warning"));
             return;
         }
-        // Add the job to saved jobs
-        controller.jobToSavedList(selectedJob);
         
-        // Set default rating and comments
+        controller.jobToSavedList(selectedJob);
         controller.getUpdateJob(selectedJob.id(), "No comments provided", 0);
         
-        // Show success message
         JOptionPane.showMessageDialog(this,
-                "Job saved successfully!",
-                "Job Saved",
-                JOptionPane.INFORMATION_MESSAGE,
-                IconLoader.loadIcon("images/success.png"));
+            "Job saved successfully!",
+            "Job Saved",
+            JOptionPane.INFORMATION_MESSAGE,
+            icons.get("success"));
         
-        // Switch to Saved Jobs tab using JobActionHelper
         JobActionHelper.switchToSavedJobsTab(this, controller);
     }
     
     /**
      * Updates the job list and visualization if needed.
      * This method ensures we don't override search results with saved jobs.
+     * 
      * @param jobsList The list of jobs to update
      */
     @Override
     public void updateJobsList(List<JobRecord> jobsList) {
-        // Only update if we don't have search results yet
         if (searchResults == null || searchResults.isEmpty()) {
             super.updateJobsList(jobsList);
             updateVisualizationIfNeeded(jobsList);
         } else {
-            // Otherwise maintain our search results
             super.updateJobsList(searchResults);
             updateVisualizationIfNeeded(searchResults);
         }
@@ -545,6 +529,7 @@ public class FindJobTab extends JobView {
     
     /**
      * Sets the job list and updates the visualization if needed.
+     * 
      * @param jobsList The list of jobs to set
      */
     @Override
