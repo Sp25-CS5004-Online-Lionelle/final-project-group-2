@@ -660,23 +660,14 @@ namespace view {
     }
     
     class SavedJobsTab {
-        -openButton: ThemedButton
-        -saveButton: ThemedButton
-        -exportButton: ThemedButton
-        -editButton: ThemedButton
-        -deleteButton: ThemedButton
-        -openIcon: ImageIcon
-        -saveIcon: ImageIcon
-        -exportIcon: ImageIcon
-        -warningIcon: ImageIcon
-        -successIcon: ImageIcon
-        -editIcon: ImageIcon
-        -deleteIcon: ImageIcon
+        -buttons: Map~String, ThemedButton~
+        -icons: Map~String, ImageIcon~
         +SavedJobsTab(IController, List~JobRecord~)
         +makeTopButtonPanel(): JPanel
         +makeBottomButtonPanel(): JPanel
         -handleSaveAction(): void
         -handleExportAction(JComboBox): void
+        -cleanJobRecords(List~JobRecord~): List~JobRecord~
         -showNoJobsMessage(JFrame, String): void
         -showSaveConfirmDialog(JFrame, int): boolean
         -showExportConfirmDialog(JFrame, String): boolean
