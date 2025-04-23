@@ -152,6 +152,8 @@ public class QuerySuggestionService {
      * This measures the minimum number of single-character edits
      * (insertions, deletions, or substitutions) required to change
      * one string into the other.
+     * Inspired by Geeks for Geeks:
+     * https://www.geeksforgeeks.org/java-program-to-implement-levenshtein-distance-computing-algorithm/
      * 
      * @param s1 First string
      * @param s2 Second string
