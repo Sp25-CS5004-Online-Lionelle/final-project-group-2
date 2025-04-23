@@ -48,6 +48,9 @@
 
 ![Search Correction](./testing_images/image-26.png)
 
+### Query Does Not Exist
+![Query Does Not Exist](./testing_images/QueryDoesNotExist.png)
+
 ### Job Selection
 
 ![Job Selection](./testing_images/image-36.png)
