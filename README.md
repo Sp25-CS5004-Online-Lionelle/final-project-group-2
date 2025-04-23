@@ -121,3 +121,4 @@ The user manual is available in the project directory at:
 
 * CS 5004 Professor Albert and the TAs Esther and Estelita for their guidance and support
 * Bootstrap for color theme inspiration
+* Query Suggestion Service - Levenshtein Distance - https://www.geeksforgeeks.org/java-program-to-implement-levenshtein-distance-computing-algorithm/
