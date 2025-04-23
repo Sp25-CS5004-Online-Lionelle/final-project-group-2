@@ -32,4 +32,3 @@ bin
 # ingore ide files
 .vscode
 idea/
-data/SavedJobs.csv
