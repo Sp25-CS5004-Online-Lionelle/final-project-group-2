@@ -20,7 +20,6 @@
 
 *Also demonstrates: ColorTheme, FindJobTab, IconLoader, SalaryVisualizationPanel, TabStyleManager, ThemedButton*
 
-
 ## 2. Custom Header
 
 ### Dynamic Column Headers
