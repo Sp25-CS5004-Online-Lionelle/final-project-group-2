@@ -16,7 +16,7 @@ repositories {
 }
 
 application {
-    mainClass.set("skillzhunter.SkillzHunterApp") /** Update with your main driver app location */
+    mainClass.set("skillzhunter.SkillzHunterApp")
 }
 
 dependencies {
@@ -24,7 +24,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.10.2'
 
-    // optional, left these in here in case you wanted to use them.
+    
     implementation 'com.github.javaparser:javaparser-symbol-solver-core:3.25.3'
     implementation 'org.apache.commons:commons-lang3:3.14.0'
     implementation 'com.opencsv:opencsv:5.8'
