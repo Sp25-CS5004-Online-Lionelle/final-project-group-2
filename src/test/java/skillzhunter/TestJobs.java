@@ -929,63 +929,116 @@ public void testGetLocations() {
     }
 
     /**
- * Test capitalizing items in a list with special cases.
+     * Test capitalizing items in a list with special cases.
+     */
+    @Test
+    public void testCapitalizeItems() {
+        Map<String, String> specialCases = new HashMap<>();
+        specialCases.put("hr", "HR");
+        specialCases.put("usa", "USA");
+        
+        List<String> items = Arrays.asList(
+            "java developer", "hr manager", "usa job", "python programmer", "it support"
+        );
+        
+        List<String> expected = Arrays.asList(
+            "Java Developer", "HR Manager", "USA Job", "Python Programmer", "It Support"
+        );
+        
+        List<String> result = jobList.capitalizeItems(items, specialCases);
+        assertEquals(expected, result);
+    }
+
+    /**
+     * Test cleaning a job record with various HTML entity types.
+     */
+    @Test
+    public void testCleanJob() {
+        // Create a job with different types of HTML entities
+        JobRecord jobWithEntities = new JobRecord(
+            100,
+            "https://example.com/job",
+            "test-job",
+            "Software &amp; Hardware Engineer",
+            "Tech &amp; Co.",
+            "https://logo.example.com",
+            List.of("Hardware &amp; Software", "R&amp;D"),
+            List.of("Full-time"),
+            "New York, NY &amp; Remote",
+            "Senior",
+            "Job with &#8220;special&#8221; characters &amp; HTML entities",
+            "Details with &lt;strong&gt;formatted&lt;/strong&gt; text",
+            "2025-04-01",
+            120000,
+            150000,
+            "USD",
+            4,
+            "Great &quot;opportunity&quot; with &#x1F600; emoji"
+        );
+        
+        JobRecord cleanedJob = jobList.cleanJob(jobWithEntities);
+        
+        // Check that HTML entities are replaced properly
+        assertEquals("Software & Hardware Engineer", cleanedJob.jobTitle());
+        assertEquals("Tech & Co.", cleanedJob.companyName());
+        assertEquals(List.of("Hardware & Software", "R&D"), cleanedJob.jobIndustry());
+        assertEquals("New York, NY & Remote", cleanedJob.jobGeo());
+        assertEquals("Job with \u201Cspecial\u201D characters & HTML entities", cleanedJob.jobExcerpt());
+        assertEquals("Details with <strong>formatted</strong> text", cleanedJob.jobDescription());
+        assertTrue(cleanedJob.comments().contains("Great \"opportunity\""));
+    }
+
+    /**
+ * Test error handling when saving jobs to an invalid path.
  */
 @Test
-public void testCapitalizeItems() {
-    Map<String, String> specialCases = new HashMap<>();
-    specialCases.put("hr", "HR");
-    specialCases.put("usa", "USA");
+public void testSaveJobsToInvalidPath() {
+    // Create a path that cannot be written to (a file that exists and is a directory)
+    Path invalidPath = tempDir.resolve("directory-not-file");
+    invalidPath.toFile().mkdir();
     
-    List<String> items = Arrays.asList(
-        "java developer", "hr manager", "usa job", "python programmer", "it support"
-    );
+    // This should throw an exception, but it should be wrapped in a RuntimeException
+    Exception exception = assertThrows(RuntimeException.class, () -> {
+        jobList.saveJobsToCsv(invalidPath.toString());
+    });
     
-    List<String> expected = Arrays.asList(
-        "Java Developer", "HR Manager", "USA Job", "Python Programmer", "It Support"
-    );
-    
-    List<String> result = jobList.capitalizeItems(items, specialCases);
-    assertEquals(expected, result);
+    // Verify the exception message contains information about the failure
+    assertTrue(exception.getMessage().contains("Failed") || 
+               exception.getMessage().contains("Error") || 
+               exception.getMessage().contains("Cannot"),
+               "Exception should indicate file write problem");
 }
 
 /**
- * Test cleaning a job record with various HTML entity types.
+ * Test error handling when exporting to an invalid path.
  */
 @Test
-public void testCleanJob() {
-    // Create a job with different types of HTML entities
-    JobRecord jobWithEntities = new JobRecord(
-        100,
-        "https://example.com/job",
-        "test-job",
-        "Software &amp; Hardware Engineer",
-        "Tech &amp; Co.",
-        "https://logo.example.com",
-        List.of("Hardware &amp; Software", "R&amp;D"),
-        List.of("Full-time"),
-        "New York, NY &amp; Remote",
-        "Senior",
-        "Job with &#8220;special&#8221; characters &amp; HTML entities",
-        "Details with &lt;strong&gt;formatted&lt;/strong&gt; text",
-        "2025-04-01",
-        120000,
-        150000,
-        "USD",
-        4,
-        "Great &quot;opportunity&quot; with &#x1F600; emoji"
-    );
+public void testExportToInvalidPath() {
+    // Create a path to a directory that we'll make read-only
+    Path readOnlyPath = tempDir.resolve("readonly-dir");
+    File readOnlyDir = readOnlyPath.toFile();
     
-    JobRecord cleanedJob = jobList.cleanJob(jobWithEntities);
-    
-    // Check that HTML entities are replaced properly
-    assertEquals("Software & Hardware Engineer", cleanedJob.jobTitle());
-    assertEquals("Tech & Co.", cleanedJob.companyName());
-    assertEquals(List.of("Hardware & Software", "R&D"), cleanedJob.jobIndustry());
-    assertEquals("New York, NY & Remote", cleanedJob.jobGeo());
-    assertEquals("Job with \u201Cspecial\u201D characters & HTML entities", cleanedJob.jobExcerpt());
-    assertEquals("Details with <strong>formatted</strong> text", cleanedJob.jobDescription());
-    assertTrue(cleanedJob.comments().contains("Great \"opportunity\""));
+    try {
+        // Create the directory and make it read-only
+        readOnlyDir.mkdir();
+        readOnlyDir.setReadOnly();
+        
+        // Try to export to a file in this directory
+        Path invalidFile = readOnlyPath.resolve("cannot-write.csv");
+        
+        // This should throw a RuntimeException
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            jobList.exportSavedJobs(jobList.getJobRecords(), "CSV", invalidFile.toString());
+        });
+        
+        // Verify the exception message
+        assertTrue(exception.getMessage().contains("Failed") || 
+                   exception.getMessage().contains("Error") || 
+                   exception.getMessage().contains("unable"),
+                   "Exception should indicate file access problem");
+    } finally {
+        // Clean up - make the directory writable again so it can be deleted
+        readOnlyDir.setWritable(true);
+    }
 }
-
 }
