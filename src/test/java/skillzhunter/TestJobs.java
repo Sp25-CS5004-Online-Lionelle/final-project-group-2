@@ -12,8 +12,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import skillzhunter.model.AlertListener;
 import skillzhunter.model.JobRecord;
@@ -924,5 +927,65 @@ public void testGetLocations() {
             fail("Sending alert with no listener should not throw exception: " + e.getMessage());
         }
     }
+
+    /**
+ * Test capitalizing items in a list with special cases.
+ */
+@Test
+public void testCapitalizeItems() {
+    Map<String, String> specialCases = new HashMap<>();
+    specialCases.put("hr", "HR");
+    specialCases.put("usa", "USA");
+    
+    List<String> items = Arrays.asList(
+        "java developer", "hr manager", "usa job", "python programmer", "it support"
+    );
+    
+    List<String> expected = Arrays.asList(
+        "Java Developer", "HR Manager", "USA Job", "Python Programmer", "It Support"
+    );
+    
+    List<String> result = jobList.capitalizeItems(items, specialCases);
+    assertEquals(expected, result);
+}
+
+/**
+ * Test cleaning a job record with various HTML entity types.
+ */
+@Test
+public void testCleanJob() {
+    // Create a job with different types of HTML entities
+    JobRecord jobWithEntities = new JobRecord(
+        100,
+        "https://example.com/job",
+        "test-job",
+        "Software &amp; Hardware Engineer",
+        "Tech &amp; Co.",
+        "https://logo.example.com",
+        List.of("Hardware &amp; Software", "R&amp;D"),
+        List.of("Full-time"),
+        "New York, NY &amp; Remote",
+        "Senior",
+        "Job with &#8220;special&#8221; characters &amp; HTML entities",
+        "Details with &lt;strong&gt;formatted&lt;/strong&gt; text",
+        "2025-04-01",
+        120000,
+        150000,
+        "USD",
+        4,
+        "Great &quot;opportunity&quot; with &#x1F600; emoji"
+    );
+    
+    JobRecord cleanedJob = jobList.cleanJob(jobWithEntities);
+    
+    // Check that HTML entities are replaced properly
+    assertEquals("Software & Hardware Engineer", cleanedJob.jobTitle());
+    assertEquals("Tech & Co.", cleanedJob.companyName());
+    assertEquals(List.of("Hardware & Software", "R&D"), cleanedJob.jobIndustry());
+    assertEquals("New York, NY & Remote", cleanedJob.jobGeo());
+    assertEquals("Job with \u201Cspecial\u201D characters & HTML entities", cleanedJob.jobExcerpt());
+    assertEquals("Details with <strong>formatted</strong> text", cleanedJob.jobDescription());
+    assertTrue(cleanedJob.comments().contains("Great \"opportunity\""));
+}
 
 }
