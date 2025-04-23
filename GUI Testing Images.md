@@ -1,32 +1,33 @@
 # Jobz Hunter GUI Test Images
 
-## MainView
+## 1. MainView
 
-### Main Operation:
+### Main Operation
 
 ![Main View](./testing_images/image-27.png)
 
-### Custom Menu Bar:
+### Custom Menu Bar
 
 ![Menu Bar](./testing_images/image-28.png)
 
-### Menu Bar - Exit Dialogue:
+### Menu Bar - Exit Dialogue
 
 ![Menu Bar - Exit Dialogue](./testing_images/image-29.png)
 
-### Menu Bar - Dark Mode:
+### Menu Bar - Dark Mode
 
 ![Menu Bar - Dark Mode](./testing_images/image-30.png)
 
 *Also demonstrates: ColorTheme, FindJobTab, IconLoader, SalaryVisualizationPanel, TabStyleManager, ThemedButton*
 
-### ColorTheme
 
-## Custom Header
+## 2. Custom Header
+
+### Dynamic Column Headers
 
 ![Custom Header](./testing_images/image-31.png)
 
-## Find Job Tab
+## 3. Find Job Tab
 
 ### Industry Combobox
 
@@ -52,7 +53,7 @@
 
 ![Job Selection](./testing_images/image-36.png)
 
-## Job Details Dialogue
+## 4. Job Details Dialogue
 
 ![Job Details Dialogue](./testing_images/image-37.png)
 
@@ -64,7 +65,7 @@
 
 ![Successful Save Dialogue](./testing_images/image-39.png)
 
-## Saved Job Details Dialogue
+## 5. Saved Job Details Dialogue
 
 ![Saved Job Details Dialogue](./testing_images/image-40.png)
 
@@ -76,7 +77,7 @@
 
 ![Failed Save Dialogue (if already saved)](./testing_images/image-42.png)
 
-## Saved Jobs Tab
+## 6. Saved Jobs Tab
 
 ![Saved Jobs Tab](./testing_images/image-43.png)
 
@@ -111,3 +112,7 @@
 ### Successfully Exported to File Dialogue:
 
 ![Successfully Exported to File Dialogue](./testing_images/image-51.png)
+
+### Successfully Exported File:
+
+![Successfully Exported File](./testing_images/image-52.png)
