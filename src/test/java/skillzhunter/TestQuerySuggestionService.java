@@ -92,42 +92,52 @@ public class TestQuerySuggestionService {
     }
 
     /**
- * Test that suggestions come from common terms first, then from recent queries.
- */
-@Test
-public void testSuggestionPriority() throws Exception {
-    // We need to test common terms vs. recent queries
-    QuerySuggestionService testService = new QuerySuggestionService();
-    
-    // Add a successful query that isn't already in common terms
-    // First, we need to get the commonTerms list through reflection
-    Field commonTermsField = QuerySuggestionService.class.getDeclaredField("commonTerms");
-    commonTermsField.setAccessible(true);
-    @SuppressWarnings("unchecked")
-    List<String> commonTerms = (List<String>)commonTermsField.get(testService);
-    
-    // Find a term not in common terms
-    String uniqueTerm = "uniqueterm";
-    while (commonTerms.contains(uniqueTerm)) {
-        uniqueTerm += "x";
+     * Test that suggestions come from common terms first, then from recent queries.
+     */
+    @Test
+    public void testSuggestionPriority() throws Exception {
+        // We need to test common terms vs. recent queries
+        QuerySuggestionService testService = new QuerySuggestionService();
+        
+        // Add a successful query that isn't already in common terms
+        // First, we need to get the commonTerms list through reflection
+        Field commonTermsField = QuerySuggestionService.class.getDeclaredField("commonTerms");
+        commonTermsField.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        List<String> commonTerms = (List<String>)commonTermsField.get(testService);
+        
+        // Find a term not in common terms
+        String uniqueTerm = "uniqueterm";
+        while (commonTerms.contains(uniqueTerm)) {
+            uniqueTerm += "x";
+        }
+        
+        // Add a misspelled version to recent queries
+        testService.addSuccessfulQuery(uniqueTerm);
+        
+        // Now test a typo - it should suggest from recent queries since it's not in common terms
+        String typo = uniqueTerm.substring(0, uniqueTerm.length() - 1); // Remove last char
+        assertEquals(uniqueTerm, testService.suggestCorrection(typo, 0),
+                    "Should suggest from recent queries for terms not in common terms");
+        
+        // Now add a common term with a similar typo and test again
+        // The suggestion should now come from common terms instead
+        String commonTerm = "developer";
+        assertTrue(commonTerms.contains(commonTerm), "The term 'developer' should be in common terms");
+        
+        // Test a typo that could match both
+        String commonTypo = "develope"; // Missing last char
+        assertEquals(commonTerm, testService.suggestCorrection(commonTypo, 0),
+                    "Should prioritize suggestion from common terms over recent queries");
     }
-    
-    // Add a misspelled version to recent queries
-    testService.addSuccessfulQuery(uniqueTerm);
-    
-    // Now test a typo - it should suggest from recent queries since it's not in common terms
-    String typo = uniqueTerm.substring(0, uniqueTerm.length() - 1); // Remove last char
-    assertEquals(uniqueTerm, testService.suggestCorrection(typo, 0),
-                "Should suggest from recent queries for terms not in common terms");
-    
-    // Now add a common term with a similar typo and test again
-    // The suggestion should now come from common terms instead
-    String commonTerm = "developer";
-    assertTrue(commonTerms.contains(commonTerm), "The term 'developer' should be in common terms");
-    
-    // Test a typo that could match both
-    String commonTypo = "develope"; // Missing last char
-    assertEquals(commonTerm, testService.suggestCorrection(commonTypo, 0),
-                "Should prioritize suggestion from common terms over recent queries");
-}
+
+    /**
+     * Test that the service can handle empty strings.
+     */
+    @Test
+    public void testEmptyString() {
+        // Test empty string input
+        assertNull(service.suggestCorrection("", 0), 
+                  "Empty string should return null");
+    }
 }
