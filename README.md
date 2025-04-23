@@ -41,6 +41,32 @@ Skillz Hunter follows the Model-View-Controller (MVC) architectural pattern:
 * **View**: Handles UI components and user interaction
 * **Controller**: Coordinates between Model and View
 
+## Design Choices
+
+Our development approach was guided by several key architectural and technical decisions:
+
+### Architectural Design
+* **Strict MVC Pattern**: Clear separation between Model, View, and Controller components for maintainable and testable code
+* **Interface-Driven Development**: Core functionality is defined through interfaces (IModel, IView, IController) to promote loose coupling and enable component substitution
+* **Observer Pattern**: Implemented a robust alert system using AlertListener and AlertObserver interfaces for flexible, event-driven communication between components
+
+### Technical Implementation
+* **Comprehensive Testing**: Extensive unit tests for all components, including dedicated tests for controller functionality and alert mechanism
+* **Data Sanitization**: HTML entity processing and proper escaping for all job data to prevent rendering issues and potential security vulnerabilities
+* **Flexible Data Formatting**: Support for multiple export formats (CSV, JSON, XML) with specialized formatters
+* **Error Handling**: Graceful handling of API errors, network issues, and malformed data with appropriate user feedback
+
+### User Experience
+* **Enhanced Search**: Implementation of NLP techniques like Levenshtein distance for typo correction and query suggestions
+* **Progressive Disclosure**: Complex information is presented in stages to avoid overwhelming users
+* **Responsive Design**: UI components dynamically resize based on content and viewport
+
+### Project Structure
+* **Package Organization**: Code organized into logical packages (model, view, controller, formatters) for clear separation of concerns
+* **Consistent API Design**: Standardized method signatures and parameter conventions across the codebase
+
+These design choices ensure that Skillz Hunter is not only functional but also maintainable, modular, and user-friendly.
+
 ## Design Documents
 
 The application design documentation is available at:
