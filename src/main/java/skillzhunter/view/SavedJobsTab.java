@@ -64,8 +64,8 @@ public class SavedJobsTab extends JobView {
         
         // Use IconLoader to load icons
         this.openIcon = IconLoader.loadIcon("images/open.png");
-        this.saveIcon = IconLoader.loadIcon("images/saveIcon.png");
-        this.exportIcon = IconLoader.loadIcon("images/exportIcon.png");
+        this.saveIcon = IconLoader.loadIcon("images/save-icon.png");
+        this.exportIcon = IconLoader.loadIcon("images/export-icon.png");
         this.warningIcon = IconLoader.loadIcon("images/warning.png");
         this.successIcon = IconLoader.loadIcon("images/success.png");
         this.editIcon = IconLoader.loadIcon("images/edit.png");
