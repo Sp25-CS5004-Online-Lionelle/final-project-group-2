@@ -18,6 +18,12 @@ Skillz Hunter is a desktop application designed to help users find and manage jo
 
 ## Features
 * **Search Jobs**: Find jobs by title, industry, and location and gives suggestions for searches based on key words
+* * **Query Suggestions**: The application incorporates Natural Language Processing techniques for search queries, including:
+  * Levenshtein distance algorithm to detect and correct typos in search terms
+  * Query suggestion system that learns from successful searches
+  * Special case handling for missing or incorrect characters
+  * Priority-based suggestion system that considers both common industry terms and user's recent successful queries
+
 * **View Job Details**: See comprehensive information about each job including salary ranges using an API
 * **Save Jobs**: Store jobs you're interested in for later reference
 * **Sort Jobs**: Sort jobs by name and amount
@@ -39,6 +45,8 @@ Skillz Hunter follows the Model-View-Controller (MVC) architectural pattern:
 
 The application design documentation is available at:
 [Skillz Hunter Design Mural](https://app.mural.co/t/groupproblems2087/m/groupproblems2087/1742423271814/5fb4f317643ee8030903040824290d9a37dc10c5)
+The final design UML can be found:
+[Mermaid UML](/DesignDocuments/README.md)
 
 ## User Manual
 
