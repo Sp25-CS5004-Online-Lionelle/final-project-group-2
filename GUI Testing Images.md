@@ -111,3 +111,12 @@
 ### Successfully Exported to File Dialogue:
 
 ![Successfully Exported to File Dialogue](./testing_images/image-51.png)
+
+### Export File:
+![Export File](./testing_images/newsavedjobs.png)
+
+### Exit Automatically Saves to Database:
+![Exit](./testing_images/exit.png)
+
+### Saved Jobs Loads With New Job From Database:
+![SavedJobsLoadsNewJob](./testing_images/SavedJobsLoadsNewJob.png)
