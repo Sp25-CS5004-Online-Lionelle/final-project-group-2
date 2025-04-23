@@ -52,18 +52,29 @@ The user manual is available in the project directory at:
 
 ## Installation and Running the Application
 
-### Build and Run from Source
+### Option 1: Run from VSCode
+
+1. Clone the repository:
+    - https://github.com/Sp25-CS5004-Online-Lionelle/final-project-group-2/
+2. Open the project folder in Visual Studio Code.
+3. Open the file:
+    - src/skillzhunter/SkillsHunterApp.java
+4. Click the Run button in the top right corner of the editor or right-click the file and select "Run Java".
+5. Make sure the Java extension is installed and your Java environment is properly set up in VSCode.
+
+### Option 2: Build and Run from Source
 
 1. Clone the repository: 
     - https://github.com/Sp25-CS5004-Online-Lionelle/final-project-group-2/
 2. Navigate to the project directory:
-   - cd skillzhunter
+    - cd skillzhunter
 3. Compile the project:
-   - javac -d bin src/skillzhunter/*.java
-4. Build gradle
-   - gradle clean build
+    - javac -d bin src/skillzhunter/*.java
+4. Build with Gradle:
+    - gradle clean build
 5. Run the application:
-   - java -cp bin skillzhunter.SkillsHunterApp
+    - java -cp bin skillzhunter.SkillsHunterApp
+
 ## Key Implementation Details
 
 * **Theme Management**: The application supports both light and dark themes with consistent styling across all components. The light theme uses Bootstrap 5 colors with Spotify green accents, while the dark theme uses a teal-based color scheme.
