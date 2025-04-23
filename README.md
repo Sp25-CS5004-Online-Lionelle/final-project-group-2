@@ -18,6 +18,12 @@ Skillz Hunter is a desktop application designed to help users find and manage jo
 
 ## Features
 * **Search Jobs**: Find jobs by title, industry, and location and gives suggestions for searches based on key words
+* * **Query Suggestions**: The application incorporates Natural Language Processing techniques for search queries, including:
+  * Levenshtein distance algorithm to detect and correct typos in search terms
+  * Query suggestion system that learns from successful searches
+  * Special case handling for missing or incorrect characters
+  * Priority-based suggestion system that considers both common industry terms and user's recent successful queries
+
 * **View Job Details**: See comprehensive information about each job including salary ranges using an API
 * **Save Jobs**: Store jobs you're interested in for later reference
 * **Sort Jobs**: Sort jobs by name and amount
@@ -35,10 +41,38 @@ Skillz Hunter follows the Model-View-Controller (MVC) architectural pattern:
 * **View**: Handles UI components and user interaction
 * **Controller**: Coordinates between Model and View
 
+## Design Choices
+
+Our development approach was guided by several key architectural and technical decisions:
+
+### Architectural Design
+* **Strict MVC Pattern**: Clear separation between Model, View, and Controller components for maintainable and testable code
+* **Interface-Driven Development**: Core functionality is defined through interfaces (IModel, IView, IController) to promote loose coupling and enable component substitution
+* **Observer Pattern**: Implemented a robust alert system using AlertListener and AlertObserver interfaces for flexible, event-driven communication between components
+
+### Technical Implementation
+* **Comprehensive Testing**: Extensive unit tests for all components, including dedicated tests for controller functionality and alert mechanism
+* **Data Sanitization**: HTML entity processing and proper escaping for all job data to prevent rendering issues and potential security vulnerabilities
+* **Flexible Data Formatting**: Support for multiple export formats (CSV, JSON, XML) with specialized formatters
+* **Error Handling**: Graceful handling of API errors, network issues, and malformed data with appropriate user feedback
+
+### User Experience
+* **Enhanced Search**: Implementation of NLP techniques like Levenshtein distance for typo correction and query suggestions
+* **Progressive Disclosure**: Complex information is presented in stages to avoid overwhelming users
+* **Responsive Design**: UI components dynamically resize based on content and viewport
+
+### Project Structure
+* **Package Organization**: Code organized into logical packages (model, view, controller, formatters) for clear separation of concerns
+* **Consistent API Design**: Standardized method signatures and parameter conventions across the codebase
+
+These design choices ensure that Skillz Hunter is not only functional but also maintainable, modular, and user-friendly.
+
 ## Design Documents
 
 The application design documentation is available at:
 [Skillz Hunter Design Mural](https://app.mural.co/t/groupproblems2087/m/groupproblems2087/1742423271814/5fb4f317643ee8030903040824290d9a37dc10c5)
+The final design UML can be found:
+[Mermaid UML](/DesignDocuments/README.md)
 
 ## User Manual
 
