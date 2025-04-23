@@ -593,7 +593,7 @@ public class TestJobs {
         testableJobs.setAlertListener(mockAlertListener);
         
         // Test with a query that shouldn't get a suggestion (too short)
-        String suggestion = testableJobs.suggestQueryCorrection("xy", 0);
+        String suggestion = testableJobs.suggestQueryCorrection("x", 0);
         assertNull(suggestion);
     }
 
