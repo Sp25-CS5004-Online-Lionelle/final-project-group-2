@@ -12,10 +12,9 @@ Skillz Hunter is a desktop application designed to help users find and manage jo
 * Judson Tallandier - https://github.com/iamjtii
 * Tor Ekstrom - https://github.com/tekstrom11
 
-## View My App (GUI Mode)
-- View Full CRUD
-  ![View](./data/images/skillzhunter.gif)
-    *Figure 1: View of the record with hostname "www.northeastern.edu" in GUI mode*
+## View My App
+![View](./data/images/skillzhunter.gif)
+* View of full CRUD operations
 
 ## Features
 * **Search Jobs**: Find jobs by title, industry, and location and gives suggestions for searches based on key words
