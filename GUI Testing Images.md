@@ -49,6 +49,9 @@
 
 ![Search Correction](./testing_images/image-26.png)
 
+### Query Does Not Exist
+![Query Does Not Exist](./testing_images/QueryDoesNotExist.png)
+
 ### Job Selection
 
 ![Job Selection](./testing_images/image-36.png)
@@ -113,6 +116,11 @@
 
 ![Successfully Exported to File Dialogue](./testing_images/image-51.png)
 
-### Successfully Exported File:
+### Export File:
+![Export File](./testing_images/newsavedjobs.png)
 
-![Successfully Exported File](./testing_images/image-52.png)
+### Exit Automatically Saves to Database:
+![Exit](./testing_images/exit.png)
+
+### Saved Jobs Loads With New Job From Database:
+![SavedJobsLoadsNewJob](./testing_images/SavedJobsLoadsNewJob.png)
