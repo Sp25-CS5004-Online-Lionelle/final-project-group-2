@@ -72,7 +72,7 @@ public class FindJobTab extends JobView {
         this.industries = controller.getIndustries().toArray(new String[0]);
 
         // Load icons into map with simple loop
-        String[] iconNames = {"open", "saveIcon", "warning", "lightbulb", "success"};
+        String[] iconNames = {"open", "save-icon", "warning", "lightbulb", "success"};
         for (String name : iconNames) {
             icons.put(name, IconLoader.loadIcon("images/" + name + ".png"));
         }
@@ -383,7 +383,7 @@ public class FindJobTab extends JobView {
         // Create buttons with array
         String[][] buttonProps = {
             {"Open", "PRIMARY", "open", "open"}, 
-            {"Save", "SUCCESS", "saveIcon", "save"}
+            {"Save", "SUCCESS", "save-icon", "save"}
         };
         
         for (String[] props : buttonProps) {

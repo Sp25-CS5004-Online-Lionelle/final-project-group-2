@@ -115,7 +115,7 @@ public class CustomMenuBar extends JPanel {
         button.setPreferredSize(new Dimension(SETTINGS_WIDTH, 24));
         
         // Set default icon using IconLoader
-        ImageIcon icon = IconLoader.loadIcon("images/SettingsIcon.png", 24, 24);
+        ImageIcon icon = IconLoader.loadIcon("images/settings-icon.png", 24, 24);
         if (icon != null) {
             button.setIcon(icon);
         } else {
@@ -150,13 +150,13 @@ public class CustomMenuBar extends JPanel {
         JMenu viewMenu = new JMenu("View Mode");
         
         // Use IconLoader to load light mode and dark mode icons
-        ImageIcon lightModeIcon = IconLoader.loadIcon("images/LightModeIcon.png", 12, 12);
+        ImageIcon lightModeIcon = IconLoader.loadIcon("images/light-mode-icon.png", 12, 12);
         lightModeItem = new JMenuItem("Light Mode");
         if (lightModeIcon != null) {
             lightModeItem.setIcon(lightModeIcon);
         }
         
-        ImageIcon darkModeIcon = IconLoader.loadIcon("images/DarkModeIcon.png", 12, 12);
+        ImageIcon darkModeIcon = IconLoader.loadIcon("images/dark-mode-icon.png", 12, 12);
         darkModeItem = new JMenuItem("Dark Mode");
         if (darkModeIcon != null) {
             darkModeItem.setIcon(darkModeIcon);
@@ -196,12 +196,12 @@ public class CustomMenuBar extends JPanel {
         boolean isDarkTheme = isDarkColor(theme.getBackground());
         
         if (isDarkTheme) {
-            ImageIcon whiteSettingsIcon = IconLoader.loadIcon("images/settingswhite.png", 24, 24);
+            ImageIcon whiteSettingsIcon = IconLoader.loadIcon("images/settings-white.png", 24, 24);
             if (whiteSettingsIcon != null) {
                 settingsButton.setIcon(whiteSettingsIcon);
             }
         } else {
-            ImageIcon normalSettingsIcon = IconLoader.loadIcon("images/SettingsIcon.png", 24, 24);
+            ImageIcon normalSettingsIcon = IconLoader.loadIcon("images/settings-icon.png", 24, 24);
             if (normalSettingsIcon != null) {
                 settingsButton.setIcon(normalSettingsIcon);
             }
