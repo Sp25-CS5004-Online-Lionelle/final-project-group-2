@@ -3,6 +3,7 @@ package skillzhunter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.MockedStatic;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -27,6 +28,7 @@ import skillzhunter.model.net.JobBoardApiResult;
 /**
  * Comprehensive test class for Jobs model functionality.
  * Covers CRUD operations, search functionality, file operations, and edge cases.
+ * Updated to use static mocking for JobBoardApi.
  */
 public class TestJobs {
     private Jobs jobList;
@@ -39,55 +41,11 @@ public class TestJobs {
     static Path tempDir;
 
     /**
-     * Fake JobBoardApi implementation for testing.
-     * This class returns controlled results instead of making real API calls.
-     */
-    class FakeJobBoardApi extends JobBoardApi {
-        private List<JobRecord> results;
-        private String errorMessage;
-        
-        // This will be used for testing search
-        public FakeJobBoardApi(List<JobRecord> results, String errorMessage) {
-            this.results = results;
-            this.errorMessage = errorMessage;
-        }
-        
-        @Override
-        public JobBoardApiResult getJobBoard(String query, Integer numberOfResults, String location, String industry) {
-            // Track the parameters for verification in tests if needed
-            this.lastQuery = query;
-            this.lastNumberOfResults = numberOfResults;
-            this.lastLocation = location;
-            this.lastIndustry = industry;
-            
-            return new JobBoardApiResult(results, errorMessage);
-        }
-        
-        // Fields to record parameters for verification
-        private String lastQuery;
-        private Integer lastNumberOfResults;
-        private String lastLocation;
-        private String lastIndustry;
-        
-        // Getters for verification
-        public String getLastQuery() { return lastQuery; }
-        public Integer getLastNumberOfResults() { return lastNumberOfResults; }
-        public String getLastLocation() { return lastLocation; }
-        public String getLastIndustry() { return lastIndustry; }
-    }
-
-    /**
      * Create a fresh Jobs instance for testing.
      * This ensures we have a clean state for each test.
      */
     private Jobs createFreshJobsList() {
-        Jobs jobs = new Jobs() {
-            // Override to avoid loading from file in tests
-            @Override
-            protected JobBoardApi createJobBoardApi() {
-                return new FakeJobBoardApi(new ArrayList<>(), null);
-            }
-        };
+        Jobs jobs = new Jobs();
         jobs.setAlertListener(mockAlertListener);
         return jobs;
     }
@@ -432,38 +390,32 @@ public class TestJobs {
     }
     
     /**
-     * Test searching for jobs with a fake API.
+     * Test searching for jobs with a mock static API.
      */
     @Test
     public void testSearchJobs() {
-        // Create a fake JobBoardApi with controlled results
-        final FakeJobBoardApi fakeApi = new FakeJobBoardApi(
-            List.of(jobRecord1, jobRecord2),
-            null
-        );
-        
-        // Create a Jobs instance that uses our fake API
-        Jobs testableJobs = new Jobs() {
-            @Override
-            protected JobBoardApi createJobBoardApi() {
-                return fakeApi;
-            }
-        };
-        testableJobs.setAlertListener(mockAlertListener);
-        
-        // Perform the search
-        List<JobRecord> results = testableJobs.searchJobs("python", 2, "New York", "Technology");
-        
-        // Verify the results
-        assertEquals(2, results.size());
-        assertEquals(jobRecord1.id(), results.get(0).id());
-        assertEquals(jobRecord2.id(), results.get(1).id());
-        
-        // Verify parameters were passed correctly to the API
-        assertEquals("python", fakeApi.getLastQuery());
-        assertEquals(Integer.valueOf(2), fakeApi.getLastNumberOfResults());
-        assertEquals("New York", fakeApi.getLastLocation());
-        assertEquals("Technology", fakeApi.getLastIndustry());
+        // Use MockedStatic to mock the static JobBoardApi methods
+        try (MockedStatic<JobBoardApi> mockedApi = mockStatic(JobBoardApi.class)) {
+            // Setup the mock to return our controlled results
+            JobBoardApiResult mockResult = new JobBoardApiResult(
+                List.of(jobRecord1, jobRecord2),
+                null
+            );
+            
+            mockedApi.when(() -> JobBoardApi.getJobBoard("python", 2, "New York", "Technology"))
+                    .thenReturn(mockResult);
+            
+            // Perform the search
+            List<JobRecord> results = jobList.searchJobs("python", 2, "New York", "Technology");
+            
+            // Verify the results
+            assertEquals(2, results.size());
+            assertEquals(jobRecord1.id(), results.get(0).id());
+            assertEquals(jobRecord2.id(), results.get(1).id());
+            
+            // Verify the method was called with the correct parameters
+            mockedApi.verify(() -> JobBoardApi.getJobBoard("python", 2, "New York", "Technology"));
+        }
     }
     
     /**
@@ -471,58 +423,52 @@ public class TestJobs {
      */
     @Test
     public void testSearchJobsWithError() {
-        // Create a fake JobBoardApi that returns an error
-        String errorMessage = "Error searching for jobs";
-        final FakeJobBoardApi fakeApi = new FakeJobBoardApi(
-            Collections.emptyList(),
-            errorMessage
-        );
-        
-        // Create a Jobs instance that uses our fake API
-        Jobs testableJobs = new Jobs() {
-            @Override
-            protected JobBoardApi createJobBoardApi() {
-                return fakeApi;
-            }
-        };
-        testableJobs.setAlertListener(mockAlertListener);
-        
-        // Perform the search
-        List<JobRecord> results = testableJobs.searchJobs("python", 2, "New York", "Technology");
-        
-        // Verify the results are empty because of the error
-        assertTrue(results.isEmpty());
-        
-        // Verify the error message was sent to the alert listener
-        verify(mockAlertListener).onAlert(errorMessage);
+        // Use MockedStatic to mock the static JobBoardApi methods
+        try (MockedStatic<JobBoardApi> mockedApi = mockStatic(JobBoardApi.class)) {
+            // Setup the mock to return an error
+            String errorMessage = "Error searching for jobs";
+            JobBoardApiResult mockResult = new JobBoardApiResult(
+                Collections.emptyList(),
+                errorMessage
+            );
+            
+            mockedApi.when(() -> JobBoardApi.getJobBoard("python", 2, "New York", "Technology"))
+                    .thenReturn(mockResult);
+            
+            // Perform the search
+            List<JobRecord> results = jobList.searchJobs("python", 2, "New York", "Technology");
+            
+            // Verify the results are empty because of the error
+            assertTrue(results.isEmpty());
+            
+            // Verify the error message was sent to the alert listener
+            verify(mockAlertListener).onAlert(errorMessage);
+        }
     }
     
-
     /**
-     * Test suggestion for a query with a typo.
+     * Test suggestion for a query with a typo using static API.
      */
     @Test
     public void testQuerySuggestionForTypo() {
-        // Create a Jobs instance with our fake API
-        final FakeJobBoardApi fakeApi = new FakeJobBoardApi(
-            List.of(jobRecord1, jobRecord2),
-            null
-        );
-        
-        Jobs testableJobs = new Jobs() {
-            @Override
-            protected JobBoardApi createJobBoardApi() {
-                return fakeApi;
-            }
-        };
-        testableJobs.setAlertListener(mockAlertListener);
-        
-        // First do a successful search to add "python" to the recent queries
-        testableJobs.searchJobs("python", 10, "any", "any");
-        
-        // Test query suggestion for a typo
-        String suggestion = testableJobs.suggestQueryCorrection("pythom", 0);
-        assertEquals("python", suggestion);
+        // Use MockedStatic to mock the static JobBoardApi methods
+        try (MockedStatic<JobBoardApi> mockedApi = mockStatic(JobBoardApi.class)) {
+            // Setup the mock to return success for a search
+            JobBoardApiResult mockResult = new JobBoardApiResult(
+                List.of(jobRecord1, jobRecord2),
+                null
+            );
+            
+            mockedApi.when(() -> JobBoardApi.getJobBoard("python", 10, "any", "any"))
+                    .thenReturn(mockResult);
+            
+            // First do a successful search to add "python" to the recent queries
+            jobList.searchJobs("python", 10, "any", "any");
+            
+            // Test query suggestion for a typo
+            String suggestion = jobList.suggestQueryCorrection("pythom", 0);
+            assertEquals("python", suggestion);
+        }
     }
 
     /**
@@ -530,22 +476,9 @@ public class TestJobs {
      */
     @Test
     public void testQuerySuggestionForCommonTerm() {
-        // Create a Jobs instance with our fake API
-        final FakeJobBoardApi fakeApi = new FakeJobBoardApi(
-            List.of(jobRecord1, jobRecord2),
-            null
-        );
-        
-        Jobs testableJobs = new Jobs() {
-            @Override
-            protected JobBoardApi createJobBoardApi() {
-                return fakeApi;
-            }
-        };
-        testableJobs.setAlertListener(mockAlertListener);
-        
-        // Test with a query that should match a common term
-        String suggestion = testableJobs.suggestQueryCorrection("jaba", 0);
+        // Create a simple test case for common term matching
+        // No mock needed since this functionality doesn't rely on JobBoardApi
+        String suggestion = jobList.suggestQueryCorrection("jaba", 0);
         assertEquals("java", suggestion);
     }
 
@@ -554,22 +487,8 @@ public class TestJobs {
      */
     @Test
     public void testNoSuggestionForUnrelatedQuery() {
-        // Create a Jobs instance with our fake API
-        final FakeJobBoardApi fakeApi = new FakeJobBoardApi(
-            List.of(jobRecord1, jobRecord2),
-            null
-        );
-        
-        Jobs testableJobs = new Jobs() {
-            @Override
-            protected JobBoardApi createJobBoardApi() {
-                return fakeApi;
-            }
-        };
-        testableJobs.setAlertListener(mockAlertListener);
-        
-        // Test with a query that shouldn't get a suggestion (too different)
-        String suggestion = testableJobs.suggestQueryCorrection("xyzabc", 0);
+        // No mock needed since this functionality doesn't rely on JobBoardApi
+        String suggestion = jobList.suggestQueryCorrection("xyzabc", 0);
         assertNull(suggestion);
     }
 
@@ -578,22 +497,8 @@ public class TestJobs {
      */
     @Test
     public void testNoSuggestionForShortQuery() {
-        // Create a Jobs instance with our fake API
-        final FakeJobBoardApi fakeApi = new FakeJobBoardApi(
-            List.of(jobRecord1, jobRecord2),
-            null
-        );
-        
-        Jobs testableJobs = new Jobs() {
-            @Override
-            protected JobBoardApi createJobBoardApi() {
-                return fakeApi;
-            }
-        };
-        testableJobs.setAlertListener(mockAlertListener);
-        
-        // Test with a query that shouldn't get a suggestion (too short)
-        String suggestion = testableJobs.suggestQueryCorrection("x", 0);
+        // No mock needed since this functionality doesn't rely on JobBoardApi
+        String suggestion = jobList.suggestQueryCorrection("x", 0);
         assertNull(suggestion);
     }
 
@@ -602,22 +507,8 @@ public class TestJobs {
      */
     @Test
     public void testNoSuggestionWithResults() {
-        // Create a Jobs instance with our fake API
-        final FakeJobBoardApi fakeApi = new FakeJobBoardApi(
-            List.of(jobRecord1, jobRecord2),
-            null
-        );
-        
-        Jobs testableJobs = new Jobs() {
-            @Override
-            protected JobBoardApi createJobBoardApi() {
-                return fakeApi;
-            }
-        };
-        testableJobs.setAlertListener(mockAlertListener);
-        
-        // Test with a query that shouldn't get a suggestion (has results)
-        String suggestion = testableJobs.suggestQueryCorrection("python", 5);
+        // No mock needed since this functionality doesn't rely on JobBoardApi
+        String suggestion = jobList.suggestQueryCorrection("python", 5);
         assertNull(suggestion);
     }
 
@@ -692,6 +583,9 @@ public class TestJobs {
         assertEquals("Unsupported format: INVALID", exception.getMessage());
     }
     
+    /**
+     * Test getIndustries with mocked data.
+     */
     @Test
     public void testGetIndustries() {
         // Create a Jobs class with mocked industry data
@@ -713,25 +607,28 @@ public class TestJobs {
         assertTrue(industries.contains("any"));
     }
 
-@Test
-public void testGetLocations() {
-    // Create a Jobs class with mocked location data
-    Jobs jobsWithMockData = new Jobs() {
-        @Override
-        public List<String> getLocations() {
-            return List.of("anywhere", "australia", "china", "austria");
-        }
-    };
-    
-    List<String> locations = jobsWithMockData.getLocations();
-    assertNotNull(locations);
-    
-    // Test specific locations
-    assertTrue(locations.contains("anywhere"));
-    assertTrue(locations.contains("australia"));
-    assertTrue(locations.contains("china"));
-    assertTrue(locations.contains("austria"));
-}
+    /**
+     * Test getLocations with mocked data.
+     */
+    @Test
+    public void testGetLocations() {
+        // Create a Jobs class with mocked location data
+        Jobs jobsWithMockData = new Jobs() {
+            @Override
+            public List<String> getLocations() {
+                return List.of("anywhere", "australia", "china", "austria");
+            }
+        };
+        
+        List<String> locations = jobsWithMockData.getLocations();
+        assertNotNull(locations);
+        
+        // Test specific locations
+        assertTrue(locations.contains("anywhere"));
+        assertTrue(locations.contains("australia"));
+        assertTrue(locations.contains("china"));
+        assertTrue(locations.contains("austria"));
+    }
     
     /**
      * Test sending an alert through the alert listener.
@@ -765,6 +662,7 @@ public void testGetLocations() {
         // Verify exactly 2 calls were made to onAlert
         verify(mockAlertListener, times(2)).onAlert(any());
     }
+    
     /**
      * Test that test mode is correctly detected.
      * This is a bit meta - testing the test detection itself.
@@ -1041,6 +939,7 @@ public void testGetLocations() {
             readOnlyDir.setWritable(true);
         }
     }
+    
     /**
      * Test adding a malformed job record with invalid data.
      */
