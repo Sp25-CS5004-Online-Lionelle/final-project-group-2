@@ -136,9 +136,6 @@ Port over from HW 9 => helper functions for get request
 ```
 
 # Final UML
-```
-
-# Final Design
 ```mermaid
 ---
 config:
@@ -341,7 +338,6 @@ namespace model {
         -alertListener: AlertListener
         -jobList: List~JobRecord~
         -runs: int
-        -api: JobBoardApi
         -static final DEFAULT_SAVED_JOBS_PATH: String
         -isTestMode: boolean
         -isInitialSearch: boolean
@@ -349,7 +345,6 @@ namespace model {
         +Jobs()
         +setAlertListener(AlertListener): void
         -isRunningInTestEnvironment(): boolean
-        #createJobBoardApi(): JobBoardApi
         +getIndustries(): List~String~
         +getLocations(): List~String~
         +addJob(JobRecord): void
@@ -517,19 +512,19 @@ namespace model.formatters {
 
 namespace model.net {
     class JobBoardApi {
+        <<utility>>
         -static CLIENT: OkHttpClient
         -static OBJECT_MAPPER: ObjectMapper
         -static INDUSTRY_MAP: Map~String, String~
         -static LOCATION_MAP: Map~String, String~
-        -errorMessage: String
-        +JobBoardApi()
+        -JobBoardApi()
         +static loadCsvData(String, String, String): Map~String, String~
-        +getJobBoard(String): JobBoardApiResult
-        +getJobBoard(String, Integer): JobBoardApiResult
-        +getJobBoard(String, Integer, String): JobBoardApiResult
-        +getJobBoard(String, Integer, String, String): JobBoardApiResult
-        #searchApi(String): List~JobRecord~
-        +main(String[]): void
+        +static getJobBoard(String): JobBoardApiResult
+        +static getJobBoard(String, Integer): JobBoardApiResult
+        +static getJobBoard(String, Integer, String): JobBoardApiResult
+        +static getJobBoard(String, Integer, String, String): JobBoardApiResult
+        +static searchApi(String): List~JobRecord~
+        +static main(String[]): void
     }
     
     class JobBoardApiResult {

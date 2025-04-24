@@ -36,9 +36,6 @@ public class Jobs implements IModel {
     /** Used to track number of times the joblist is accessed.*/
     private int runs = 0;
 
-    /** Object representing the Jobs Api.*/
-    private final JobBoardApi api;
-
     /** Standard path for saved jobs file. */
     private static final String DEFAULT_SAVED_JOBS_PATH = "data/SavedJobs.csv";
 
@@ -48,16 +45,15 @@ public class Jobs implements IModel {
     /** Flag to indicate if this is an initial search on startup. */
     private boolean isInitialSearch = true;
 
-    /** Flag to indicate if suggestion can be provided. */
+    /** Service for providing query suggestions. */
     private final QuerySuggestionService suggestionService = new QuerySuggestionService();
 
     /**
      * Constructor for Jobs class.
-     * Initializes the job list and API.
+     * Initializes the job list.
      */
     public Jobs() {
         this.jobList = new ArrayList<>();
-        this.api = createJobBoardApi();
 
         // Check if running in test environment
         isTestMode = isRunningInTestEnvironment();
@@ -105,16 +101,6 @@ public class Jobs implements IModel {
             }
         }
         return false;
-    }
-
-    /**
-     * Creates a JobBoardApi instance.
-     * This method exists to allow test classes to override it and provide a mock API.
-     * 
-     * @return A JobBoardApi instance
-     */
-    protected JobBoardApi createJobBoardApi() {
-        return new JobBoardApi();
     }
 
     /**
@@ -295,7 +281,8 @@ public class Jobs implements IModel {
                                  ("any".equals(location) || location == null) && 
                                  ("any".equals(industry) || industry == null);
         
-        JobBoardApiResult result = api.getJobBoard(query, numberOfResults, location, industry);
+        // Use static method instead of instance method
+        JobBoardApiResult result = JobBoardApi.getJobBoard(query, numberOfResults, location, industry);
 
         // If there's an error message and this is not an initial generic search, send alert
         if (result.hasError() && !(isInitialSearch && isGenericSearch)) {
