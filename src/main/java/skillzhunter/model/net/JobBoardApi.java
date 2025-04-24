@@ -22,7 +22,11 @@ import skillzhunter.model.JobBean;
 import skillzhunter.model.JobRecord;
 import skillzhunter.model.ResponseRecord;
 
-public class JobBoardApi {
+/**
+ * Utility class for making API calls to the Job Board.
+ * This class provides static methods for fetching job listings from the API.
+ */
+public final class JobBoardApi {
     /** client for making request call.*/
     private static final OkHttpClient CLIENT = new OkHttpClient();
 
@@ -30,22 +34,20 @@ public class JobBoardApi {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     /** map for storing industries and their slugs.*/
-    private static final Map<String, String> INDUSTRY_MAP = JobBoardApi.loadCsvData(
+    private static final Map<String, String> INDUSTRY_MAP = loadCsvData(
     Paths.get("data", "industries.csv").toString(), "industry", "slug");
 
     /** map for storing locations and their slugs.*/
-    private static final Map<String, String> LOCATION_MAP = JobBoardApi.loadCsvData(
+    private static final Map<String, String> LOCATION_MAP = loadCsvData(
     Paths.get("data", "locations.csv").toString(), "location", "slug");
 
-    /** Message to send as an error, defaults to empty.*/
-    private String errorMessage = null;
-
-    /** empty contructor.*/
-    public JobBoardApi() {
-        // empty constructor
+    /** 
+     * Private constructor to prevent instantiation of utility class.
+     */
+    private JobBoardApi() {
+        // Prevent instantiation
     }
     
-
     /**
      * Loads csv data into a map.
      * Decodes HTML entities in the key and value before storing them.
@@ -99,9 +101,9 @@ public class JobBoardApi {
      * - `location`: Must match an entry in `location.csv`. Defaults to "anywhere" if not found.
      * - `industry`: Must match an entry in `industry.csv`. Defaults to "any" if not found.
      * @param query
-     * @return List<JobRecord> list of jobs given criteria
+     * @return JobBoardApiResult containing list of jobs given criteria and any error messages
      */
-    public JobBoardApiResult getJobBoard(String query) {
+    public static JobBoardApiResult getJobBoard(String query) {
         return getJobBoard(query, null, null, null);
     }
 
@@ -114,9 +116,9 @@ public class JobBoardApi {
      * - `industry`: Must match an entry in `industry.csv`. Defaults to "any" if not found.
      * @param query
      * @param numberOfResults
-     * @return List<JobRecord> list of jobs given criteria
+     * @return JobBoardApiResult containing list of jobs given criteria and any error messages
      */
-    public JobBoardApiResult getJobBoard(String query, Integer numberOfResults) {
+    public static JobBoardApiResult getJobBoard(String query, Integer numberOfResults) {
         return getJobBoard(query, numberOfResults, null, null);
     }
 
@@ -130,11 +132,12 @@ public class JobBoardApi {
      * @param query
      * @param numberOfResults
      * @param location
-     * @return List<JobRecord> list of jobs given criteria
+     * @return JobBoardApiResult containing list of jobs given criteria and any error messages
      */
-    public JobBoardApiResult getJobBoard(String query, Integer numberOfResults, String location) {
+    public static JobBoardApiResult getJobBoard(String query, Integer numberOfResults, String location) {
         return getJobBoard(query, numberOfResults, location, null);
     }
+    
     /**
      * Retrieves job records based on the provided query parameters.
      * If any parameter is invalid or not provided, default values are applied:
@@ -143,18 +146,18 @@ public class JobBoardApi {
      * - `location`: Must match an entry in `location.csv`. Defaults to "anywhere" if not found.
      * - `industry`: Must match an entry in `industry.csv`. Defaults to "any" if not found.
      *
-     * The `location.csv` and `industry.csv` files are loaded into memory as maps (`locationsMap` and `industriesMap`),
+     * The `location.csv` and `industry.csv` files are loaded into memory as maps (`LOCATION_MAP` and `INDUSTRY_MAP`),
      * ensuring that only valid locations and industries are used for lookups.
      *
      * @param query Search query for the job board.
      * @param numberOfResults Number of results to return.
      * @param location Location to filter jobs (e.g., city or region).
      * @param industry Industry to filter jobs (e.g., IT, healthcare).
-     * @return List of job records matching the criteria.
+     * @return JobBoardApiResult containing list of jobs and any error message.
      */
-    public JobBoardApiResult getJobBoard(String query, Integer numberOfResults, String location, String industry) {
-        // Reset error message at the start of each call
-        errorMessage = null;
+    public static JobBoardApiResult getJobBoard(String query, Integer numberOfResults, String location, String industry) {
+        // Initialize error message as null
+        String errorMessage = null;
         
         // getting slug for request, if it breaks we default
         if (location != null) {
@@ -223,16 +226,16 @@ public class JobBoardApi {
         }
         System.err.println("URL: " + url);
     
-        List<JobRecord> jobs = this.searchApi(url);
+        List<JobRecord> jobs = searchApi(url);
         return new JobBoardApiResult(jobs, errorMessage);
     }
 
     /**
-     * makes a request to the api and returns the response.
-     * @param url url to make the request to
-     * @return list of job records
+     * Makes a request to the API and returns the response.
+     * @param url URL to make the request to
+     * @return List of job records
      */
-    protected List<JobRecord> searchApi(String url) {
+    public static List<JobRecord> searchApi(String url) {
         Request request = new Request.Builder()
             .url(url)
             .build();
@@ -261,12 +264,11 @@ public class JobBoardApi {
     }
 
     /**
-     * main method for testing.
-     * @param args command line arguments
+     * Main method for testing.
+     * @param args Command line arguments
      */
     public static void main(String[] args) {
-        JobBoardApi api = new JobBoardApi();
-        JobBoardApiResult apiResults = api.getJobBoard("python", 5, "austria", "devops & sysadmin");
+        JobBoardApiResult apiResults = getJobBoard("python", 5, "austria", "devops & sysadmin");
         List<JobRecord> results = apiResults.getJobs();
         System.out.println("Job Records: " + results.size());
         for (JobRecord job : results) {
