@@ -512,7 +512,7 @@ namespace model.net {
         -static OBJECT_MAPPER: ObjectMapper
         -static INDUSTRY_MAP: Map~String, String~
         -static LOCATION_MAP: Map~String, String~
-        -JobBoardApi() <<private>>
+        -JobBoardApi()
         +static loadCsvData(String, String, String): Map~String, String~
         +static getJobBoard(String): JobBoardApiResult
         +static getJobBoard(String, Integer): JobBoardApiResult
