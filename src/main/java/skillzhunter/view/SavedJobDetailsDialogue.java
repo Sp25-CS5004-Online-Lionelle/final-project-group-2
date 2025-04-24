@@ -22,25 +22,26 @@ import skillzhunter.model.JobRecord;
  */
 public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
     
-    // Icons for buttons and dialogs
+    // Icons for buttons and dialogs declared as fields
     /** edit icon. */
-    private static final ImageIcon EDIT_ICON;
+    private static final ImageIcon EDIT_ICON = IconLoader.loadIcon("images/edit.png", 24, 24);
     /** delete icon. */
-    private static final ImageIcon DELETE_ICON;
+    private static final ImageIcon DELETE_ICON = IconLoader.loadIcon("images/delete.png", 24, 24);
     /** close icon. */
-    private static final ImageIcon CLOSE_ICON;
+    private static final ImageIcon CLOSE_ICON = IconLoader.loadIcon("images/close.png", 24, 24);
     /** warning icon. */
-    private static final ImageIcon WARNING_ICON;
+    private static final ImageIcon WARNING_ICON = IconLoader.loadIcon("images/warning.png", 24, 24);
+    
+    // Buttons declared as fields
+    /** Edit button */
+    private static ThemedButton editButton;
+    /** Delete button */
+    private static ThemedButton deleteButton;
+    /** Close button */
+    private static ThemedButton closeButton;
+    
     /** Standard button dimensions. */
     private static final int BUTTON_WIDTH = 100;
-    
-    // Initialize icons
-    static {
-        EDIT_ICON = IconLoader.loadIcon("images/edit.png", 24, 24);
-        DELETE_ICON = IconLoader.loadIcon("images/delete.png", 24, 24);
-        CLOSE_ICON = IconLoader.loadIcon("images/close.png", 24, 24);
-        WARNING_ICON = IconLoader.loadIcon("images/warning.png", 24, 24);
-    }
     
     /**
      * Shows a job details dialog with Edit, Delete, and Close buttons.
@@ -106,10 +107,10 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
     private static JPanel createButtonPanel(JDialog dialog, JobRecord job, IController controller, Component parent) {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         
-        // Create themed buttons
-        ThemedButton editButton = createButton("Edit", ThemedButton.ButtonType.INFO, EDIT_ICON);
-        ThemedButton deleteButton = createButton("Delete", ThemedButton.ButtonType.DANGER, DELETE_ICON);
-        ThemedButton closeButton = createButton("Close", ThemedButton.ButtonType.SECONDARY, CLOSE_ICON);
+        // Create themed buttons using class fields
+        editButton = createButton("Edit", ThemedButton.ButtonType.INFO, EDIT_ICON);
+        deleteButton = createButton("Delete", ThemedButton.ButtonType.DANGER, DELETE_ICON);
+        closeButton = createButton("Close", ThemedButton.ButtonType.SECONDARY, CLOSE_ICON);
         
         // Set consistent button sizes
         int buttonHeight = calculateButtonHeight(editButton, deleteButton, closeButton);
@@ -159,9 +160,9 @@ public class SavedJobDetailsDialogue extends BaseJobDetailsDialogue {
     /**
      * Sets consistent size for all buttons.
      * 
-     * @param deleteButton Delete button to size
      * @param editButton edit button to size
-     * @param closeButton button to size
+     * @param deleteButton Delete button to size
+     * @param closeButton close button to size
      * @param height The height to set
      */
     private static void setButtonSizes(ThemedButton editButton, ThemedButton deleteButton, 
