@@ -14,13 +14,17 @@ import skillzhunter.controller.IController;
  */
 public class JobDetailsDialogue extends BaseJobDetailsDialogue {
 
-    // Icons for buttons and dialogs
+    // Icons for buttons and dialogs declared as fields
     /** info icon. */
     private static final ImageIcon INFO_ICON = IconLoader.loadIcon("images/info.png");
     /** warning icon. */
     private static final ImageIcon WARNING_ICON = IconLoader.loadIcon("images/warning.png");
     /** success icon. */
     private static final ImageIcon SUCCESS_ICON = IconLoader.loadIcon("images/success.png");
+    /** yes button. */
+    private static JButton yesButton;
+    /** no button. */
+    private static JButton noButton;
 
     /**
      * Shows job details when accessed from the Find Jobs tab
@@ -164,8 +168,9 @@ public class JobDetailsDialogue extends BaseJobDetailsDialogue {
                                            JobRecord job, IController controller) {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         
-        JButton yesButton = new JButton("Yes");
-        JButton noButton = new JButton("No");
+        // Initialize buttons as class fields
+        yesButton = new JButton("Yes");
+        noButton = new JButton("No");
         
         // Set consistent size for buttons
         int buttonWidth = 100;

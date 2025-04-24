@@ -136,6 +136,9 @@ Port over from HW 9 => helper functions for get request
 ```
 
 # Final UML
+```
+
+# Final Design
 ```mermaid
 ---
 config:
@@ -818,6 +821,8 @@ namespace view {
         -static INFO_ICON: ImageIcon
         -static WARNING_ICON: ImageIcon
         -static SUCCESS_ICON: ImageIcon
+        -static yesButton: JButton
+        -static noButton: JButton
         +static showJobDetails(Component, JobRecord, List~JobRecord~, IController): void
         -static showFindJobDetails(Component, JobRecord, IController): void
         -static createContentPanel(JobRecord): JPanel
@@ -831,6 +836,9 @@ namespace view {
         -static DELETE_ICON: ImageIcon
         -static CLOSE_ICON: ImageIcon
         -static WARNING_ICON: ImageIcon
+        -static editButton: ThemedButton
+        -static deleteButton: ThemedButton
+        -static closeButton: ThemedButton
         -static BUTTON_WIDTH: int
         +static show(Component, JobRecord, IController): void
         -static validateInputs(Component, JobRecord, IController): boolean
