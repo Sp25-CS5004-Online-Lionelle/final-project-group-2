@@ -2,6 +2,8 @@ package skillzhunter.view;
 
 import java.awt.Image;
 import java.net.URL;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 
@@ -17,6 +19,9 @@ import javax.swing.ImageIcon;
  * - Light/Dark mode menu icons: 12x12
  */
 public final class IconLoader {
+    
+    /** Cache for storing loaded logo images to avoid reloading */
+    private static final Map<String, ImageIcon> LOGO_CACHE = new ConcurrentHashMap<>();
 
     /**
      * Private constructor to prevent instantiation.
@@ -80,7 +85,7 @@ public final class IconLoader {
     }
     
     /**
-     * Attempts to load a company logo from a URL.
+     * Attempts to load a company logo from a URL with caching.
      * If loading fails, returns a default icon.
      * 
      * @param logoUrl The URL of the company logo
@@ -92,6 +97,15 @@ public final class IconLoader {
     public static ImageIcon loadCompanyLogo(String logoUrl, int width, int height, String defaultIconPath) {
         if (logoUrl == null || logoUrl.isEmpty()) {
             return loadIcon(defaultIconPath);
+        }
+        
+        // Generate a cache key that includes dimensions
+        String cacheKey = logoUrl + "_" + width + "x" + height;
+        
+        // Check cache first
+        ImageIcon cachedIcon = LOGO_CACHE.get(cacheKey);
+        if (cachedIcon != null) {
+            return cachedIcon;
         }
         
         try {
@@ -123,7 +137,12 @@ public final class IconLoader {
                 if (image != null) {
                     // Resize the image
                     Image resized = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-                    return new ImageIcon(resized);
+                    ImageIcon icon = new ImageIcon(resized);
+                    
+                    // Cache the icon
+                    LOGO_CACHE.put(cacheKey, icon);
+                    
+                    return icon;
                 } else {
                     System.err.println("Failed to decode logo image");
                     return loadIcon(defaultIconPath);
@@ -133,5 +152,14 @@ public final class IconLoader {
             System.err.println("Error loading company logo from " + logoUrl + ": " + e.getMessage());
             return loadIcon(defaultIconPath);
         }
+    }
+    
+    /**
+     * Clears the logo cache to free memory when no longer needed.
+     * This can be called during application shutdown or when
+     * switching between major views.
+     */
+    public static void clearLogoCache() {
+        LOGO_CACHE.clear();
     }
 }

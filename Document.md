@@ -889,11 +889,13 @@ namespace view {
     class ImageCellRenderer {
         -static IMAGE_WIDTH: int
         -static IMAGE_HEIGHT: int
-        -imageCache: Map~String, ImageIcon~
-        -loadingStatus: Map~String, Boolean~
+        -static SHARED_IMAGE_CACHE: Map~String, ImageIcon~
+        -static SHARED_LOADING_STATUS: Map~String, Boolean~
+        -static LOAD_START_TIMES: Map~String, Long~
         +getTableCellRendererComponent(JTable, Object, boolean, boolean, int, int): Component
-        -loadImageAsync(String, JLabel, JTable): void
+        -loadImageAsync(String, JTable): void
         +clearCache(): void
+        +static isImageCached(String): boolean
     }
     
     class TabStyleManager {
